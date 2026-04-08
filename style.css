@@ -1,0 +1,27 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+}
+
+#map {
+  height: 90vh;
+}
+
+#controls {
+  padding: 10px;
+  text-align: center;
+  background: #111;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* smooth animation */
+.leaflet-interactive {
+  transition: fill 0.4s ease, fill-opacity 0.4s ease;
+}

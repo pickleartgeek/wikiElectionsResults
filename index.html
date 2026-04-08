@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Election Map</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; }
+    #map { height: 90%; width: 100%; }
+    #controls { padding: 5px; text-align: center; }
+    #controls button { margin: 0 5px; padding: 5px 10px; }
+  </style>
+</head>
+<body>
+
+<div id="controls">
+  <button onclick="switchRace('class 4')">Class 4</button>
+  <button onclick="switchRace('class 5')">Class 5</button>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
