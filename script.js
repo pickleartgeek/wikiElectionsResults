@@ -243,26 +243,23 @@ fetch('your-geojson.geojson')
 // LOAD RESULTS
 // =====================
 async function loadResults() {
-  const res = await fetch('results.json');
-  results = await res.json();
+function loadResults() {
+  fetch('results.json')
+    .then(res => res.json())
+    .then(data => {
+      results = data;
 
-  if (geojsonLayer) geojsonLayer.setStyle(style);
+      console.log("Results loaded:", results);
 
-  showStatewideResults();
-}
+      if (geojsonLayer) {
+        geojsonLayer.setStyle(style);
+      }
 
-setInterval(loadResults, 10000);
-loadResults();
-
-async function loadResults() {
-  const res = await fetch('results.json');
-  results = await res.json();
-
-  console.log("RESULTS LOADED:", results);
-
-  if (geojsonLayer) geojsonLayer.setStyle(style);
-
-  showStatewideResults();
+      showStatewideResults();
+    })
+    .catch(err => {
+      console.log("Results failed to load:", err);
+    });
 }
 
 // =====================
