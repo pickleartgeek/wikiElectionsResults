@@ -87,14 +87,9 @@ body, html {
   margin-top: 2px;
 }
 
-/* =====================
-   MOBILE FRIENDLY OVERRIDES
-   ===================== */
+/* Mobile adjustments */
 @media (max-width: 768px) {
-  #container {
-    flex-direction: column;
-  }
-
+  #container { flex-direction: column; }
   #sidebar {
     width: 100%;
     max-height: 40vh;
@@ -102,25 +97,9 @@ body, html {
     border-right: none;
     border-bottom: 1px solid #ddd;
   }
-
-  #map {
-    height: 60vh;
-  }
-
-  #resultsTableContainer {
-    max-height: 25vh;
-    overflow-y: auto;
-  }
-
-  .vote-bar {
-    height: 10px;
-  }
-
-  #winnerBanner {
-    font-size: 14px;
-  }
-
-  #resultsTable td {
-    padding: 10px 4px;
-  }
+  #map { height: 60vh; }
+  #resultsTableContainer { max-height: 25vh; overflow-y: auto; }
+  .vote-bar { height: 10px; }
+  #winnerBanner { font-size: 14px; }
+  #resultsTable td { padding: 10px 4px; }
 }
