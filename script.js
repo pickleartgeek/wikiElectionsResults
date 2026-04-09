@@ -155,14 +155,20 @@ function onEachFeature(feature, layer) {
   const id = String(feature.properties.id);
   const name = feature.properties.NAME;
 
-  // Mobile-friendly: only tap/click
-  layer.on("click", () => {
-    const c = results[currentRace]?.[id];
+  // Mobile-friendly: only tap/click to show per-group results
+  layer.on("click", function(e) {
+    const raceData = results[currentRace];
+    if (!raceData) return;
+
+    const c = raceData[id];
     if (!c) return;
+
     updateTable(c, name);
+
+    // Stop click from propagating to map background
+    e.originalEvent.stopPropagation();
   });
 }
-
 // =====================
 // LOAD DATA
 // =====================
