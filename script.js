@@ -2,8 +2,8 @@
 let turnoutPercent = 100;
 let reportingPercent = 65;
 
-const partyColors = { dem:"#2171b5", rep:"#cb181d", green:"#41ab5d", ind:"#ff7f00" };
-const partyNames = { dem:"Democratic", rep:"Republican", green:"Green", ind:"Independent" };
+const partyColors = { wc:"#2171b5", qtw:"#cb181d", rf:"#cb181d", gsx:"#691391", dvwb:"#F0B27A" };
+const partyNames = { cupcake:"Worth-Cupcake", quant:"TyroniusTheIII", repfee:"Representative-Fee65", gsx: "gunsmokexeon", dvwb: "Disguised_VW_Beetle"};
 
 // MAP
 const map = L.map('map').setView([38.5, -82], 7);
