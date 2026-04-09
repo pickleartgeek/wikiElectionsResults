@@ -74,7 +74,6 @@ if (calledParty) {
 
 // STATEWIDE
 function showStatewide() {
-function showStatewide() {
   const raceData = results[currentRace];
   if (!raceData) return;
 
