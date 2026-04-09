@@ -188,17 +188,35 @@ function style(feature) {
 // CLICK HANDLER (MOBILE FIX)
 // =====================
 function onEachFeature(feature, layer) {
-  const id = String(feature.properties.id);
+function onEachFeature(feature, layer) {
+  const id = String(feature.properties.id).trim();
   const name = feature.properties.NAME;
 
   layer.on("click", function(e) {
-    const c = results[currentRace]?.[id];
-    if (!c) return;
+    console.log("CLICKED ID:", id);
+    console.log("CURRENT RACE:", currentRace);
+    console.log("AVAILABLE:", results[currentRace]);
+
+    const raceData = results?.[currentRace];
+
+    if (!raceData) {
+      console.log("NO RACE DATA LOADED");
+      return;
+    }
+
+    const c = raceData[id];
+
+    if (!c) {
+      console.log("NO MATCH FOR ID:", id);
+      console.log("AVAILABLE KEYS:", Object.keys(raceData));
+      return;
+    }
 
     currentCandidatesData = c;
     currentFeatureName = name;
 
-    const totalRaw = Object.values(c).reduce((s,v)=>s+Number(v||0),0);
+    const totalRaw = Object.values(c)
+      .reduce((s,v)=>s+Number(v||0),0);
 
     updateTurnoutUI(totalRaw);
     updateResultsTable(c, name);
