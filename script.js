@@ -225,16 +225,26 @@ fetch('your-geojson.geojson')
 // LOAD RESULTS
 // =====================
 async function loadResults() {
-  const res = await fetch('results.json');
-  results = await res.json();
+  try {
+    const res = await fetch('./results.json?v=' + Date.now());
+    results = await res.json();
 
-  if (geojsonLayer) geojsonLayer.setStyle(style);
+    if (geojsonLayer) geojsonLayer.setStyle(style);
 
-  showStatewideResults();
+    // 🚨 safety check (prevents "nothing showing")
+    if (!results[currentRace]) {
+      console.warn("Race not found:", currentRace);
+
+      // fallback to first available race so app still works
+      currentRace = Object.keys(results)[0];
+    }
+
+    showStatewideResults();
+
+  } catch (e) {
+    console.error("Results failed to load:", e);
+  }
 }
-
-setInterval(loadResults, 10000);
-loadResults();
 
 // =====================
 // MAP RESET
