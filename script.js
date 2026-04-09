@@ -242,7 +242,6 @@ fetch('your-geojson.geojson')
 // =====================
 // LOAD RESULTS
 // =====================
-async function loadResults() {
 function loadResults() {
   fetch('results.json')
     .then(res => res.json())
