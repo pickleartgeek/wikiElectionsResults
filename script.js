@@ -67,7 +67,8 @@ function updateResultsTable(candidates, name, forceNoProjection = false) {
     .filter(v => typeof v === "number")
     .reduce((s,v)=>s+Number(v||0),0);
 
-  const total = totalRaw * (turnoutPercent / 100);
+  const safeTotal = totalRaw > 0 ? totalRaw : 1;
+const total = safeTotal * (turnoutPercent / 100);
 
   const sorted = Object.entries(candidates)
     .filter(([p]) => p !== "called")
