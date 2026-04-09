@@ -128,7 +128,6 @@ function showStatewide() {
 
   updateTable(totals, "Statewide");
 }
-
 // =====================
 // MAP STYLE
 // =====================
@@ -156,14 +155,7 @@ function onEachFeature(feature, layer) {
   const id = String(feature.properties.id);
   const name = feature.properties.NAME;
 
-  layer.on("mouseover", () => {
-    const c = results[currentRace]?.[id];
-    if (!c) return;
-    updateTable(c, name);
-  });
-
-  layer.on("mouseout", showStatewide);
-
+  // Mobile-friendly: only tap/click
   layer.on("click", () => {
     const c = results[currentRace]?.[id];
     if (!c) return;
