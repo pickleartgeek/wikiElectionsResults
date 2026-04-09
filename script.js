@@ -32,7 +32,7 @@ function updateBars(totalVotesRaw){
 }
 
 // TABLE
-function updateTable(candidates,name){
+function updateTable(candidates, name, forceNoProjection = false) {
     tableTitle.textContent=name;
     tableBody.innerHTML="";
     const totalRaw = Object.values(candidates).reduce((s,v)=>s+Number(v||0),0);
@@ -41,14 +41,15 @@ function updateTable(candidates,name){
     const winner = sorted[0][0];
     let calledParty = null;
 
-// 1. Check JSON "called"
-if (candidates.called) {
-  calledParty = candidates.called;
-}
-    
-// 2. Fallback to 50% rule
-else if (sorted[0][1] / totalRaw > 0.5) and (reportingPercent > 80){
-  calledParty = winner;
+if (!forceNoProjection) {
+  // 1. Manual JSON call
+  if (candidates.called) {
+    calledParty = candidates.called;
+  }
+  // 2. Fallback 50% rule
+  else if (sorted[0][1] / totalRaw > 0.5) {
+    calledParty = winner;
+  }
 }
 
 if (calledParty) {
@@ -57,6 +58,7 @@ if (calledParty) {
 } else {
   winnerBanner.textContent = "No Projection";
 }
+
     for(const [p,raw] of sorted){
         const votes = Math.round(raw*(turnoutPercent/100));
         const pct = total ? ((votes/total)*100).toFixed(1) : 0;
@@ -71,6 +73,7 @@ if (calledParty) {
 }
 
 // STATEWIDE
+function showStatewide() {
 function showStatewide() {
   const raceData = results[currentRace];
   if (!raceData) return;
@@ -88,13 +91,15 @@ function showStatewide() {
     }
   }
 
-  updateTable(totals, "Statewide");
-
-  // 🔥 APPLY STATEWIDE CALL
   const metaCall = raceData._meta?.called;
+
   if (metaCall) {
-    winnerBanner.textContent =
-      "PROJECTED WINNER: " + (partyNames[metaCall] || metaCall.toUpperCase());
+    // pass called manually
+    totals.called = metaCall;
+    updateTable(totals, "Statewide");
+  } else {
+    // 🚫 force NO projection
+    updateTable(totals, "Statewide", true);
   }
 }
 
