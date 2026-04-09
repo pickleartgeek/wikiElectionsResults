@@ -254,6 +254,17 @@ async function loadResults() {
 setInterval(loadResults, 10000);
 loadResults();
 
+async function loadResults() {
+  const res = await fetch('results.json');
+  results = await res.json();
+
+  console.log("RESULTS LOADED:", results);
+
+  if (geojsonLayer) geojsonLayer.setStyle(style);
+
+  showStatewideResults();
+}
+
 // =====================
 // MAP RESET
 // =====================
