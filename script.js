@@ -37,7 +37,10 @@ function updateTable(candidates, name, forceNoProjection = false) {
     tableBody.innerHTML="";
     const totalRaw = Object.values(candidates).reduce((s,v)=>s+Number(v||0),0);
     const total = totalRaw*(turnoutPercent/100);
-    const sorted = Object.entries(candidates).map(([p,v])=>[p,Number(v)||0]).sort((a,b)=>b[1]-a[1]);
+    const sorted = Object.entries(candidates)
+  .filter(([p]) => p !== "called") // 👈 ignore "called"
+  .map(([p,v]) => [p, Number(v) || 0])
+  .sort((a,b)=>b[1]-a[1]);
     const winner = sorted[0][0];
     let calledParty = null;
 
