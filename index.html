@@ -6,24 +6,61 @@
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
-
-  <style>
-    body, html { margin: 0; padding: 0; height: 100%; }
-    #map { height: 90%; width: 100%; }
-    #controls { padding: 5px; text-align: center; }
-    #controls button { margin: 0 5px; padding: 5px 10px; }
-  </style>
 </head>
 <body>
 
-<div id="controls">
-  <button onclick="switchRace('class 4')">Class 4</button>
-  <button onclick="switchRace('class 5')">Class 5</button>
-</div>
+<div id="container">
 
-<div id="map"></div>
+  <div id="sidebar">
+    <h2>Election Results</h2>
+
+    <select id="raceSelect">
+      <option value="class 4">Class 4</option>
+      <option value="class 5">Class 5</option>
+    </select>
+
+    <!-- PROJECTED WINNER -->
+    <div id="winnerBanner">No Projection</div>
+
+    <!-- REPORTING BAR -->
+    <div class="card">
+      <div class="card-header">
+        <span>% Reporting</span>
+        <span id="reportingValue">0%</span>
+      </div>
+      <div class="bar-bg">
+        <div id="reportingBar" class="bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- TURNOUT (CODE ONLY) -->
+    <div class="card">
+      <div class="card-header">
+        <span>Turnout</span>
+        <span id="turnoutValue">100%</span>
+      </div>
+      <div class="bar-bg">
+        <div id="turnoutBar" class="bar-fill green"></div>
+      </div>
+      <div id="estVotesText">Est. Votes: 0</div>
+    </div>
+
+    <!-- TABLE -->
+    <div id="resultsTableContainer">
+      <h3 id="tableTitle">Statewide</h3>
+      <table id="resultsTable">
+        <tbody></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="map"></div>
+
+</div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
