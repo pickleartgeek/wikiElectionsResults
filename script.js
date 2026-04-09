@@ -59,23 +59,64 @@ function updateTurnoutUI(totalVotesRaw = 0) {
 // =====================
 // TABLE + PROJECTION
 // =====================
-function updateResultsTable(candidates, name, forceNoProjection = false) {
+function updateResultsTable(candidates, name, called=false) {
   tableTitle.textContent = name;
   tableBody.innerHTML = "";
 
-  const totalRaw = Object.values(candidates)
-    .filter(v => typeof v === "number")
-    .reduce((s,v)=>s+Number(v||0),0);
+  // 🚨 HARD SAFETY: reject bad data early
+  if (!candidates || typeof candidates !== "object") {
+    tableBody.innerHTML = "<tr><td>NO DATA</td></tr>";
+    return;
+  }
 
-  const safeTotal = totalRaw > 0 ? totalRaw : 1;
-const total = safeTotal * (turnoutPercent / 100);
+  const cleanEntries = Object.entries(candidates)
+    .filter(([p,v]) =>
+      p !== "called" &&
+      typeof v !== "undefined" &&
+      !isNaN(Number(v))
+    )
+    .map(([p,v]) => [p, Number(v)]);
 
-  const sorted = Object.entries(candidates)
-    .filter(([p]) => p !== "called")
-    .map(([p,v]) => [p, Number(v)||0])
-    .sort((a,b)=>b[1]-a[1]);
+  if (cleanEntries.length === 0) {
+    tableBody.innerHTML = "<tr><td>NO VALID VOTES</td></tr>";
+    return;
+  }
 
-  const winner = sorted[0]?.[0];
+  const totalRaw = cleanEntries.reduce((s,[p,v]) => s + v, 0);
+  const total = totalRaw * (turnoutPercent / 100);
+
+  const sorted = cleanEntries.sort((a,b)=>b[1]-a[1]);
+  const winner = sorted[0][0];
+
+  let calledParty = null;
+
+  if (called) calledParty = candidates.called || null;
+  else if (sorted[0][1] / totalRaw > 0.5) calledParty = winner;
+
+  winnerBanner.textContent = calledParty
+    ? "PROJECTED WINNER: " + (partyNames[calledParty] || calledParty)
+    : "No Projection";
+
+  for (const [p,raw] of sorted) {
+    const votes = Math.round(raw * (turnoutPercent / 100));
+    const pct = total ? ((votes / total) * 100).toFixed(1) : 0;
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td style="color:${partyColors[p] || '#000'}">
+        ${partyNames[p] || p}
+        <div class="bar-bg">
+          <div class="bar-fill" style="width:${pct}%; background:${partyColors[p] || '#999'}"></div>
+        </div>
+      </td>
+      <td>${votes.toLocaleString()}</td>
+      <td>${pct}%</td>
+    `;
+    tableBody.appendChild(row);
+  }
+
+  updateTurnoutUI(totalRaw);
+}
 
   // =====================
   // CALL LOGIC (SAFE JSON)
@@ -193,15 +234,27 @@ function onEachFeature(feature, layer) {
   const name = feature.properties.NAME;
 
   layer.on("click", function(e) {
-    const c = results[currentRace]?.[id];
-    if (!c) return;
+    const raceData = results[currentRace];
+
+    if (!raceData) {
+      console.log("NO RACE DATA");
+      return;
+    }
+
+    const c = raceData[id];
+
+    if (!c) {
+      console.log("NO DISTRICT DATA FOR ID:", id);
+      updateResultsTable({}, name);
+      return;
+    }
 
     currentCandidatesData = c;
     currentFeatureName = name;
 
-    const totalRaw = Object.entries(candidates)
-  .filter(([p,v]) => p !== "called" && typeof v !== "undefined")
-  .reduce((s,[p,v]) => s + (Number(v) || 0), 0);
+    const totalRaw = Object.values(c)
+      .filter(v => typeof v === "number" || !isNaN(Number(v)))
+      .reduce((s,v)=>s+Number(v||0),0);
 
     updateTurnoutUI(totalRaw);
     updateResultsTable(c, name);
