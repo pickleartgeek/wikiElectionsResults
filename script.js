@@ -198,7 +198,9 @@ function onEachFeature(feature, layer) {
     currentCandidatesData = c;
     currentFeatureName = name;
 
-    const totalRaw = Object.values(c).reduce((s,v)=>s+Number(v||0),0);
+    const totalRaw = Object.entries(candidates)
+  .filter(([p,v]) => p !== "called" && typeof v !== "undefined")
+  .reduce((s,[p,v]) => s + (Number(v) || 0), 0);
 
     updateTurnoutUI(totalRaw);
     updateResultsTable(c, name);
