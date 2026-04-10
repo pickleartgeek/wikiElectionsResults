@@ -4,24 +4,15 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 18
 }).addTo(map);
 
-// =====================
-//turnout
-// =====================
-const TURNOUT_PERCENT = 62;
-const REPORTING_PERCENT = 87;
-
-// =====================
-// DATA STATE
-// =====================
 let geojsonLayer;
 let results = {};
 let currentRace = "class 4";
-let currentCandidatesData = null;
-let currentFeatureName = "";
 
-// =====================
+// EDIT THESE ONLY
+const TURNOUT_PERCENT = 62;
+const REPORTING_PERCENT = 87;
+
 // PARTY CONFIG (YOUR CUSTOM)
-// =====================
 const partyColors = {
   wc:"#2171b5",
   qtw:"#b71212",
@@ -38,183 +29,123 @@ const partyNames = {
   dvwb:"Disguised_VW_Beetle"
 };
 
-// =====================
-// UI ELEMENTS
-// =====================
-const tableBody = document.querySelector("#resultsTable tbody");
-const tableTitle = document.getElementById("tableTitle");
-
-// TOP BANNERS (must exist in HTML)
-const winnerBanner = document.getElementById("winnerBanner");
-const reportingBar = document.getElementById("reportingBarFill");
-const reportingText = document.getElementById("reportingText");
+// STATE
+let currentCandidatesData = null;
+let currentFeatureName = "";
 
 // =====================
-// UI HELPERS
+// SAFE NUMBER HELPERS
 // =====================
-function format(n){ return n.toLocaleString(); }
+const turnoutMul = TURNOUT_PERCENT / 100;
 
 // =====================
-// TURNOUT / REPORTING (NO SLIDER)
-// =====================
-function getTurnoutMultiplier() {
-  return TURNOUT_PERCENT / 100;
-}
-
-function getReportingMultiplier() {
-  return REPORTING_PERCENT / 100;
-}
-
-// =====================
-// WINNER LOGIC
+// WINNER
 // =====================
 function getWinner(c) {
-  let max = -1, winner = null;
-
+  let max = -1, win = null;
   for (const p in c) {
     const v = Number(c[p]) || 0;
     if (v > max) {
       max = v;
-      winner = p;
+      win = p;
     }
   }
-
-  return winner;
-}
-
-function checkIfCalled(c) {
-  const total = Object.values(c).reduce((s,v)=>s+Number(v||0),0);
-
-  for (const p in c) {
-    if (Number(c[p]) / total > 0.5) return true;
-  }
-
-  return false;
+  return win;
 }
 
 // =====================
-// PROJECTED WINNER BANNER
+// TABLE
 // =====================
-function updateWinnerBanner(candidates) {
-  const winner = getWinner(candidates);
+const tableBody = document.querySelector("#resultsTable tbody");
+const tableTitle = document.getElementById("tableTitle");
+const winnerBanner = document.getElementById("winnerBanner");
+const reportingBar = document.getElementById("reportingBarFill");
+const reportingText = document.getElementById("reportingText");
 
-  if (!winnerBanner) return;
+function updateUI(candidates, name) {
+  if (!candidates) return;
 
-  winnerBanner.textContent =
-    "PROJECTED WINNER: " + (partyNames[winner] || winner.toUpperCase());
-
-  winnerBanner.style.background = partyColors[winner];
-}
-
-// =====================
-// REPORTING BAR
-// =====================
-function updateReportingBar() {
-  if (!reportingBar || !reportingText) return;
-
-  reportingBar.style.width = REPORTING_PERCENT + "%";
-  reportingText.textContent = REPORTING_PERCENT + "% Reporting";
-}
-
-// =====================
-// SORTED TABLE RENDER
-// =====================
-function updateResultsTable(candidates, name, called=false) {
-  tableTitle.textContent = name + (called ? " (CALLED)" : "");
   tableBody.innerHTML = "";
 
-  const turnoutMul = getTurnoutMultiplier();
+  const totalRaw = Object.values(candidates)
+    .reduce((a,b)=>a+Number(b||0),0);
 
-  const totalRaw = Object.values(candidates).reduce((s,v)=>s+Number(v||0),0);
   const total = totalRaw * turnoutMul;
 
-  // SORT CANDIDATES (BIG FIX)
   const sorted = Object.entries(candidates)
     .sort((a,b)=>b[1]-a[1]);
 
   const winner = sorted[0]?.[0];
 
-  for (const [p, val] of sorted) {
-    const raw = Number(val) || 0;
-    const votes = Math.round(raw * turnoutMul);
+  tableTitle.textContent = name;
+
+  winnerBanner.textContent =
+    "PROJECTED WINNER: " + (partyNames[winner] || winner);
+
+  winnerBanner.style.background = partyColors[winner] || "#ffcc00";
+
+  reportingBar.style.width = REPORTING_PERCENT + "%";
+  reportingText.textContent = REPORTING_PERCENT + "% Reporting";
+
+  for (const [p,v] of sorted) {
+    const votes = Math.round(Number(v) * turnoutMul);
     const pct = total ? ((votes/total)*100).toFixed(1) : 0;
 
     const row = document.createElement("tr");
-
     if (p === winner) row.classList.add("winner-row");
 
     row.innerHTML = `
       <td style="color:${partyColors[p]}">
-        ${partyNames[p] || p.toUpperCase()}
+        ${partyNames[p] || p}
         <div class="bar-bg">
-          <div class="bar-fill" style="
-            width:${pct}%;
-            background:${partyColors[p]};
-          "></div>
+          <div class="bar-fill" style="width:${pct}%; background:${partyColors[p]}"></div>
         </div>
       </td>
-      <td>${format(votes)}</td>
+      <td>${votes}</td>
       <td>${pct}%</td>
     `;
 
     tableBody.appendChild(row);
   }
-
-  updateWinnerBanner(candidates);
 }
 
 // =====================
-// STATEWIDE TOTAL
+// STATEWIDE
 // =====================
-function showStatewideResults() {
-  const raceData = results[currentRace];
-  if (!raceData) return;
+function showStatewide() {
+  const race = results[currentRace];
+  if (!race) return;
 
   const totals = {};
 
-  for (const district in raceData) {
-    for (const p in raceData[district]) {
-      totals[p] = (totals[p] || 0) + Number(raceData[district][p] || 0);
+  for (const d in race) {
+    for (const p in race[d]) {
+      totals[p] = (totals[p] || 0) + Number(race[d][p] || 0);
     }
   }
 
   currentCandidatesData = totals;
-  currentFeatureName = "STATEWIDE TOTAL";
+  currentFeatureName = "STATEWIDE";
 
-  updateResultsTable(totals, "Statewide Total", checkIfCalled(totals));
+  updateUI(totals, "Statewide Total");
 }
 
 // =====================
-// MAP COLORING (MARGIN BASED)
+// MAP STYLE (SAFE)
 // =====================
 function getColor(c) {
   if (!c) return "#ccc";
 
-  const vals = Object.values(c).map(Number);
-  const total = vals.reduce((a,b)=>a+b,0);
-
   const sorted = Object.entries(c).sort((a,b)=>b[1]-a[1]);
-  const winner = sorted[0][0];
-  const second = sorted[1]?.[1] || 0;
+  const win = sorted[0]?.[0];
 
-  const margin = (sorted[0][1] - second) / total;
-
-  const base = partyColors[winner] || "#ccc";
-
-  // stronger margin = darker
-  if (margin > 0.4) return base;
-  if (margin > 0.2) return base + "cc";
-  if (margin > 0.1) return base + "99";
-
-  return base + "66";
+  return partyColors[win] || "#ccc";
 }
 
 function style(feature) {
   const id = String(feature.properties.id);
-  const c = results[currentRace]?.[id];
-
   return {
-    fillColor: getColor(c),
+    fillColor: getColor(results[currentRace]?.[id]),
     weight: 1,
     color: "white",
     fillOpacity: 0.85
@@ -235,35 +166,29 @@ function onEachFeature(feature, layer) {
     currentCandidatesData = c;
     currentFeatureName = name;
 
-    updateResultsTable(c, name, checkIfCalled(c));
+    updateUI(c, name);
   });
 
-  layer.on("mouseout", () => {
-    showStatewideResults();
-  });
+  layer.on("mouseout", showStatewide);
 }
 
 // =====================
-// LOAD MAP DATA
+// LOAD DATA (IMPORTANT)
 // =====================
-fetch('your-geojson.geojson')
+fetch("your-geojson.geojson")
   .then(r=>r.json())
   .then(data=>{
-    geojsonLayer = L.geoJSON(data, { style, onEachFeature }).addTo(map);
+    geojsonLayer = L.geoJSON(data,{style,onEachFeature}).addTo(map);
     map.fitBounds(geojsonLayer.getBounds());
   });
 
-// =====================
-// LOAD RESULTS
-// =====================
 async function loadResults() {
-  const res = await fetch('results.json');
+  const res = await fetch("results.json");
   results = await res.json();
 
   if (geojsonLayer) geojsonLayer.setStyle(style);
 
-  updateReportingBar();
-  showStatewideResults();
+  showStatewide();
 }
 
 setInterval(loadResults, 10000);
@@ -271,4 +196,9 @@ loadResults();
 
 // =====================
 // RACE SWITCH
-// =================
+// =====================
+document.getElementById("raceSelect").addEventListener("change", e => {
+  currentRace = e.target.value;
+  if (geojsonLayer) geojsonLayer.setStyle(style);
+  showStatewide();
+});
