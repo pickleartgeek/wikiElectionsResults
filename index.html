@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Election Results Map</title>
+  <title>TSR Elects</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -301,8 +301,8 @@
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <div class="header-eyebrow">Live Results Dashboard</div>
-    <div class="header-title">Election Results</div>
+    <div class="header-eyebrow">WATCH LIVE</div>
+    <div class="header-title">TSR Elects: Class 4 and 5 Special Elections</div>
     <div class="meta-row">
       <div class="meta-item">
         <span class="meta-label">Turnout</span>
@@ -356,8 +356,8 @@ const partyNames = {
   dvwb: "Disguised_VW_Beetle"
 };
 
-let turnout = 65;
-let reporting = 80;
+let turnout = 20;
+let reporting = 60;
 
 let map = L.map('map', { zoomControl: false }).setView([40, -95], 4);
 L.control.zoom({ position: 'bottomright' }).addTo(map);
