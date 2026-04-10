@@ -1,241 +1,538 @@
-<!DOCTYPE html><html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Election Map Improved</title>
+  <title>Election Results Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
   <style>
-    body { margin:0; display:flex; font-family:Segoe UI, sans-serif; }#map { width:68%; height:100vh; }
+    :root {
+      --bg: #0d0f14;
+      --surface: #13161d;
+      --surface2: #1a1e28;
+      --border: rgba(255,255,255,0.07);
+      --accent: #e8d5a3;
+      --accent2: #c9a84c;
+      --text: #e4e6ed;
+      --muted: #6b7280;
+      --font-display: 'Playfair Display', Georgia, serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
 
-#sidebar {
-  width:32%;
-  padding:15px;
-  overflow:auto;
-  background:#ffffff;
-  box-shadow:-2px 0 8px rgba(0,0,0,0.1);
-}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-h2 { margin-top:0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-.race-btn {
-  display:inline-block;
-  margin:4px;
-  padding:8px 12px;
-  background:#eee;
-  border-radius:20px;
-  cursor:pointer;
-  font-size:13px;
-}
+    #map {
+      flex: 1;
+      height: 100vh;
+    }
 
-.race-btn.active { background:#333; color:#fff; }
+    .leaflet-container { background: #0d0f14 !important; }
 
-table {
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-  font-size:14px;
-}
+    /* ── SIDEBAR ── */
+    #sidebar {
+      width: 340px;
+      min-width: 300px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      overflow: hidden;
+    }
 
-th, td {
-  padding:8px;
-  border-bottom:1px solid #eee;
-}
+    .sidebar-header {
+      padding: 24px 22px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
 
-.leader {
-  font-weight:bold;
-  color:green;
-}
+    .header-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 6px;
+    }
 
-.progress-wrap {
-  margin:10px 0;
-}
+    .header-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.1;
+      margin-bottom: 14px;
+    }
 
-.bar-container {
-  width:100%;
-  height:14px;
-  background:#eee;
-  border-radius:8px;
-  overflow:hidden;
-}
+    .meta-row { display: flex; gap: 16px; margin-bottom: 10px; }
 
-.bar {
-  height:100%;
-  background:#4caf50;
-}
+    .meta-item { display: flex; flex-direction: column; }
 
-.candidate-box {
-  display:flex;
-  justify-content:space-between;
-  padding:6px;
-  border-radius:6px;
-  margin-bottom:4px;
-}
+    .meta-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
 
+    .meta-value {
+      font-family: var(--font-mono);
+      font-size: 17px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .reporting-bar-track {
+      width: 100%;
+      height: 3px;
+      background: var(--surface2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .reporting-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 2px;
+    }
+
+    .reporting-bar-sub {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--muted);
+      margin-top: 4px;
+      letter-spacing: 0.08em;
+    }
+
+    /* Race buttons */
+    .race-section {
+      padding: 14px 22px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .race-section-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    #raceButtons { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .race-btn {
+      padding: 5px 13px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      background: var(--surface2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    .race-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+
+    .race-btn.active {
+      background: var(--accent2);
+      color: #0d0f14;
+      border-color: var(--accent2);
+      font-weight: 500;
+    }
+
+    /* Results */
+    #resultsScroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 22px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--surface2) transparent;
+    }
+
+    #resultsScroll::-webkit-scrollbar { width: 4px; }
+    #resultsScroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+    .results-heading {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .candidate-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 5px;
+    }
+
+    .candidate-swatch {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .candidate-name {
+      font-size: 13px;
+      color: var(--text);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .candidate-name.leader { font-weight: 500; color: #fff; }
+
+    .candidate-votes {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .candidate-votes.leader { color: var(--accent); }
+
+    .vote-bar-track {
+      width: 100%;
+      height: 3px;
+      background: var(--surface2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .vote-bar-fill { height: 100%; border-radius: 2px; }
+
+    .winner-tag {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--accent2);
+      color: #0d0f14;
+      padding: 1px 5px;
+      border-radius: 2px;
+      margin-left: 5px;
+      vertical-align: middle;
+    }
+
+    .district-divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 14px 0;
+    }
+
+    .placeholder {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .placeholder .icon { font-size: 28px; margin-bottom: 12px; opacity: 0.4; }
+
+    /* Legend */
+    #legend {
+      padding: 12px 22px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .legend-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .legend-items { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Leaflet overrides */
+    .leaflet-tooltip {
+      background: #0d0f14 !important;
+      border: 1px solid rgba(255,255,255,0.1) !important;
+      color: #e4e6ed !important;
+      font-family: 'DM Mono', monospace !important;
+      font-size: 11px !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+    }
+    .leaflet-tooltip::before { display: none !important; }
   </style>
 </head>
-<body><div id="map"></div><div id="sidebar">
-  <h2>Election Results</h2>
-  <div id="raceButtons"></div>  <div class="progress-wrap" id="completion"></div>  <div id="resultsTable"></div>
-</div><script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script>
+<body>
+
+<div id="map"></div>
+
+<div id="sidebar">
+  <div class="sidebar-header">
+    <div class="header-eyebrow">Live Results Dashboard</div>
+    <div class="header-title">Election Results</div>
+    <div class="meta-row">
+      <div class="meta-item">
+        <span class="meta-label">Turnout</span>
+        <span class="meta-value" id="turnoutVal">—</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Precincts Reporting</span>
+        <span class="meta-value" id="reportingVal">—</span>
+      </div>
+    </div>
+    <div class="reporting-bar-track">
+      <div class="reporting-bar-fill" id="reportingBar" style="width:0%"></div>
+    </div>
+    <div class="reporting-bar-sub" id="reportingSub"></div>
+  </div>
+
+  <div class="race-section">
+    <div class="race-section-label">Select Race</div>
+    <div id="raceButtons"></div>
+  </div>
+
+  <div id="resultsScroll">
+    <div class="placeholder">
+      <div class="icon">🗳</div>
+      Select a race above, then click a district on the map to see results.
+    </div>
+  </div>
+
+  <div id="legend">
+    <div class="legend-label">Candidates</div>
+    <div class="legend-items" id="legendItems"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+
 const partyColors = {
-  wc:"#2171b5",
-  qtw:"#b71212",
-  rf:"#b71212",
-  gsx:"#691391",
-  dvwb:"#F0B27A"
+  wc:   "#4a9edd",
+  qtw:  "#e05555",
+  rf:   "#e07c30",
+  gsx:  "#9b6fd4",
+  dvwb: "#e8c44a"
 };
 
 const partyNames = {
-  wc:"Worth-Cupcake",
-  qtw:"TyroniusTheIII",
-  rf:"Representative-Fee65",
-  gsx:"gunsmokexeon",
-  dvwb:"Disguised_VW_Beetle"
+  wc:   "Worth-Cupcake",
+  qtw:  "TyroniusTheIII",
+  rf:   "Representative-Fee65",
+  gsx:  "gunsmokexeon",
+  dvwb: "Disguised_VW_Beetle"
 };
-
-let map = L.map('map').setView([40, -95], 4);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-let geoLayer;
-let resultsData;
-let currentRace;
 
 let turnout = 65;
 let reporting = 80;
 
-fetch('geo.json')
-  .then(res => res.json())
-  .then(geojson => {
-    geoLayer = L.geoJSON(geojson, {
-      style: styleFeature,
-      onEachFeature: (feature, layer) => {
-        layer.on('click', () => showDistrict(feature.properties.id));
-        layer.bindTooltip("District " + feature.properties.id);
-      }
-    }).addTo(map);
+let map = L.map('map', { zoomControl: false }).setView([40, -95], 4);
+L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    map.fitBounds(geoLayer.getBounds());
-  });
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap &copy; CARTO',
+  maxZoom: 19
+}).addTo(map);
 
-fetch('results.json')
-  .then(res => res.json())
-  .then(data => {
-    resultsData = data;
-    initUI();
-  });
+let geoLayer;
+let resultsData;
+let currentRace = null;
+let selectedDistrictId = null;
 
-function initUI() {
-  const container = document.getElementById('raceButtons');
+// Both fetches run in parallel; rendering waits until both are ready
+Promise.all([
+  fetch('geo.json').then(r => r.json()),
+  fetch('results.json').then(r => r.json())
+]).then(([geojson, data]) => {
+  resultsData = data;
 
-  Object.keys(resultsData).forEach(race => {
-    const btn = document.createElement('div');
-    btn.className = 'race-btn';
-    btn.innerText = race;
+  geoLayer = L.geoJSON(geojson, {
+    style: styleFeature,
+    onEachFeature: (feature, layer) => {
+      layer.on({
+        click: () => {
+          selectedDistrictId = feature.properties.id;
+          showDistrict(feature.properties.id);
+          geoLayer.setStyle(styleFeature);
+        },
+        mouseover: e => e.target.setStyle({ weight: 2.5, fillOpacity: 0.92 }),
+        mouseout:  e => geoLayer.resetStyle(e.target)
+      });
+      layer.bindTooltip(
+        `<span style="opacity:0.5;font-size:9px;letter-spacing:0.1em">DISTRICT</span><br><strong>${feature.properties.id}</strong>`,
+        { sticky: true, offset: [10, 0] }
+      );
+    }
+  }).addTo(map);
 
-    btn.onclick = () => {
-      document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentRace = race;
-      geoLayer.setStyle(styleFeature);
-      updateTotals();
-    };
+  map.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
 
-    container.appendChild(btn);
-  });
-
-  updateCompletion();
-}
+  initUI();
+});
 
 function styleFeature(feature) {
+  const isSelected = feature.properties.id === selectedDistrictId;
+
   if (!currentRace || !resultsData) {
-    return { color:'#444', weight:2, fillOpacity:0.1 };
+    return { color: isSelected ? '#fff' : '#3a3f4d', weight: isSelected ? 2.5 : 1, fillColor: '#1a1e28', fillOpacity: 0.7 };
   }
 
   const id = feature.properties.id;
   const data = resultsData[currentRace][id];
 
   if (!data) {
-    return { color:'#444', weight:2, fillOpacity:0.1 };
+    return { color: '#3a3f4d', weight: 1, fillColor: '#1a1e28', fillOpacity: 0.5 };
   }
 
-  let sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]);
-  let winner = sorted[0];
+  const [winnerKey] = Object.entries(data).sort((a, b) => b[1] - a[1])[0];
 
   return {
-    fillColor: partyColors[winner[0]] || '#ccc',
-    fillOpacity: 0.75,
-    color:'#000',
-    weight:2
+    fillColor: partyColors[winnerKey] || '#555',
+    fillOpacity: isSelected ? 0.95 : 0.72,
+    color: isSelected ? '#ffffff' : 'rgba(0,0,0,0.4)',
+    weight: isSelected ? 2.5 : 1
   };
+}
+
+function initUI() {
+  // Completion stats
+  document.getElementById('turnoutVal').textContent = turnout + '%';
+  document.getElementById('reportingVal').textContent = reporting + '%';
+  document.getElementById('reportingBar').style.width = reporting + '%';
+  document.getElementById('reportingSub').textContent = `${reporting} of 100 precincts reporting`;
+
+  // Race buttons
+  const container = document.getElementById('raceButtons');
+  Object.keys(resultsData).forEach(race => {
+    const btn = document.createElement('div');
+    btn.className = 'race-btn';
+    btn.textContent = race;
+    btn.onclick = () => {
+      document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentRace = race;
+      selectedDistrictId = null;
+      geoLayer.setStyle(styleFeature);
+      showRaceOverview();
+    };
+    container.appendChild(btn);
+  });
+
+  // Legend
+  const legendEl = document.getElementById('legendItems');
+  Object.entries(partyNames).forEach(([k, name]) => {
+    legendEl.innerHTML += `
+      <div class="legend-item">
+        <div class="legend-dot" style="background:${partyColors[k]}"></div>
+        <span>${name}</span>
+      </div>`;
+  });
+}
+
+function showRaceOverview() {
+  const raceData = resultsData[currentRace];
+  let totals = {};
+  Object.values(raceData).forEach(d => {
+    Object.entries(d).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; });
+  });
+
+  const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+  const totalVotes = sorted.reduce((a, [, v]) => a + v, 0);
+
+  let html = `<div class="results-heading">${currentRace} — Overview</div>`;
+  sorted.forEach(([k, v], i) => {
+    const pct = totalVotes ? ((v / totalVotes) * 100).toFixed(1) : 0;
+    const leader = i === 0;
+    html += `
+      <div class="candidate-row">
+        <div class="candidate-swatch" style="background:${partyColors[k]}"></div>
+        <span class="candidate-name ${leader ? 'leader' : ''}">
+          ${partyNames[k]}${leader ? '<span class="winner-tag">Leading</span>' : ''}
+        </span>
+        <span class="candidate-votes ${leader ? 'leader' : ''}">${v.toLocaleString()} · ${pct}%</span>
+      </div>
+      <div class="vote-bar-track">
+        <div class="vote-bar-fill" style="width:${pct}%;background:${partyColors[k]}"></div>
+      </div>`;
+  });
+
+  html += `<hr class="district-divider">
+    <div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">
+      Click a district on the map for local results
+    </div>`;
+
+  document.getElementById('resultsScroll').innerHTML = html;
 }
 
 function showDistrict(id) {
   if (!currentRace) return;
-
   const data = resultsData[currentRace][id];
   if (!data) return;
 
-  let total = Object.values(data).reduce((a,b)=>a+b,0);
+  const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+  const totalVotes = sorted.reduce((a, [, v]) => a + v, 0);
 
-  let html = `<h3>District ${id}</h3>`;
-
-  Object.entries(data)
-    .sort((a,b)=>b[1]-a[1])
-    .forEach(([k,v], i) => {
-      let percent = total ? ((v/total)*100).toFixed(1) : 0;
-
-      html += `
-        <div class="candidate-box" style="background:${i===0 ? '#e8f5e9' : '#f5f5f5'}">
-          <span style="color:${partyColors[k]}">${partyNames[k]}</span>
-          <span>${v} (${percent}%)</span>
-        </div>
-      `;
-    });
-
-  document.getElementById('resultsTable').innerHTML = html;
-}
-
-function updateTotals() {
-  const raceData = resultsData[currentRace];
-
-  let totals = {};
-
-  Object.values(raceData).forEach(d => {
-    Object.entries(d).forEach(([k,v]) => {
-      totals[k] = (totals[k] || 0) + v;
-    });
-  });
-
-  let sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
-  let totalVotes = Object.values(totals).reduce((a,b)=>a+b,0);
-
-  let html = `<h3>${currentRace} Overview</h3>`;
-
-  sorted.forEach(([k,v], i) => {
-    let percent = totalVotes ? ((v/totalVotes)*100).toFixed(1) : 0;
-
+  let html = `<div class="results-heading">District ${id}</div>`;
+  sorted.forEach(([k, v], i) => {
+    const pct = totalVotes ? ((v / totalVotes) * 100).toFixed(1) : 0;
+    const leader = i === 0;
     html += `
-      <div class="candidate-box" style="background:${i===0 ? '#e8f5e9' : '#f5f5f5'}">
-        <span style="color:${partyColors[k]}">${partyNames[k]}</span>
-        <span>${v} (${percent}%) ${i===0 ? '✔' : ''}</span>
+      <div class="candidate-row">
+        <div class="candidate-swatch" style="background:${partyColors[k]}"></div>
+        <span class="candidate-name ${leader ? 'leader' : ''}">
+          ${partyNames[k]}${leader ? '<span class="winner-tag">Winner</span>' : ''}
+        </span>
+        <span class="candidate-votes ${leader ? 'leader' : ''}">${v.toLocaleString()} · ${pct}%</span>
       </div>
-    `;
+      <div class="vote-bar-track">
+        <div class="vote-bar-fill" style="width:${pct}%;background:${partyColors[k]}"></div>
+      </div>`;
   });
 
-  document.getElementById('resultsTable').innerHTML = html;
+  html += `<hr class="district-divider">
+    <div style="color:var(--muted);font-size:12px;margin-bottom:4px">Total votes cast</div>
+    <div style="font-family:var(--font-mono);font-size:18px;color:var(--accent);margin-bottom:14px">${totalVotes.toLocaleString()}</div>
+    <hr class="district-divider">
+    <div onclick="showRaceOverview()" style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0;cursor:pointer;text-decoration:underline">
+      ← Back to overview
+    </div>`;
+
+  document.getElementById('resultsScroll').innerHTML = html;
 }
 
-function updateCompletion() {
-  document.getElementById('completion').innerHTML = `
-    <div><strong>Turnout:</strong> ${turnout}%</div>
-    <div><strong>Reporting:</strong> ${reporting}%</div>
-    <div class="bar-container">
-      <div class="bar" style="width:${reporting}%"></div>
-    </div>
-  `;
-}
-
-</script></body>
+</script>
+</body>
 </html>
