@@ -1,53 +1,164 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Election Dashboard</title>
-
+  <meta charset="utf-8" />
+  <title>Election Map</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { margin:0; display:flex; font-family:Arial; }
+    #map { width:70%; height:100vh; }
+    #sidebar { width:30%; padding:10px; overflow:auto; background:#f7f7f7; }
+    .race-btn { display:block; margin:5px 0; padding:8px; background:#ddd; cursor:pointer; border-radius:6px; }
+    .race-btn.active { background:#bbb; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { padding:6px; border-bottom:1px solid #ccc; text-align:left; }
+    .called { color:green; font-weight:bold; }
+    .not-called { color:red; }
+    .bar-container { width:100%; background:#ddd; height:20px; border-radius:10px; margin-top:10px; }
+    .bar { height:100%; background:#4caf50; width:0%; border-radius:10px; }
+  </style>
 </head>
+<body><div id="map"></div>
+<div id="sidebar">
+  <h2>Election Results</h2>
+  <div id="raceButtons"></div>
+  <div id="completion"></div>
+  <div id="resultsTable"></div>
+</div><script src="https://unpkg.com/leaflet/dist/leaflet.js"></script><script>
+const partyColors = {
+  wc:"#2171b5",
+  qtw:"#b71212",
+  rf:"#b71212",
+  gsx:"#691391",
+  dvwb:"#F0B27A"
+};
 
-<body>
+const partyNames = {
+  wc:"Worth-Cupcake",
+  qtw:"TyroniusTheIII",
+  rf:"Representative-Fee65",
+  gsx:"gunsmokexeon",
+  dvwb:"Disguised_VW_Beetle"
+};
 
-<div id="container">
+let map = L.map('map').setView([40, -95], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-  <!-- ===================== -->
-  <!-- SIDEBAR -->
-  <!-- ===================== -->
-  <div id="sidebar">
+let geoLayer;
+let resultsData;
+let currentRace;
 
-    <h2>Election Results</h2>
+// Adjustable completion values
+let turnout = 65; // % turnout
+let reporting = 80; // % reporting
 
-    <!-- RACE SWITCH -->
-    <select id="raceSelect">
-      <option value="class 4">Class 4</option>
-      <option value="class 5">Class 5</option>
-    </select>
+fetch('geo.json')
+  .then(res => res.json())
+  .then(geojson => {
+    geoLayer = L.geoJSON(geojson, {
+      style: feature => styleFeature(feature),
+      onEachFeature: onEachFeature
+    }).addTo(map);
+  });
 
-    <!-- ===================== -->
-    <!-- WINNER BANNER -->
-    <!-- ===================== -->
-    <div id="winnerBanner">PROJECTED WINNER: —</div>
+fetch('results.json')
+  .then(res => res.json())
+  .then(data => {
+    resultsData = data;
+    initUI();
+  });
 
-    <!-- ===================== -->
-    <!-- REPORTING BAR -->
-    <!-- ===================== -->
-    <div id="reportingContainer">
-      <div id="reportingText">0% Reporting</div>
+function initUI() {
+  const container = document.getElementById('raceButtons');
+  Object.keys(resultsData).forEach(race => {
+    const btn = document.createElement('div');
+    btn.className = 'race-btn';
+    btn.innerText = race;
+    btn.onclick = () => selectRace(race, btn);
+    container.appendChild(btn);
+  });
+  updateCompletion();
+}
 
-      <div class="reporting-bg">
-        <div id="reportingBarFill"></div>
-      </div>
+function selectRace(race, btn) {
+  currentRace = race;
+  document.querySelectorAll('.race-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  geoLayer.setStyle(styleFeature);
+  updateTable();
+}
+
+function styleFeature(feature) {
+  if (!currentRace || !resultsData) return { color:'#ccc', weight:1 };
+
+  const id = feature.properties.id;
+  const data = resultsData[currentRace][id];
+  if (!data) return { color:'#ccc' };
+
+  let winner = Object.entries(data).sort((a,b)=>b[1]-a[1])[0];
+  return {
+    fillColor: partyColors[winner[0]] || '#ccc',
+    fillOpacity: 0.7,
+    color:'#333',
+    weight:1
+  };
+}
+
+function onEachFeature(feature, layer) {
+  layer.on('click', () => {
+    showDistrict(feature.properties.id);
+  });
+}
+
+function showDistrict(id) {
+  if (!currentRace) return;
+  const data = resultsData[currentRace][id];
+  if (!data) return;
+
+  let html = `<h3>District ${id}</h3><table>`;
+  Object.entries(data).forEach(([k,v]) => {
+    html += `<tr><td>${partyNames[k]}</td><td>${v}</td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('resultsTable').innerHTML = html;
+}
+
+function updateTable() {
+  if (!currentRace) return;
+  const raceData = resultsData[currentRace];
+
+  let totals = {};
+  Object.values(raceData).forEach(d => {
+    Object.entries(d).forEach(([k,v]) => {
+      totals[k] = (totals[k] || 0) + v;
+    });
+  });
+
+  let sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  let leader = sorted[0][0];
+
+  let html = `<h3>${currentRace} (Total)</h3><table>`;
+  sorted.forEach(([k,v], i) => {
+    html += `<tr>
+      <td style="color:${partyColors[k]}">${partyNames[k]}</td>
+      <td>${v}</td>
+      <td class="${i===0?'called':'not-called'}">${i===0?'Leader':'Trailing'}</td>
+    </tr>`;
+  });
+  html += '</table>';
+
+  document.getElementById('resultsTable').innerHTML = html;
+}
+
+function updateCompletion() {
+  const container = document.getElementById('completion');
+  container.innerHTML = `
+    <div>Turnout: ${turnout}%</div>
+    <div>Reporting: ${reporting}%</div>
+    <div class="bar-container">
+      <div class="bar" style="width:${reporting}%"></div>
     </div>
+  `;
+}
 
-    <!-- ===================== -->
-    <!-- RESULTS TABLE -->
-    <!-- ===================== -->
-    <div id="resultsTableContainer">
-      <h3 id="tableTitle">Statewide Total</h3>
-
-      <table id="resultsTable">
-        <thead>
-          <tr>
-            <th>Candidate</
+</script></body>
+</html>
