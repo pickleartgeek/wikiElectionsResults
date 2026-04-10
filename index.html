@@ -2,61 +2,52 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Election Map</title>
+  <title>Election Dashboard</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
 <div id="container">
 
+  <!-- ===================== -->
+  <!-- SIDEBAR -->
+  <!-- ===================== -->
   <div id="sidebar">
+
     <h2>Election Results</h2>
 
+    <!-- RACE SWITCH -->
     <select id="raceSelect">
       <option value="class 4">Class 4</option>
       <option value="class 5">Class 5</option>
     </select>
 
-    <div id="winnerBanner">No Projection</div>
+    <!-- ===================== -->
+    <!-- WINNER BANNER -->
+    <!-- ===================== -->
+    <div id="winnerBanner">PROJECTED WINNER: —</div>
 
-    <div class="card">
-      <div class="card-header">
-        <span>% Reporting</span>
-        <span id="reportingValue">0%</span>
-      </div>
-      <div class="bar-bg">
-        <div id="reportingBar" class="bar-fill"></div>
+    <!-- ===================== -->
+    <!-- REPORTING BAR -->
+    <!-- ===================== -->
+    <div id="reportingContainer">
+      <div id="reportingText">0% Reporting</div>
+
+      <div class="reporting-bg">
+        <div id="reportingBarFill"></div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-header">
-        <span>Turnout</span>
-        <span id="turnoutValue">100%</span>
-      </div>
-      <div class="bar-bg">
-        <div id="turnoutBar" class="bar-fill green"></div>
-      </div>
-      <div id="estVotesText">Est. Votes: 0</div>
-    </div>
-
+    <!-- ===================== -->
+    <!-- RESULTS TABLE -->
+    <!-- ===================== -->
     <div id="resultsTableContainer">
-      <h3 id="tableTitle">Statewide</h3>
+      <h3 id="tableTitle">Statewide Total</h3>
+
       <table id="resultsTable">
-        <tbody></tbody>
-      </table>
-    </div>
-
-  </div>
-
-  <div id="map"></div>
-
-</div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="script.js"></script>
-
-</body>
-</html>
+        <thead>
+          <tr>
+            <th>Candidate</
