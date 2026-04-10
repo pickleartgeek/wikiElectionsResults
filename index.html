@@ -327,7 +327,7 @@
   <div id="resultsScroll">
     <div class="placeholder">
       <div class="icon">🗳</div>
-      Select a race above, then click a district on the map to see results.
+      Select a race above, then click a group on the map to see results.
     </div>
   </div>
 
@@ -392,7 +392,7 @@ Promise.all([
         mouseout:  e => geoLayer.resetStyle(e.target)
       });
       layer.bindTooltip(
-        `<span style="opacity:0.5;font-size:9px;letter-spacing:0.1em">DISTRICT</span><br><strong>${feature.properties.id}</strong>`,
+        `<span style="opacity:0.5;font-size:9px;letter-spacing:0.1em">GROUP</span><br><strong>${feature.properties.id}</strong>`,
         { sticky: true, offset: [10, 0] }
       );
     }
@@ -505,7 +505,7 @@ function showDistrict(id) {
   const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
   const totalVotes = sorted.reduce((a, [, v]) => a + v, 0);
 
-  let html = `<div class="results-heading">District ${id}</div>`;
+  let html = `<div class="results-heading">Group ${id}</div>`;
   sorted.forEach(([k, v], i) => {
     const pct = totalVotes ? ((v / totalVotes) * 100).toFixed(1) : 0;
     const leader = i === 0;
