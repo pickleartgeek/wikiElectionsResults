@@ -462,10 +462,10 @@ function marginColor(data) {
   const MID = 0.35; 
   if (margin < MID) {
     
-    const t = (1 - margin / MID) * 0.65;
+    const t = (1 - margin / MID) * 0.35;
     return lightenHex(base, t);
   } else {
-    const t = ((margin - MID) / (1 - MID)) * 0.55;
+    const t = ((margin - MID) / (1 - MID)) * 0.30;
     return darkenHex(base, t);
   }
 }
