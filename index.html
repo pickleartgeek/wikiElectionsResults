@@ -403,6 +403,70 @@ Promise.all([
   initUI();
 });
 
+function darkenHex(hex, t) {
+  let r = parseInt(hex.slice(1,3),16);
+  let g = parseInt(hex.slice(3,5),16);
+  let b = parseInt(hex.slice(5,7),16);
+  r = Math.round(r * (1 - t));
+  g = Math.round(g * (1 - t));
+  b = Math.round(b * (1 - t));
+  return `rgb(${r},${g},${b})`;
+}
+
+/**
+ * Blend a hex colour toward white by `t` (0 = original, 1 = white).
+ */
+function lightenHex(hex, t) {
+  let r = parseInt(hex.slice(1,3),16);
+  let g = parseInt(hex.slice(3,5),16);
+  let b = parseInt(hex.slice(5,7),16);
+  r = Math.round(r + (255 - r) * t);
+  g = Math.round(g + (255 - g) * t);
+  b = Math.round(b + (255 - b) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+/**
+ * Returns the fill colour for a district based on margin:
+ *   - No votes → near-black (#111)
+ *   - Tie       → grey (#888)
+ *   - Otherwise → winner colour, darkened for big margins, lightened for small ones.
+ *     midpoint (50% opacity equivalent) = the raw party colour at ~40% margin.
+ */
+function marginColor(data) {
+  if (!data) return '#111111';
+
+  const total = Object.values(data).reduce((a, b) => a + b, 0);
+  if (total === 0) return '#111111';
+
+  const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+  const [firstKey, firstVal] = sorted[0];
+  const secondVal = sorted[1] ? sorted[1][1] : 0;
+
+  const margin = (firstVal - secondVal) / total; // 0..1
+
+  // Tie
+  if (margin === 0) return '#888888';
+
+  const base = partyColors[firstKey] || '#aaaaaa';
+
+  // Map margin 0..1 to a visual range:
+  //   small margin (near 0) → much lighter than base
+  //   ~0.4 margin           → base colour (midpoint)
+  //   large margin (near 1) → darker than base
+  const MID = 0.35; // margin at which we show the pure party colour
+
+  if (margin < MID) {
+    // lighter side: lighten up to 65% at margin=0
+    const t = (1 - margin / MID) * 0.65;
+    return lightenHex(base, t);
+  } else {
+    // darker side: darken up to 55% at margin=1
+    const t = ((margin - MID) / (1 - MID)) * 0.55;
+    return darkenHex(base, t);
+  }
+}
+
 function styleFeature(feature) {
   const isSelected = feature.properties.id === selectedDistrictId;
 
