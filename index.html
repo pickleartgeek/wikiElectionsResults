@@ -430,7 +430,7 @@ function marginColor(data) {
   if (!data) return '#111111';
 
   const total = Object.values(data).reduce((a, b) => a + b, 0);
-  if (total === 0) return '#111111';
+  if (total === 0) return '#1a1e28';
 
   const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
   const [firstKey, firstVal] = sorted[0];
