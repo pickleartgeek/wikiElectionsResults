@@ -439,7 +439,7 @@ function marginColor(data) {
   const margin = (firstVal - secondVal) / total; // 0..1
 
   
-  if (Math.abs(margin) < 0.0001) return '#888888';
+  if (Math.abs(margin) < 0.0001) {   const secondKey = sorted[1] ? sorted[1][0] : null;    if (!secondKey) return '#888888';    const c1 = partyColors[firstKey];   const c2 = partyColors[secondKey];    let blended = blendColors(c1, c2, 0.5);    // optional: wash it out so it *looks* like a tie   blended = lightenHex(     '#' + blended.match(/\d+/g).map(x => (+x).toString(16).padStart(2,'0')).join(''),     0.4   );    return blended; }
 
   const base = partyColors[firstKey] || '#aaaaaa';
   const MID = 0.35; 
