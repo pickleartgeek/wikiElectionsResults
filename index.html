@@ -439,7 +439,7 @@ function marginColor(data) {
   const margin = (firstVal - secondVal) / total; // 0..1
 
   
-  if (margin === 0) return '#888888';
+  if (Math.abs(margin) < 0.0001) return '#888888';
 
   const base = partyColors[firstKey] || '#aaaaaa';
   const MID = 0.35; 
@@ -470,7 +470,7 @@ function styleFeature(feature) {
   const [winnerKey] = Object.entries(data).sort((a, b) => b[1] - a[1])[0];
 
   return {
-    fillColor: partyColors[winnerKey] || '#555',
+    fillColor: marginColor(data),
     fillOpacity: isSelected ? 0.95 : 0.72,
     color: isSelected ? '#ffffff' : 'rgba(0,0,0,0.4)',
     weight: isSelected ? 2.5 : 1
