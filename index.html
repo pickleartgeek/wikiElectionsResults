@@ -473,7 +473,8 @@ function marginColor(data) {
 function styleFeature(feature) {
   const isSelected = feature.properties.id === selectedDistrictId;
 
-  if (!currentRace || !resultsData) {
+  const raceToUse = currentRace || Object.keys(resultsData)[0];
+const data = resultsData[raceToUse]?.[feature.properties.id]; {
     return { color: isSelected ? '#fff' : '#3a3f4d', weight: isSelected ? 2.5 : 1, fillColor: '#1a1e28', fillOpacity: 0.7 };
   }
 
