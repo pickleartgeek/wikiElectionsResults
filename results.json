@@ -1,16 +1,5 @@
-[
-  {
-    "id": "class4_special",
-    "title": "Class 4 Special Election",
-    "date": "2026-04-09",
-    "party": "TSR",
-    "turnout": 38,
-    "precincts_reporting": 99.99,
-    "precincts_total": 100,
-
-    "first_round": {
-      "races": {
-        "Class 4": {
+    {
+      "class 4": {
           "D1": { "wc": 2, "qtw": 1 },
           "D2": { "wc": 0, "qtw": 1 },
           "D3": { "wc": 2, "qtw": 3 },
@@ -20,26 +9,8 @@
           "D7": { "wc": 1, "qtw": 1 },
           "D8": { "wc": 2, "qtw": 0 },
           "D9": { "wc": 1, "qtw": 0 }
-        }
-      },
-      "calls": {}
-    },
-
-    "runoff_round": null
-  },
-
-  {
-    "id": "class5_special",
-    "title": "Class 5 Special Election",
-    "date": "2026-04-09",
-    "party": "TSR",
-    "turnout": 38,
-    "precincts_reporting": 99.99,
-    "precincts_total": 100,
-
-    "first_round": {
-      "races": {
-        "Class 5": {
+        },
+        "class 5": {
           "D1": { "dvwb": 1, "gsx": 1, "rf": 1 },
           "D2": { "dvwb": 0, "gsx": 1, "rf": 0 },
           "D3": { "dvwb": 2, "gsx": 2, "rf": 1 },
@@ -50,28 +21,4 @@
           "D8": { "dvwb": 1, "gsx": 0, "rf": 1 },
           "D9": { "dvwb": 1, "gsx": 0, "rf": 0 }
         }
-      },
-      "calls": {}
-    },
-
-    "runoff_round": {
-      "turnout": null,
-      "precincts_reporting": 0,
-      "precincts_total": 100,
-
-      "races": {
-        "Class 5": {
-          "D1": {},
-          "D2": {},
-          "D3": {},
-          "D4": {},
-          "D5": {},
-          "D6": {},
-          "D7": {},
-          "D8": {},
-          "D9": {}
-        }
       }
-    }
-  }
-]
