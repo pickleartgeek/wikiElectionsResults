@@ -374,7 +374,6 @@ Promise.all([
   fetch('geo.json').then(r => r.json()),
   fetch('results.json').then(r => r.json())
 ]).then(([geojson, data]) => {
-  resultsData = data;
 
   resultsData = {};
 
