@@ -356,9 +356,6 @@ const partyNames = {
   dvwb: "Disguised_VW_Beetle"
 };
 
-let turnout = 65;
-let reporting = 80;
-
 let map = L.map('map', { zoomControl: false }).setView([40, -95], 4);
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
@@ -379,6 +376,16 @@ Promise.all([
 ]).then(([geojson, data]) => {
   resultsData = data;
 
+  resultsData = {};
+
+data.forEach(election => {
+  const races = election.first_round.races;
+
+  Object.entries(races).forEach(([raceName, districts]) => {
+    resultsData[raceName] = districts;
+  });
+});
+  
   geoLayer = L.geoJSON(geojson, {
     style: styleFeature,
     onEachFeature: (feature, layer) => {
