@@ -405,7 +405,9 @@ data.forEach(election => {
   }).addTo(map);
 
   map.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
-
+  
+ let turnout = data[0].turnout;
+ let reporting = data[0].precincts_reporting;
   initUI();
 });
 
@@ -416,7 +418,7 @@ function styleFeature(feature) {
     return { color: isSelected ? '#fff' : '#3a3f4d', weight: isSelected ? 2.5 : 1, fillColor: '#1a1e28', fillOpacity: 0.7 };
   }
 
-  const id = feature.properties.id;
+  const id = String(feature.properties.id);
   const data = resultsData[currentRace][id];
 
   if (!data) {
