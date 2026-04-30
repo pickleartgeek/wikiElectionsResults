@@ -2,24 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Election Results Map</title>
+  <title>TSR Elects</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-
   <style>
     :root {
-      --bg: #0d0f14;
-      --surface: #13161d;
+      --bg:       #0d0f14;
+      --surface:  #13161d;
       --surface2: #1a1e28;
-      --border: rgba(255,255,255,0.07);
-      --accent: #e8d5a3;
-      --accent2: #c9a84c;
-      --text: #e4e6ed;
-      --muted: #6b7280;
+      --border:   rgba(255,255,255,0.07);
+      --accent:   #e8d5a3;
+      --accent2:  #c9a84c;
+      --text:     #e4e6ed;
+      --muted:    #6b7280;
       --font-display: 'Playfair Display', Georgia, serif;
-      --font-body: 'DM Sans', sans-serif;
-      --font-mono: 'DM Mono', monospace;
+      --font-body:    'DM Sans', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+      --sidebar-w: 360px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,11 +28,14 @@
       background: var(--bg);
       color: var(--text);
       font-family: var(--font-body);
-      display: flex;
       height: 100vh;
       overflow: hidden;
+      display: flex;
     }
 
+    /* ══════════════════════════════════════
+       MAP — always visible behind sidebar
+    ══════════════════════════════════════ */
     #map {
       flex: 1;
       height: 100vh;
@@ -40,9 +43,11 @@
 
     .leaflet-container { background: #0d0f14 !important; }
 
-    /* ── SIDEBAR ── */
+    /* ══════════════════════════════════════
+       SIDEBAR SHELL
+    ══════════════════════════════════════ */
     #sidebar {
-      width: 340px;
+      width: var(--sidebar-w);
       min-width: 300px;
       height: 100vh;
       display: flex;
@@ -50,107 +55,443 @@
       background: var(--surface);
       border-left: 1px solid var(--border);
       overflow: hidden;
+      position: relative;
     }
 
-    .sidebar-header {
-      padding: 24px 22px 18px;
+    /* Permanent branding header */
+    .sb-brand {
+      padding: 18px 22px 14px;
       border-bottom: 1px solid var(--border);
       background: var(--bg);
+      flex-shrink: 0;
     }
 
-    .header-eyebrow {
+    .sb-brand-eyebrow {
       font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.18em;
+      font-size: 9px;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
       color: var(--accent2);
-      margin-bottom: 6px;
+      margin-bottom: 3px;
     }
 
-    .header-title {
+    .sb-brand-title {
       font-family: var(--font-display);
       font-size: 22px;
       font-weight: 900;
       color: var(--text);
-      line-height: 1.1;
-      margin-bottom: 14px;
+      line-height: 1.05;
     }
 
-    .meta-row { display: flex; gap: 16px; margin-bottom: 10px; }
-
-    .meta-item { display: flex; flex-direction: column; }
-
-    .meta-label {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 2px;
-    }
-
-    .meta-value {
-      font-family: var(--font-mono);
-      font-size: 17px;
-      font-weight: 500;
-      color: var(--accent);
-    }
-
-    .reporting-bar-track {
-      width: 100%;
-      height: 3px;
-      background: var(--surface2);
-      border-radius: 2px;
+    /* ══════════════════════════════════════
+       PANEL SYSTEM — three panels that
+       slide left/right inside the sidebar
+    ══════════════════════════════════════ */
+    .panel-viewport {
+      flex: 1;
       overflow: hidden;
-      margin-top: 6px;
+      position: relative;
     }
 
-    .reporting-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent2), var(--accent));
-      border-radius: 2px;
+    .panel {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+      will-change: transform;
     }
 
-    .reporting-bar-sub {
+    /* default: hidden to the right */
+    .panel { transform: translateX(100%); opacity: 0; pointer-events: none; }
+    .panel.active { transform: translateX(0); opacity: 1; pointer-events: all; }
+    .panel.behind  { transform: translateX(-30px); opacity: 0; pointer-events: none; }
+
+    /* ══════════════════════════════════════
+       PANEL A — TIMELINE
+    ══════════════════════════════════════ */
+    #panelTimeline {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tl-filter-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .tl-tab {
+      flex: 1;
       font-family: var(--font-mono);
       font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 9px 4px;
+      text-align: center;
+      cursor: pointer;
       color: var(--muted);
-      margin-top: 4px;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      user-select: none;
+    }
+
+    .tl-tab:hover { color: var(--text); }
+    .tl-tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
+
+    .tl-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 16px 24px 28px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--surface2) transparent;
+    }
+
+    .tl-scroll::-webkit-scrollbar { width: 3px; }
+    .tl-scroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+    .tl-year-group { margin-bottom: 28px; }
+
+    .tl-year {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tl-year::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .tl-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-left: 18px;
+      border-left: 2px solid var(--border);
+    }
+
+    .tl-card {
+      position: relative;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 11px 14px;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .tl-card::before {
+      content: '';
+      position: absolute;
+      left: -23px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 2px solid var(--border);
+      transition: all 0.16s;
+    }
+
+    .tl-card:hover,
+    .tl-card.selected { border-color: rgba(255,255,255,0.14); background: #1f2330; }
+    .tl-card:hover::before,
+    .tl-card.selected::before { background: var(--accent2); border-color: var(--accent2); }
+
+    .tl-card.most-recent { border-color: rgba(201,168,76,0.25); }
+    .tl-card.most-recent::before { background: var(--accent2); border-color: var(--accent2); }
+    .tl-card.selected { border-color: rgba(201,168,76,0.4) !important; }
+
+    .tl-date-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 30px;
+      flex-shrink: 0;
+    }
+
+    .tl-day {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .tl-month {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .tl-vline { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
+
+    .tl-body { flex: 1; min-width: 0; }
+
+    .tl-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tl-tags { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+
+    .tl-tag {
+      font-family: var(--font-mono);
+      font-size: 8px;
       letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 1px 5px;
+      border-radius: 2px;
+      background: var(--surface);
+      color: var(--muted);
+      border: 1px solid var(--border);
     }
 
-    /* Race buttons */
-    .race-section {
-      padding: 14px 22px 12px;
+    .tl-tag.tag-recent { background: rgba(201,168,76,0.08); color: var(--accent2); border-color: rgba(201,168,76,0.2); }
+    .tl-tag.tag-runoff { background: rgba(255,159,0,0.08); color: #ff9f00; border-color: rgba(255,159,0,0.2); }
+
+    .tl-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; }
+
+    /* ══════════════════════════════════════
+       PANEL B — ROUND PICKER
+    ══════════════════════════════════════ */
+    #panelRound {
+      overflow: hidden;
+    }
+
+    .panel-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
       border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
     }
 
-    .race-section-label {
+    .panel-back {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s;
+      user-select: none;
+    }
+
+    .panel-back:hover { color: var(--text); }
+
+    .panel-nav-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      flex: 1;
+      text-align: right;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .round-pick-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 24px 20px;
+      gap: 10px;
+    }
+
+    .round-pick-label {
       font-family: var(--font-mono);
       font-size: 9px;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 10px;
+      margin-bottom: 6px;
     }
 
-    #raceButtons { display: flex; flex-wrap: wrap; gap: 6px; }
+    .round-opt {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.16s;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .round-opt:hover { border-color: rgba(255,255,255,0.16); background: #1f2330; }
+
+    .round-opt-icon {
+      font-size: 20px;
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--surface);
+      border-radius: 7px;
+      flex-shrink: 0;
+    }
+
+    .round-opt-body { flex: 1; }
+
+    .round-opt-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .round-opt-sub {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .round-opt-arrow { color: var(--muted); font-size: 16px; }
+
+    /* ══════════════════════════════════════
+       PANEL C — RESULTS
+    ══════════════════════════════════════ */
+    #panelResults { overflow: hidden; }
+
+    /* Results header — election name + meta */
+    .res-header {
+      padding: 10px 16px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .res-header-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .res-election-name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .res-round-badge {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 3px;
+      background: rgba(255,159,0,0.1);
+      color: #ff9f00;
+      border: 1px solid rgba(255,159,0,0.2);
+      flex-shrink: 0;
+    }
+
+    .res-meta-row { display: flex; gap: 14px; margin-bottom: 6px; }
+    .res-meta-item { display: flex; flex-direction: column; }
+
+    .res-meta-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 1px;
+    }
+
+    .res-meta-value {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--accent);
+    }
+
+    .res-bar-track {
+      width: 100%; height: 2px;
+      background: var(--surface2);
+      border-radius: 2px; overflow: hidden;
+    }
+
+    .res-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      border-radius: 2px;
+    }
+
+    .res-bar-sub {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      color: var(--muted);
+      margin-top: 3px;
+      letter-spacing: 0.06em;
+    }
+
+    /* Race tabs */
+    .race-tab-bar {
+      padding: 8px 16px 0;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .race-tab-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    #raceButtons { display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 8px; }
 
     .race-btn {
-      padding: 5px 13px;
+      padding: 4px 11px;
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 0.05em;
       background: var(--surface2);
       color: var(--muted);
       border: 1px solid var(--border);
       border-radius: 4px;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.14s ease;
       user-select: none;
     }
 
-    .race-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.18); }
+    .race-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.16); }
 
     .race-btn.active {
       background: var(--accent2);
@@ -159,292 +500,626 @@
       font-weight: 500;
     }
 
-    /* Results */
+    /* Admin call bar — hidden by default, shown only when IS_ADMIN */
+    .call-bar {
+      padding: 8px 16px;
+      border-bottom: 1px solid rgba(255,230,0,0.1);
+      background: rgba(255,230,0,0.03);
+      flex-shrink: 0;
+      display: none !important;
+    }
+
+    .call-bar.admin-on { display: block !important; }
+
+    .call-bar-label {
+      font-family: var(--font-mono);
+      font-size: 8px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,230,0,0.45);
+      margin-bottom: 6px;
+    }
+
+    .call-btns { display: flex; gap: 6px; }
+
+    .call-btn {
+      padding: 5px 11px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      transition: all 0.15s;
+    }
+
+    .call-btn-winner { background: #ffe600; color: #0d0f14; }
+    .call-btn-winner:hover { background: #ffed40; box-shadow: 0 0 14px rgba(255,230,0,0.35); }
+    .call-btn-runoff { background: #ff9f00; color: #0d0f14; }
+    .call-btn-runoff:hover { background: #ffb733; }
+    .call-btn-uncall { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+    .call-btn-uncall:hover { color: var(--text); }
+
+    /* Results scroll area */
     #resultsScroll {
       flex: 1;
       overflow-y: auto;
-      padding: 18px 22px;
+      padding: 14px 16px;
       scrollbar-width: thin;
       scrollbar-color: var(--surface2) transparent;
     }
 
-    #resultsScroll::-webkit-scrollbar { width: 4px; }
+    #resultsScroll::-webkit-scrollbar { width: 3px; }
     #resultsScroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
-
-    .results-heading {
-      font-family: var(--font-display);
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .candidate-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 5px;
-    }
-
-    .candidate-swatch {
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .candidate-name {
-      font-size: 13px;
-      color: var(--text);
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .candidate-name.leader { font-weight: 500; color: #fff; }
-
-    .candidate-votes {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-
-    .candidate-votes.leader { color: var(--accent); }
-
-    .vote-bar-track {
-      width: 100%;
-      height: 3px;
-      background: var(--surface2);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-bottom: 10px;
-    }
-
-    .vote-bar-fill { height: 100%; border-radius: 2px; }
-
-    .winner-tag {
-      display: inline-block;
-      font-family: var(--font-mono);
-      font-size: 8px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      background: var(--accent2);
-      color: #0d0f14;
-      padding: 1px 5px;
-      border-radius: 2px;
-      margin-left: 5px;
-      vertical-align: middle;
-    }
-
-    .district-divider {
-      border: none;
-      border-top: 1px solid var(--border);
-      margin: 14px 0;
-    }
-
-    .placeholder {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.8;
-    }
-
-    .placeholder .icon { font-size: 28px; margin-bottom: 12px; opacity: 0.4; }
 
     /* Legend */
     #legend {
-      padding: 12px 22px;
+      padding: 8px 16px;
       border-top: 1px solid var(--border);
       background: var(--bg);
+      flex-shrink: 0;
     }
 
     .legend-label {
       font-family: var(--font-mono);
-      font-size: 9px;
+      font-size: 8px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 5px;
     }
 
-    .legend-items { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+    .legend-items { display: flex; flex-wrap: wrap; gap: 5px 10px; }
 
     .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--muted);
+      display: flex; align-items: center;
+      gap: 5px; font-size: 10px; color: var(--muted);
     }
 
-    .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
-    /* Leaflet overrides */
+    /* ══════════════════════════════════════
+       RESULTS CONTENT STYLES
+    ══════════════════════════════════════ */
+    .results-heading {
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 700;
+      color: var(--text); margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+
+    .call-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: var(--font-mono); font-size: 8px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 2px 6px; border-radius: 3px; font-weight: 700;
+    }
+
+    .call-badge-winner {
+      background: #ffe600; color: #0d0f14;
+      animation: badge-pulse 2s ease-in-out infinite;
+    }
+
+    .call-badge-runoff { background: #ff9f00; color: #0d0f14; }
+
+    @keyframes badge-pulse {
+      0%,100% { box-shadow: 0 0 6px rgba(255,230,0,0.3); }
+      50%      { box-shadow: 0 0 16px rgba(255,230,0,0.6); }
+    }
+
+    .flip-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-family: var(--font-mono); font-size: 8px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 2px 6px; border-radius: 3px; font-weight: 700;
+      background: linear-gradient(135deg,#3b5bdb,#7048e8);
+      color: #fff; box-shadow: 0 0 10px rgba(91,74,232,0.35);
+    }
+
+    .candidate-row {
+      display: flex; align-items: center;
+      gap: 8px; margin-bottom: 4px;
+    }
+
+    .candidate-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+    .candidate-name { font-size: 12px; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .candidate-name.leader { font-weight: 500; color: #fff; }
+
+    .candidate-votes { font-family: var(--font-mono); font-size: 10px; color: var(--muted); white-space: nowrap; }
+    .candidate-votes.leader { color: var(--accent); }
+
+    .vote-bar-track { width: 100%; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+    .vote-bar-fill { height: 100%; border-radius: 2px; }
+
+    .winner-tag {
+      display: inline-block; font-family: var(--font-mono); font-size: 7px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      background: var(--accent2); color: #0d0f14;
+      padding: 1px 4px; border-radius: 2px;
+      margin-left: 4px; vertical-align: middle;
+    }
+
+    .district-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+    .placeholder { text-align: center; padding: 32px 20px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+    .placeholder .icon { font-size: 24px; margin-bottom: 10px; opacity: 0.4; }
+
+    .margin-legend { margin-top: 8px; }
+    .margin-legend-label { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .margin-scale-wrap { display: flex; align-items: center; gap: 7px; }
+    .margin-scale-bar { flex: 1; height: 6px; border-radius: 3px; }
+    .margin-scale-text { font-family: var(--font-mono); font-size: 8px; color: var(--muted); white-space: nowrap; }
+
+    /* Leaflet */
     .leaflet-tooltip {
-      background: #0d0f14 !important;
-      border: 1px solid rgba(255,255,255,0.1) !important;
-      color: #e4e6ed !important;
-      font-family: 'DM Mono', monospace !important;
-      font-size: 11px !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+      background: #0d0f14 !important; border: 1px solid rgba(255,255,255,0.1) !important;
+      color: #e4e6ed !important; font-family: 'DM Mono', monospace !important;
+      font-size: 11px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
     }
     .leaflet-tooltip::before { display: none !important; }
   </style>
 </head>
 <body>
 
+<!-- MAP always rendered behind the sidebar -->
 <div id="map"></div>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
-  <div class="sidebar-header">
-    <div class="header-eyebrow">Live Results Dashboard</div>
-    <div class="header-title">Election Results</div>
-    <div class="meta-row">
-      <div class="meta-item">
-        <span class="meta-label">Turnout</span>
-        <span class="meta-value" id="turnoutVal">—</span>
+
+  <!-- Permanent brand header -->
+  <div class="sb-brand">
+    <div class="sb-brand-eyebrow">Live Results</div>
+    <div class="sb-brand-title">TSR Elects</div>
+  </div>
+
+  <!-- Panel viewport — slides between panels -->
+  <div class="panel-viewport">
+
+    <!-- ── PANEL A: TIMELINE ── -->
+    <div class="panel active" id="panelTimeline">
+      <div class="tl-filter-bar">
+        <div class="tl-tab active" onclick="filterTimeline('all',this)">All</div>
+        <div class="tl-tab" onclick="filterTimeline('President',this)">President</div>
+        <div class="tl-tab" onclick="filterTimeline('Senate',this)">Senate</div>
+        <div class="tl-tab" onclick="filterTimeline('Governor',this)">Governor</div>
       </div>
-      <div class="meta-item">
-        <span class="meta-label">Precincts Reporting</span>
-        <span class="meta-value" id="reportingVal">—</span>
+      <div class="tl-scroll" id="tlScroll">
+        <div class="placeholder"><div class="icon">🗳</div>Loading elections…</div>
       </div>
     </div>
-    <div class="reporting-bar-track">
-      <div class="reporting-bar-fill" id="reportingBar" style="width:0%"></div>
+
+    <!-- ── PANEL B: ROUND PICKER ── -->
+    <div class="panel" id="panelRound">
+      <div class="panel-nav">
+        <div class="panel-back" onclick="goPanel('panelTimeline')">← Elections</div>
+        <div class="panel-nav-title" id="roundNavTitle"></div>
+      </div>
+      <div class="round-pick-wrap">
+        <div class="round-pick-label">Select round</div>
+        <div id="roundOptions"></div>
+      </div>
     </div>
-    <div class="reporting-bar-sub" id="reportingSub"></div>
-  </div>
 
-  <div class="race-section">
-    <div class="race-section-label">Select Race</div>
-    <div id="raceButtons"></div>
-  </div>
+    <!-- ── PANEL C: RESULTS ── -->
+    <div class="panel" id="panelResults">
+      <!-- Election header -->
+      <div class="res-header">
+        <div class="res-header-top">
+          <div class="panel-back" onclick="goBackFromResults()">←</div>
+          <div class="res-election-name" id="resElectionName">—</div>
+          <div class="res-round-badge" id="resRoundBadge" style="display:none">Runoff</div>
+        </div>
+        <div class="res-meta-row">
+          <div class="res-meta-item">
+            <span class="res-meta-label">Turnout</span>
+            <span class="res-meta-value" id="turnoutVal">—</span>
+          </div>
+          <div class="res-meta-item">
+            <span class="res-meta-label">Reporting</span>
+            <span class="res-meta-value" id="reportingVal">—</span>
+          </div>
+          <div class="res-meta-item" id="partyMetaWrap" style="display:none">
+            <span class="res-meta-label">Party</span>
+            <span class="res-meta-value" id="partyVal" style="font-size:11px">—</span>
+          </div>
+        </div>
+        <div class="res-bar-track">
+          <div class="res-bar-fill" id="reportingBar" style="width:0%"></div>
+        </div>
+        <div class="res-bar-sub" id="reportingSub"></div>
+      </div>
 
-  <div id="resultsScroll">
-    <div class="placeholder">
-      <div class="icon">🗳</div>
-      Select a race above, then click a district on the map to see results.
+      <!-- Race tabs -->
+      <div class="race-tab-bar">
+        <div class="race-tab-label">Race</div>
+        <div id="raceButtons"></div>
+      </div>
+
+      <!-- Admin call bar — only shows with ?admin=1 in URL -->
+      <div class="call-bar" id="callBar">
+        <div class="call-bar-label">🔒 Admin · Call <span id="callBarDistrict"></span></div>
+        <div class="call-btns">
+          <button class="call-btn call-btn-winner" onclick="callDistrict('winner')">✔ Winner</button>
+          <button class="call-btn call-btn-runoff" onclick="callDistrict('runoff')">⚡ Runoff</button>
+          <button class="call-btn call-btn-uncall" onclick="callDistrict(null)">✕ Uncall</button>
+        </div>
+      </div>
+
+      <!-- Results content -->
+      <div id="resultsScroll">
+        <div class="placeholder">
+          <div class="icon">🗳</div>
+          Select a race above, then click a district on the map.
+        </div>
+      </div>
+
+      <!-- Candidate legend -->
+      <div id="legend">
+        <div class="legend-label">Candidates</div>
+        <div class="legend-items" id="legendItems"></div>
+      </div>
     </div>
-  </div>
 
-  <div id="legend">
-    <div class="legend-label">Candidates</div>
-    <div class="legend-items" id="legendItems"></div>
-  </div>
-</div>
+  </div><!-- /panel-viewport -->
+</div><!-- /sidebar -->
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
+// ══════════════════════════════════════════════════════════════
+//  ADMIN MODE
+// ══════════════════════════════════════════════════════════════
+const IS_ADMIN = new URLSearchParams(window.location.search).get('admin') === '1';
+if (IS_ADMIN) document.getElementById('callBar').classList.add('admin-on');
 
-const partyColors = {
-  wc:   "#4a9edd",
-  qtw:  "#e05555",
-  rf:   "#e07c30",
-  gsx:  "#9b6fd4",
-  dvwb: "#e8c44a"
+// ══════════════════════════════════════════════════════════════
+//  CANDIDATE REGISTRY
+//  These are the fallback built-ins. The JSON can extend/override
+//  via a top-level "candidates" object (see schema).
+//  Each entry: { name, color, party }
+//  party links to a partyRegistry entry key (e.g. 'tsp', 'udc').
+// ══════════════════════════════════════════════════════════════
+let candidateRegistry = {
+  wc:   { name: 'Worth-Cupcake',       color: '#4a9edd', party: 'udc'  },
+  qtw:  { name: 'TyroniusTheIII',      color: '#e05555', party: 'tsp'  },
+  rf:   { name: 'Representative-Fee65',color: '#e07c30', party: null   },
+  gsx:  { name: 'gunsmokexeon',        color: '#9b6fd4', party: null   },
+  dvwb: { name: 'Disguised_VW_Beetle', color: '#e8c44a', party: null   },
 };
 
-const partyNames = {
-  wc:   "Worth-Cupcake",
-  qtw:  "TyroniusTheIII",
-  rf:   "Representative-Fee65",
-  gsx:  "gunsmokexeon",
-  dvwb: "Disguised_VW_Beetle"
+// ══════════════════════════════════════════════════════════════
+//  PARTY REGISTRY
+//  Each entry: { name, color, shortName }
+//  Can also be extended/overridden via JSON top-level "parties".
+// ══════════════════════════════════════════════════════════════
+let partyRegistry = {
+  tsp: { name: 'The Standard Party',  shortName: 'TSP', color: '#e05555' },
+  udc: { name: 'United Democratic Coalition', shortName: 'UDC', color: '#4a9edd' },
 };
 
-let map = L.map('map', { zoomControl: false }).setView([40, -95], 4);
-L.control.zoom({ position: 'bottomright' }).addTo(map);
+// Convenience accessors (used throughout render code)
+function candidateColor(key) { return candidateRegistry[key]?.color || '#888888'; }
+function candidateName(key)  { return candidateRegistry[key]?.name  || key; }
+function candidateParty(key) { return candidateRegistry[key]?.party || null; }
 
+// ══════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════
+let allElections        = [];
+let geojsonCache        = null;
+let currentElection     = null;
+let currentRoundKey     = null;
+let currentRace         = null;
+let selectedDistrictId  = null;
+let districtCalls       = {};
+let geoLayer            = null;
+let mapInstance         = null;
+let activeFilter        = 'all';
+let selectedElectionIdx = null;
+let compareMode         = false;   // compare tool active
+let compareA            = null;    // first selected district
+let compareB            = null;    // second selected district
+
+// ══════════════════════════════════════════════════════════════
+//  MAP INIT (once, permanent)
+// ══════════════════════════════════════════════════════════════
+mapInstance = L.map('map', { zoomControl: false }).setView([40, -95], 4);
+L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; OpenStreetMap &copy; CARTO',
-  maxZoom: 19
-}).addTo(map);
+  attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
+}).addTo(mapInstance);
 
-let geoLayer;
-let resultsData;
-let currentRace = null;
-let selectedDistrictId = null;
+// ══════════════════════════════════════════════════════════════
+//  BOOT — fetch both files, show error state if either fails
+// ══════════════════════════════════════════════════════════════
+function showFetchError(which) {
+  document.getElementById('tlScroll').innerHTML = `
+    <div class="placeholder">
+      <div class="icon">⚠️</div>
+      <strong style="color:#e05555">Could not load ${which}</strong><br>
+      Make sure <code style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">${which}</code>
+      is in the same folder as this HTML file and your server is running.<br><br>
+      <span style="font-size:10px;color:var(--muted)">Opening via <code>file://</code> will always fail — use a local server
+      (e.g. <code>npx serve .</code> or VS Code Live Server).</span>
+    </div>`;
+}
 
-// Both fetches run in parallel; rendering waits until both are ready
 Promise.all([
-  fetch('geo.json').then(r => r.json()),
-  fetch('results.json').then(r => r.json())
-]).then(([geojson, data]) => {
+  fetch('results.json').then(r => { if (!r.ok) throw new Error('results.json'); return r.json(); }),
+  fetch('geo.json').then(r => { if (!r.ok) throw new Error('geo.json'); return r.json(); })
+]).then(([data, geo]) => {
+  geojsonCache = geo;
 
-  resultsData = {};
+  // Unwrap: support multiple JSON shapes
+  let elections;
+  if (Array.isArray(data)) {
+    // Plain array of election objects
+    elections = data;
+  } else if (data && Array.isArray(data.elections)) {
+    // { elections: [...], candidates: {...}, parties: {...} }
+    elections = data.elections;
+    // Merge optional top-level registries
+    if (data.candidates && typeof data.candidates === 'object')
+      Object.assign(candidateRegistry, data.candidates);
+    if (data.parties && typeof data.parties === 'object')
+      Object.assign(partyRegistry, data.parties);
+  } else if (data && typeof data === 'object') {
+    // Legacy: top-level keys are race names → wrap as single election
+    elections = [{
+      id: 'election_1', title: 'Election', date: null,
+      turnout: null, precincts_reporting: null, precincts_total: null, party: null,
+      first_round: { races: data }, runoff_round: null
+    }];
+  } else {
+    showFetchError('results.json (unrecognised format)');
+    return;
+  }
 
-data.forEach(election => {
-  const races = election.first_round.races;
-
-  Object.entries(races).forEach(([raceName, districts]) => {
-    resultsData[raceName] = districts;
+  allElections = elections;
+  allElections.sort((a, b) => {
+    const da = a.date ? new Date(a.date) : 0;
+    const db = b.date ? new Date(b.date) : 0;
+    return db - da;
   });
-});
-  
-  geoLayer = L.geoJSON(geojson, {
+
+  // Draw the geo layer once
+  geoLayer = L.geoJSON(geojsonCache, {
     style: styleFeature,
     onEachFeature: (feature, layer) => {
       layer.on({
         click: () => {
-          selectedDistrictId = feature.properties.id;
-          showDistrict(feature.properties.id);
+          const id = feature.properties.id;
+          if (compareMode) {
+            handleCompareClick(id);
+            return;
+          }
+          if (!currentRace) return;
+          selectedDistrictId = id;
+          showDistrict(id);
           geoLayer.setStyle(styleFeature);
+          if (IS_ADMIN) updateCallBar();
         },
-        mouseover: e => e.target.setStyle({ weight: 2.5, fillOpacity: 0.92 }),
-        mouseout:  e => geoLayer.resetStyle(e.target)
+        mouseover: e => {
+          const id = e.target.feature.properties.id;
+          if (id !== selectedDistrictId && id !== compareA && id !== compareB)
+            e.target.setStyle({ weight: 2.5, fillOpacity: 0.92 });
+        },
+        mouseout: e => {
+          const id = e.target.feature.properties.id;
+          if (id !== selectedDistrictId && id !== compareA && id !== compareB)
+            geoLayer.resetStyle(e.target);
+        }
       });
       layer.bindTooltip(
-        `<span style="opacity:0.5;font-size:9px;letter-spacing:0.1em">DISTRICT</span><br><strong>${feature.properties.id}</strong>`,
+        `<span style="opacity:.5;font-size:9px;letter-spacing:.1em">DISTRICT</span><br><strong>${feature.properties.id}</strong>`,
         { sticky: true, offset: [10, 0] }
       );
     }
-  }).addTo(map);
+  }).addTo(mapInstance);
 
-  map.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
-  
- let turnout = data[0].turnout;
- let reporting = data[0].precincts_reporting;
-  initUI();
+  mapInstance.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
+  renderTimeline(allElections);
+
+}).catch(err => {
+  showFetchError(err.message || 'data files');
 });
 
-function styleFeature(feature) {
-  const isSelected = feature.properties.id === selectedDistrictId;
+// ══════════════════════════════════════════════════════════════
+//  PANEL NAVIGATION
+// ══════════════════════════════════════════════════════════════
+function goPanel(targetId) {
+  const panels = ['panelTimeline', 'panelRound', 'panelResults'];
+  const currentIdx = panels.findIndex(p => document.getElementById(p).classList.contains('active'));
+  const targetIdx  = panels.indexOf(targetId);
 
-  if (!currentRace || !resultsData) {
-    return { color: isSelected ? '#fff' : '#3a3f4d', weight: isSelected ? 2.5 : 1, fillColor: '#1a1e28', fillOpacity: 0.7 };
-  }
-
-  const id = String(feature.properties.id);
-  const data = resultsData[currentRace][id];
-
-  if (!data) {
-    return { color: '#3a3f4d', weight: 1, fillColor: '#1a1e28', fillOpacity: 0.5 };
-  }
-
-  const [winnerKey] = Object.entries(data).sort((a, b) => b[1] - a[1])[0];
-
-  return {
-    fillColor: partyColors[winnerKey] || '#555',
-    fillOpacity: isSelected ? 0.95 : 0.72,
-    color: isSelected ? '#ffffff' : 'rgba(0,0,0,0.4)',
-    weight: isSelected ? 2.5 : 1
-  };
+  panels.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('active', 'behind');
+    if (i === targetIdx) el.classList.add('active');
+    else if (i < targetIdx) el.classList.add('behind');
+    // else: stays at translateX(100%) = default off-right
+  });
 }
 
-function initUI() {
-  // Completion stats
-  document.getElementById('turnoutVal').textContent = turnout + '%';
-  document.getElementById('reportingVal').textContent = reporting + '%';
-  document.getElementById('reportingBar').style.width = reporting + '%';
-  document.getElementById('reportingSub').textContent = `${reporting} of 100 precincts reporting`;
+function goBackFromResults() {
+  if (currentElection?.runoff_round) {
+    goPanel('panelRound');
+  } else {
+    goPanel('panelTimeline');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  TIMELINE
+// ══════════════════════════════════════════════════════════════
+function filterTimeline(type, tab) {
+  activeFilter = type;
+  document.querySelectorAll('.tl-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  const filtered = type === 'all'
+    ? allElections
+    : allElections.filter(e => e.title && e.title.includes(type));
+  renderTimeline(filtered);
+}
+
+function renderTimeline(elections) {
+  const wrap = document.getElementById('tlScroll');
+  if (!elections.length) {
+    wrap.innerHTML = '<div class="placeholder"><div class="icon">📭</div>No elections found.</div>';
+    return;
+  }
+
+  const byYear = {};
+  elections.forEach((e, i) => {
+    const yr = e.date ? new Date(e.date).getFullYear() : 'Unknown';
+    if (!byYear[yr]) byYear[yr] = [];
+    byYear[yr].push({ ...e, _origIdx: allElections.indexOf(e), _listIdx: i });
+  });
+
+  const years = Object.keys(byYear).sort((a, b) => b - a);
+  let html = '';
+
+  years.forEach(yr => {
+    html += `<div class="tl-year-group"><div class="tl-year">${yr}</div><div class="tl-cards">`;
+
+    byYear[yr].forEach(e => {
+      const d      = e.date ? new Date(e.date) : null;
+      const day    = d ? d.getDate() : '?';
+      const month  = d ? d.toLocaleString('en', { month: 'short' }).toUpperCase() : '';
+      const isFirst = e._listIdx === 0;
+      const hasRunoff = !!e.runoff_round;
+      const isSelected = e._origIdx === selectedElectionIdx;
+
+      html += `<div class="tl-card ${isFirst ? 'most-recent' : ''} ${isSelected ? 'selected' : ''}"
+        onclick="openElection(${e._origIdx})">
+        <div class="tl-date-col">
+          <div class="tl-day">${day}</div>
+          <div class="tl-month">${month}</div>
+        </div>
+        <div class="tl-vline"></div>
+        <div class="tl-body">
+          <div class="tl-title">${e.title || 'Untitled'}</div>
+          <div class="tl-tags">
+            ${isFirst ? '<span class="tl-tag tag-recent">Latest</span>' : ''}
+            ${hasRunoff ? '<span class="tl-tag tag-runoff">⚡ Runoff</span>' : ''}
+            ${e.party ? `<span class="tl-tag">${e.party}</span>` : ''}
+            ${e.turnout != null ? `<span class="tl-tag">${e.turnout}% turnout</span>` : ''}
+          </div>
+        </div>
+        <div class="tl-arrow">›</div>
+      </div>`;
+    });
+
+    html += `</div></div>`;
+  });
+
+  wrap.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ELECTION OPEN
+// ══════════════════════════════════════════════════════════════
+function openElection(idx) {
+  const e = allElections[idx];
+  if (!e) return;
+
+  selectedElectionIdx = idx;
+  currentElection = e;
+
+  // Re-render timeline to show selected state
+  const filtered = activeFilter === 'all'
+    ? allElections
+    : allElections.filter(el => el.title && el.title.includes(activeFilter));
+  renderTimeline(filtered);
+
+  if (!e.runoff_round) {
+    // Single round — go straight to map
+    selectRound(idx, 'first_round');
+  } else {
+    // Show round picker
+    document.getElementById('roundNavTitle').textContent = e.title || 'Election';
+
+    const opts = document.getElementById('roundOptions');
+    opts.innerHTML = `
+      <div class="round-opt" onclick="selectRound(${idx},'first_round')">
+        <div class="round-opt-icon">🗳</div>
+        <div class="round-opt-body">
+          <div class="round-opt-title">First Round</div>
+          <div class="round-opt-sub">All candidates · initial vote</div>
+        </div>
+        <div class="round-opt-arrow">›</div>
+      </div>
+      <div class="round-opt" onclick="selectRound(${idx},'runoff_round')">
+        <div class="round-opt-icon">⚡</div>
+        <div class="round-opt-body">
+          <div class="round-opt-title">Runoff Round</div>
+          <div class="round-opt-sub">Top-two · final results</div>
+        </div>
+        <div class="round-opt-arrow">›</div>
+      </div>`;
+
+    goPanel('panelRound');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ROUND SELECT → MAP
+// ══════════════════════════════════════════════════════════════
+function selectRound(idx, roundKey) {
+  const e = allElections[idx];
+  if (!e) return;
+
+  currentElection    = e;
+  currentRoundKey    = roundKey;
+  currentRace        = null;
+  selectedDistrictId = null;
+
+  const isRunoff  = roundKey === 'runoff_round';
+  const roundData = isRunoff ? e.runoff_round : (e.first_round || e);
+  const races     = roundData.races || roundData;
+
+  // Seed call state — only when races[race] is a district map (object of objects)
+  districtCalls = {};
+  const savedCalls = roundData.calls || {};
+  Object.keys(races).forEach(race => {
+    const raceData = races[race];
+    if (!raceData || typeof raceData !== 'object') return;
+    districtCalls[race] = {};
+    Object.keys(raceData).forEach(id => {
+      if (typeof raceData[id] !== 'object') return;
+      districtCalls[race][id] = savedCalls[race]?.[id] || { status: null, winner: null, prevWinner: null };
+    });
+  });
+
+  // Populate results header
+  document.getElementById('resElectionName').textContent = e.title || 'Election';
+  const rb = document.getElementById('resRoundBadge');
+  if (isRunoff) { rb.style.display = ''; rb.textContent = 'Runoff'; }
+  else rb.style.display = 'none';
+
+  const turnout   = roundData.turnout   ?? e.turnout   ?? '—';
+  const reporting = roundData.precincts_reporting ?? e.precincts_reporting ?? '—';
+  const total     = roundData.precincts_total     ?? e.precincts_total     ?? null;
+
+  document.getElementById('turnoutVal').textContent   = turnout   !== '—' ? turnout   + '%' : '—';
+  document.getElementById('reportingVal').textContent = reporting !== '—' ? reporting + '%' : '—';
+  document.getElementById('reportingBar').style.width = reporting !== '—' ? reporting + '%' : '0%';
+  document.getElementById('reportingSub').textContent = (total && reporting !== '—')
+    ? `${Math.round(reporting / 100 * total)} of ${total} precincts`
+    : '';
+
+  const pw = document.getElementById('partyMetaWrap');
+  if (e.party) { pw.style.display = 'flex'; document.getElementById('partyVal').textContent = e.party; }
+  else pw.style.display = 'none';
 
   // Race buttons
-  const container = document.getElementById('raceButtons');
-  Object.keys(resultsData).forEach(race => {
+  const raceContainer = document.getElementById('raceButtons');
+  raceContainer.innerHTML = '';
+  Object.keys(races).forEach(race => {
     const btn = document.createElement('div');
     btn.className = 'race-btn';
     btn.textContent = race;
@@ -453,94 +1128,509 @@ function initUI() {
       btn.classList.add('active');
       currentRace = race;
       selectedDistrictId = null;
+      if (IS_ADMIN) updateCallBar();
       geoLayer.setStyle(styleFeature);
       showRaceOverview();
     };
-    container.appendChild(btn);
+    raceContainer.appendChild(btn);
+  });  // Legend — grouped by party where possible
+  const allKeys = new Set();
+  Object.values(races).forEach(r => Object.values(r).forEach(d => Object.keys(d).forEach(k => allKeys.add(k))));
+  const legendEl = document.getElementById('legendItems');
+  legendEl.innerHTML = '';
+  allKeys.forEach(k => {
+    const party = candidateParty(k);
+    const partyInfo = party ? partyRegistry[party] : null;
+    const partyTag = partyInfo
+      ? `<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>`
+      : '';
+    legendEl.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${candidateColor(k)}"></div><span>${candidateName(k)}${partyTag}</span></div>`;
   });
 
-  // Legend
-  const legendEl = document.getElementById('legendItems');
-  Object.entries(partyNames).forEach(([k, name]) => {
-    legendEl.innerHTML += `
-      <div class="legend-item">
-        <div class="legend-dot" style="background:${partyColors[k]}"></div>
-        <span>${name}</span>
-      </div>`;
-  });
+  document.getElementById('resultsScroll').innerHTML =
+    `<div class="placeholder"><div class="icon">🗳</div>Select a race above, then click a district on the map.</div>`;
+
+  // Restyle map
+  geoLayer.setStyle(styleFeature);
+
+  goPanel('panelResults');
 }
 
-function showRaceOverview() {
-  const raceData = resultsData[currentRace];
-  let totals = {};
-  Object.values(raceData).forEach(d => {
-    Object.entries(d).forEach(([k, v]) => { totals[k] = (totals[k] || 0) + v; });
-  });
+// ══════════════════════════════════════════════════════════════
+//  COLOUR HELPERS
+// ══════════════════════════════════════════════════════════════
+function darkenHex(hex, t) {
+  let r = parseInt(hex.slice(1,3),16);
+  let g = parseInt(hex.slice(3,5),16);
+  let b = parseInt(hex.slice(5,7),16);
+  r = Math.round(r * (1 - t));
+  g = Math.round(g * (1 - t));
+  b = Math.round(b * (1 - t));
+  return `rgb(${r},${g},${b})`;
+}
 
-  const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
-  const totalVotes = sorted.reduce((a, [, v]) => a + v, 0);
+/**
+ * Blend a hex colour toward white by `t` (0 = original, 1 = white).
+ */
+function lightenHex(hex, t) {
+  let r = parseInt(hex.slice(1,3),16);
+  let g = parseInt(hex.slice(3,5),16);
+  let b = parseInt(hex.slice(5,7),16);
+  r = Math.round(r + (255 - r) * t);
+  g = Math.round(g + (255 - g) * t);
+  b = Math.round(b + (255 - b) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+function blendColors(hex1, hex2, t = 0.5) {
+  if (!hex1 || !hex2) return '#888888';
+  const r1 = parseInt(hex1.slice(1,3),16);
+  const g1 = parseInt(hex1.slice(3,5),16);
+  const b1 = parseInt(hex1.slice(5,7),16);
+  const r2 = parseInt(hex2.slice(1,3),16);
+  const g2 = parseInt(hex2.slice(3,5),16);
+  const b2 = parseInt(hex2.slice(5,7),16);
+  if ([r1,g1,b1,r2,g2,b2].some(v => isNaN(v))) return '#888888';
+  const r = Math.round(r1*(1-t) + r2*t);
+  const g = Math.round(g1*(1-t) + g2*t);
+  const b = Math.round(b1*(1-t) + b2*t);
+  return `rgb(${r},${g},${b})`;
+}
+
+function marginColor(data) {
+  if (!data) return '#111111';
+
+  const total = Object.values(data).reduce((a, b) => a + b, 0);
+  if (total === 0) return '#1a1e28';
+
+  const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+  const [firstKey, firstVal] = sorted[0];
+  const secondVal = sorted[1] ? sorted[1][1] : 0;
+
+  const margin = (firstVal - secondVal) / total; // 0..1
+
+  // Tie
+  if (margin === 0) return '#888888';
+
+  const base = candidateColor(firstKey);
+  const MID = 0.35;
+  if (margin < MID) {
+    const t = (1 - margin / MID) * 0.35;
+    return lightenHex(base, t);
+  } else {
+    const t = ((margin - MID) / (1 - MID)) * 0.30;
+    return darkenHex(base, t);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  MAP STYLE
+// ══════════════════════════════════════════════════════════════
+function getCurrentRaces() {
+  if (!currentElection) return null;
+  const rd = currentRoundKey === 'runoff_round'
+    ? currentElection.runoff_round
+    : (currentElection.first_round || currentElection);
+  return rd?.races || rd;
+}
+
+function styleFeature(feature) {
+  const isSelected = feature.properties.id === selectedDistrictId;
+  const races = getCurrentRaces();
+
+  if (!currentRace || !races) {
+    return { color: isSelected ? '#fff' : '#3a3f4d', weight: isSelected ? 2.5 : 1, fillColor: '#1a1e28', fillOpacity: 0.7 };
+  }
+
+  const id   = feature.properties.id;
+  const data = races[currentRace]?.[id];
+
+  if (!data) {
+    return { color: '#3a3f4d', weight: 1, fillColor: '#1a1e28', fillOpacity: 0.5 };
+  }
+
+  return {
+    fillColor:   marginColor(data),
+    fillOpacity: isSelected ? 0.95 : compareMode && (id === compareA || id === compareB) ? 0.95 : 0.72,
+    color:       isSelected ? '#ffffff' : (compareMode && (id === compareA || id === compareB)) ? '#ffffff' : 'rgba(0,0,0,0.4)',
+    weight:      isSelected ? 2.5 : (compareMode && (id === compareA || id === compareB)) ? 2.5 : 1
+  };
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ADMIN CALLS
+// ══════════════════════════════════════════════════════════════
+function updateCallBar() {
+  if (!IS_ADMIN) return;
+  document.getElementById('callBarDistrict').textContent =
+    (currentRace && selectedDistrictId) ? `— ${selectedDistrictId}` : '';
+}
+
+function callDistrict(status) {
+  if (!IS_ADMIN || !currentRace || !selectedDistrictId) return;
+  const rec = districtCalls[currentRace]?.[selectedDistrictId];
+  if (!rec) return;
+
+  const races = getCurrentRaces();
+  const data = races?.[currentRace]?.[selectedDistrictId];
+  const sorted = data ? Object.entries(data).sort((a,b)=>b[1]-a[1]) : [];
+  const leader = sorted.length ? sorted[0][0] : null;
+
+  if (status) {
+    const prev = rec.winner;
+    rec.prevWinner = (prev && prev !== leader) ? prev : rec.prevWinner;
+    rec.winner = leader;
+    rec.status = status;
+  } else {
+    rec.status = null;
+    rec.winner = null;
+  }
+
+  updateCallBar();
+  showDistrict(selectedDistrictId);
+  // To persist: fetch('/api/calls', { method:'POST', body: JSON.stringify({...}) });
+}
+
+// ══════════════════════════════════════════════════════════════
+//  COMPARE TOOL
+// ══════════════════════════════════════════════════════════════
+function toggleCompare() {
+  compareMode = !compareMode;
+  compareA = null;
+  compareB = null;
+  selectedDistrictId = null;
+  geoLayer.setStyle(styleFeature);
+
+  const btn = document.getElementById('compareToggleBtn');
+  if (compareMode) {
+    btn.style.background = 'linear-gradient(135deg,#3b5bdb,#7048e8)';
+    btn.style.color = '#fff';
+    btn.textContent = '⚖ Comparing — pick 2 districts';
+    document.getElementById('resultsScroll').innerHTML = `
+      <div class="placeholder">
+        <div class="icon">⚖</div>
+        Click two districts on the map to compare them side by side.
+      </div>`;
+  } else {
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.textContent = '⚖ Compare Districts';
+    showRaceOverview();
+  }
+}
+
+function handleCompareClick(id) {
+  if (!compareA) {
+    compareA = id;
+  } else if (!compareB && id !== compareA) {
+    compareB = id;
+    showComparison();
+  } else {
+    // Reset and start again
+    compareA = id;
+    compareB = null;
+    document.getElementById('resultsScroll').innerHTML = `
+      <div class="placeholder">
+        <div class="icon">⚖</div>
+        Now pick a second district to compare.
+      </div>`;
+  }
+  geoLayer.setStyle(styleFeature);
+}
+
+function showComparison() {
+  const races = getCurrentRaces();
+  if (!races || !currentRace || !compareA || !compareB) return;
+
+  const dA = races[currentRace]?.[compareA];
+  const dB = races[currentRace]?.[compareB];
+
+  function districtBlock(id, data) {
+    if (!data) return `<div style="color:var(--muted);font-size:11px">No data for ${id}</div>`;
+    const sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]);
+    const total = sorted.reduce((a,[,v])=>a+v,0);
+    const isTie = total > 0 && sorted[0]?.[1] === sorted[1]?.[1];
+    const noVotes = total === 0;
+
+    let html = `<div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">`;
+    if (!noVotes && !isTie) {
+      const wKey = sorted[0][0];
+      html += `<span style="color:${candidateColor(wKey)};margin-right:6px">●</span>`;
+    }
+    html += `${id}</div>`;
+
+    if (noVotes) { html += `<div style="color:var(--muted);font-size:11px">No votes</div>`; return html; }
+    if (isTie)   { html += `<div style="color:#aaa;font-size:10px;margin-bottom:6px">⚖ Tie</div>`; }
+
+    sorted.forEach(([k,v],i) => {
+      const pct = total ? ((v/total)*100).toFixed(1) : 0;
+      const leader = !isTie && i===0;
+      html += `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <div style="width:7px;height:7px;border-radius:50%;background:${candidateColor(k)};flex-shrink:0"></div>
+          <span style="font-size:11px;color:${leader?'#fff':'var(--text)'};flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${candidateName(k)}</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:${leader?'var(--accent)':'var(--muted)'}">${pct}%</span>
+        </div>
+        <div style="width:100%;height:2px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:5px">
+          <div style="width:${pct}%;height:100%;background:${candidateColor(k)};border-radius:2px"></div>
+        </div>`;
+    });
+
+    const firstVal  = sorted[0]?.[1] || 0;
+    const secondVal = sorted[1]?.[1] || 0;
+    const margin = total ? ((firstVal-secondVal)/total*100).toFixed(1) : null;
+
+    if (!isTie && margin !== null) {
+      html += `<div style="margin-top:6px;font-family:var(--font-mono);font-size:9px;color:var(--muted)">
+        Margin <span style="color:${candidateColor(sorted[0][0])};font-weight:500">+${margin}%</span>
+        &nbsp;·&nbsp; ${total.toLocaleString()} votes
+      </div>`;
+    }
+
+    // Party breakdown
+    const partyTotals = {};
+    sorted.forEach(([k,v]) => {
+      const p = candidateParty(k);
+      if (p) partyTotals[p] = (partyTotals[p]||0)+v;
+    });
+    const partyEntries = Object.entries(partyTotals).sort((a,b)=>b[1]-a[1]);
+    if (partyEntries.length) {
+      html += `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">`;
+      partyEntries.forEach(([p,v]) => {
+        const pInfo = partyRegistry[p];
+        const pct = total ? ((v/total)*100).toFixed(1) : 0;
+        html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+          <span style="font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:.08em;background:${pInfo?.color||'#888'}22;color:${pInfo?.color||'#888'};border:1px solid ${pInfo?.color||'#888'}44;padding:1px 4px;border-radius:2px">${pInfo?.shortName||p}</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${pct}%</span>
+        </div>`;
+      });
+      html += `</div>`;
+    }
+
+    return html;
+  }
+
+  const html = `
+    <div style="margin-bottom:10px;font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text)">
+      District Comparison
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px">
+        ${districtBlock(compareA, dA)}
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px">
+        ${districtBlock(compareB, dB)}
+      </div>
+    </div>
+    <div onclick="compareA=null;compareB=null;document.getElementById('resultsScroll').innerHTML='<div class=\\'placeholder\\'><div class=\\'icon\\'>⚖</div>Click two districts to compare.</div>';geoLayer.setStyle(styleFeature);"
+      style="color:var(--muted);font-size:11px;text-align:center;cursor:pointer;text-decoration:underline;padding:4px 0">
+      ↺ Pick new districts
+    </div>`;
+
+  document.getElementById('resultsScroll').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  RESULTS PANELS
+// ══════════════════════════════════════════════════════════════
+function showRaceOverview() {
+  const races = getCurrentRaces();
+  if (!races || !currentRace) return;
+
+  const raceData = races[currentRace];
+  let totals = {};
+  Object.values(raceData).forEach(d => Object.entries(d).forEach(([k,v]) => { totals[k]=(totals[k]||0)+v; }));
+
+  const sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
+  const total  = sorted.reduce((a,[,v])=>a+v,0);
+
+  const calls  = districtCalls[currentRace] || {};
+  const cW = Object.values(calls).filter(c=>c.status==='winner').length;
+  const cR = Object.values(calls).filter(c=>c.status==='runoff').length;
+
+  // Party totals
+  const partyTotals = {};
+  sorted.forEach(([k,v]) => {
+    const p = candidateParty(k);
+    if (p) partyTotals[p] = (partyTotals[p]||0)+v;
+  });
 
   let html = `<div class="results-heading">${currentRace} — Overview</div>`;
-  sorted.forEach(([k, v], i) => {
-    const pct = totalVotes ? ((v / totalVotes) * 100).toFixed(1) : 0;
-    const leader = i === 0;
+
+  // Party summary bar
+  const partyEntries = Object.entries(partyTotals).sort((a,b)=>b[1]-a[1]);
+  if (partyEntries.length && total > 0) {
+    html += `<div style="margin-bottom:10px">
+      <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">By Party</div>
+      <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:4px">`;
+    partyEntries.forEach(([p,v]) => {
+      const pct = ((v/total)*100).toFixed(1);
+      const col = partyRegistry[p]?.color || '#888';
+      html += `<div style="width:${pct}%;background:${col}" title="${partyRegistry[p]?.name||p}: ${pct}%"></div>`;
+    });
+    html += `</div><div style="display:flex;gap:10px;flex-wrap:wrap">`;
+    partyEntries.forEach(([p,v]) => {
+      const pct = ((v/total)*100).toFixed(1);
+      const pInfo = partyRegistry[p];
+      html += `<span style="font-family:var(--font-mono);font-size:9px;color:${pInfo?.color||'#888'}">${pInfo?.shortName||p} ${pct}%</span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  if (cW || cR) {
+    html += `<div style="margin-bottom:8px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">`;
+    if (cW) html += `<span style="color:#ffe600;margin-right:10px">✔ ${cW} called</span>`;
+    if (cR) html += `<span style="color:#ff9f00">⚡ ${cR} runoff</span>`;
+    html += `</div>`;
+  }
+
+  sorted.forEach(([k,v],i) => {
+    const pct = total ? ((v/total)*100).toFixed(1) : 0;
+    const leader = i===0;
+    const party = candidateParty(k);
+    const partyInfo = party ? partyRegistry[party] : null;
+    const partyTag = partyInfo
+      ? `<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>`
+      : '';
     html += `
       <div class="candidate-row">
-        <div class="candidate-swatch" style="background:${partyColors[k]}"></div>
-        <span class="candidate-name ${leader ? 'leader' : ''}">
-          ${partyNames[k]}${leader ? '<span class="winner-tag">Leading</span>' : ''}
-        </span>
-        <span class="candidate-votes ${leader ? 'leader' : ''}">${v.toLocaleString()} · ${pct}%</span>
+        <div class="candidate-swatch" style="background:${candidateColor(k)}"></div>
+        <span class="candidate-name ${leader?'leader':''}">${candidateName(k)}${partyTag}${leader?'<span class="winner-tag">Leading</span>':''}</span>
+        <span class="candidate-votes ${leader?'leader':''}">${v.toLocaleString()} · ${pct}%</span>
       </div>
-      <div class="vote-bar-track">
-        <div class="vote-bar-fill" style="width:${pct}%;background:${partyColors[k]}"></div>
-      </div>`;
+      <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${candidateColor(k)}"></div></div>`;
   });
 
+  const baseColor = candidateColor(sorted[0]?.[0]);
   html += `<hr class="district-divider">
-    <div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">
-      Click a district on the map for local results
-    </div>`;
+    <div class="margin-legend">
+      <div class="margin-legend-label">Map shading — margin of victory</div>
+      <div class="margin-scale-wrap">
+        <span class="margin-scale-text">Closer</span>
+        <div class="margin-scale-bar" style="background:linear-gradient(90deg,${lightenHex(baseColor,0.35)},${baseColor},${darkenHex(baseColor,0.30)})"></div>
+        <span class="margin-scale-text">Larger</span>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:4px">Tie = grey · No votes = #1a1e28</div>
+    </div>
+    <hr class="district-divider">
+    <button id="compareToggleBtn" onclick="toggleCompare()"
+      style="width:100%;padding:7px;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:5px;cursor:pointer;transition:all .2s;margin-bottom:4px">
+      ⚖ Compare Districts
+    </button>
+    <div style="color:var(--muted);font-size:11px;text-align:center;padding:4px 0">Click a district on the map for local results</div>`;
 
   document.getElementById('resultsScroll').innerHTML = html;
 }
 
 function showDistrict(id) {
-  if (!currentRace) return;
-  const data = resultsData[currentRace][id];
+  const races = getCurrentRaces();
+  if (!currentRace || !races) return;
+  const data = races[currentRace]?.[id];
   if (!data) return;
 
-  const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
-  const totalVotes = sorted.reduce((a, [, v]) => a + v, 0);
+  const sorted    = Object.entries(data).sort((a,b)=>b[1]-a[1]);
+  const total     = sorted.reduce((a,[,v])=>a+v,0);
+  const rec       = districtCalls[currentRace]?.[id] || {};
+  const firstVal  = sorted[0]?.[1] || 0;
+  const secondVal = sorted[1]?.[1] || 0;
+  const margin    = total ? ((firstVal-secondVal)/total*100).toFixed(1) : null;
+  const isTie     = total > 0 && firstVal === secondVal;
+  const noVotes   = total === 0;
+  const isFlip    = rec.status && rec.prevWinner && rec.prevWinner !== rec.winner;
 
-  let html = `<div class="results-heading">District ${id}</div>`;
-  sorted.forEach(([k, v], i) => {
-    const pct = totalVotes ? ((v / totalVotes) * 100).toFixed(1) : 0;
-    const leader = i === 0;
-    html += `
-      <div class="candidate-row">
-        <div class="candidate-swatch" style="background:${partyColors[k]}"></div>
-        <span class="candidate-name ${leader ? 'leader' : ''}">
-          ${partyNames[k]}${leader ? '<span class="winner-tag">Winner</span>' : ''}
-        </span>
-        <span class="candidate-votes ${leader ? 'leader' : ''}">${v.toLocaleString()} · ${pct}%</span>
-      </div>
-      <div class="vote-bar-track">
-        <div class="vote-bar-fill" style="width:${pct}%;background:${partyColors[k]}"></div>
-      </div>`;
+  let badges = '';
+  if (rec.status==='winner') badges += `<span class="call-badge call-badge-winner">✔ Called</span>`;
+  else if (rec.status==='runoff') badges += `<span class="call-badge call-badge-runoff">⚡ Runoff</span>`;
+  if (isFlip) badges += `<span class="flip-badge">🔄 Flip</span>`;
+
+  let html = `<div class="results-heading">District ${id} ${badges}</div>`;
+
+  if (noVotes) {
+    html += `<div style="color:var(--muted);font-size:12px;padding:8px 0">No votes reported yet.</div>`;
+  } else if (isTie) {
+    html += `<div style="background:#2a2a2a;border-radius:5px;padding:8px 10px;margin-bottom:10px;font-family:var(--font-mono);font-size:10px;color:#aaa">⚖ Tie — no candidate leads</div>`;
+  }
+
+  // Party totals for this district
+  const partyTotals = {};
+  sorted.forEach(([k,v]) => {
+    const p = candidateParty(k);
+    if (p) partyTotals[p] = (partyTotals[p]||0)+v;
   });
 
+  sorted.forEach(([k,v],i) => {
+    const pct = total ? ((v/total)*100).toFixed(1) : 0;
+    const leader = !isTie && i===0;
+    const party = candidateParty(k);
+    const partyInfo = party ? partyRegistry[party] : null;
+    const partyTag = partyInfo
+      ? `<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>`
+      : '';
+    const tag = leader
+      ? (rec.status==='winner' ? '<span class="winner-tag">✔ Winner</span>'
+        : rec.status==='runoff' ? '<span class="winner-tag">⚡ Runoff</span>'
+        : '<span class="winner-tag">Leading</span>') : '';
+    html += `
+      <div class="candidate-row">
+        <div class="candidate-swatch" style="background:${candidateColor(k)}"></div>
+        <span class="candidate-name ${leader?'leader':''}">${candidateName(k)}${partyTag}${tag}</span>
+        <span class="candidate-votes ${leader?'leader':''}">${v.toLocaleString()} · ${pct}%</span>
+      </div>
+      <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${candidateColor(k)}"></div></div>`;
+  });
+
+  // Party summary for district
+  const partyEntries = Object.entries(partyTotals).sort((a,b)=>b[1]-a[1]);
+  if (partyEntries.length && total > 0) {
+    html += `<div style="margin:6px 0 10px;padding:8px 10px;background:var(--surface2);border-radius:5px;border:1px solid var(--border)">
+      <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Party Vote</div>
+      <div style="display:flex;height:5px;border-radius:3px;overflow:hidden;margin-bottom:5px">`;
+    partyEntries.forEach(([p,v]) => {
+      const pct = ((v/total)*100).toFixed(1);
+      const col = partyRegistry[p]?.color || '#888';
+      html += `<div style="width:${pct}%;background:${col}"></div>`;
+    });
+    html += `</div><div style="display:flex;gap:10px;flex-wrap:wrap">`;
+    partyEntries.forEach(([p,v]) => {
+      const pct = ((v/total)*100).toFixed(1);
+      const pInfo = partyRegistry[p];
+      html += `<span style="font-family:var(--font-mono);font-size:9px;color:${pInfo?.color||'#888'}">${pInfo?.shortName||p} ${pct}%</span>`;
+    });
+    html += `</div></div>`;
+  }
+
+  if (!noVotes && !isTie && margin !== null) {
+    const wc = candidateColor(sorted[0][0]);
+    html += `<hr class="district-divider">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Margin</span>
+        <span style="font-family:var(--font-mono);font-size:13px;color:${wc};font-weight:500">+${margin}%</span>
+      </div>
+      <div class="vote-bar-track" style="height:4px">
+        <div class="vote-bar-fill" style="width:${Math.min(parseFloat(margin),100)}%;background:${marginColor(data)}"></div>
+      </div>`;
+  }
+
   html += `<hr class="district-divider">
-    <div style="color:var(--muted);font-size:12px;margin-bottom:4px">Total votes cast</div>
-    <div style="font-family:var(--font-mono);font-size:18px;color:var(--accent);margin-bottom:14px">${totalVotes.toLocaleString()}</div>
-    <hr class="district-divider">
-    <div onclick="showRaceOverview()" style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0;cursor:pointer;text-decoration:underline">
-      ← Back to overview
+    <div style="color:var(--muted);font-size:11px;margin-bottom:3px">Total votes cast</div>
+    <div style="font-family:var(--font-mono);font-size:17px;color:var(--accent);margin-bottom:10px">${total.toLocaleString()}</div>`;
+
+  if (isFlip) {
+    html += `<div style="background:linear-gradient(135deg,rgba(59,91,219,0.18),rgba(112,72,232,0.18));border:1px solid rgba(112,72,232,0.3);border-radius:6px;padding:9px 12px;margin-bottom:10px">
+      <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9b8fe8;margin-bottom:3px">🔄 District Flip</div>
+      <div style="font-size:12px;color:var(--text)">
+        <span style="color:${candidateColor(rec.prevWinner)}">${candidateName(rec.prevWinner)}</span>
+        <span style="color:var(--muted);margin:0 6px">→</span>
+        <span style="color:${candidateColor(rec.winner)}">${candidateName(rec.winner)}</span>
+      </div>
     </div>`;
+  }
+
+  html += `<div onclick="showRaceOverview();selectedDistrictId=null;if(geoLayer)geoLayer.setStyle(styleFeature);"
+    style="color:var(--muted);font-size:11px;text-align:center;padding:6px 0;cursor:pointer;text-decoration:underline">← Back to overview</div>`;
 
   document.getElementById('resultsScroll').innerHTML = html;
 }
-
 </script>
 </body>
 </html>
