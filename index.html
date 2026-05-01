@@ -850,7 +850,7 @@ function showFetchError(which) {
 
 Promise.all([
   fetch('results.json').then(r => { if (!r.ok) throw new Error('results.json'); return r.json(); }),
-  fetch('geo.json').then(r => { if (!r.ok) throw new Error('geo.json'); return r.json(); })
+  fetch('your-geojson.geojson').then(r => { if (!r.ok) throw new Error('.geojson'); return r.json(); })
 ]).then(([data, geo]) => {
   geojsonCache = geo;
 
