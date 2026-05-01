@@ -745,7 +745,7 @@
         <div class="call-btns">
           <button class="call-btn call-btn-winner" onclick="callDistrict('winner')">✔ Winner</button>
           <button class="call-btn call-btn-runoff" onclick="callDistrict('runoff')">⚡ Runoff</button>
-          <button class="call-btn -btn-un" onclick="District(null)">✕ Un</button>
+          <button class="call-btn call-btn-uncall" onclick="callDistrict(null)">✕ Uncall</button>
         </div>
       </div>
 
@@ -773,7 +773,7 @@
 //  ADMIN MODE
 // ══════════════════════════════════════════════════════════════
 const IS_ADMIN = new URLSearchParams(window.location.search).get('admin') === '1';
-if (IS_ADMIN) document.getElementById('Bar').classList.add('admin-on');
+if (IS_ADMIN) document.getElementById('callBar').classList.add('admin-on');
 
 // ══════════════════════════════════════════════════════════════
 //  CANDIDATE REGISTRY
@@ -892,68 +892,38 @@ Promise.all([
     onEachFeature: (feature, layer) => {
       layer.on({
         click: () => {
-        const id = feature.properties.id;
-
-  // If compare mode is active
-  if (compareMode) {
-    // NEW: allow comparing the same district across time
-    if (compareA === null) {
-      compareA = { id, race: currentRace };
-    } else if (compareB === null) {
-      compareB = { id, race: currentRace };
-    } else {
-      // Reset comparison if both slots filled
-      compareA = { id, race: currentRace };
-      compareB = null;
+          const id = feature.properties.id;
+          if (compareMode) {
+            handleCompareClick(id);
+            return;
+          }
+          if (!currentRace) return;
+          selectedDistrictId = id;
+          showDistrict(id);
+          geoLayer.setStyle(styleFeature);
+          if (IS_ADMIN) updateCallBar();
+        },
+        mouseover: e => {
+          const id = e.target.feature.properties.id;
+          if (id !== selectedDistrictId && id !== compareA && id !== compareB)
+            e.target.setStyle({ weight: 2.5, fillOpacity: 0.92 });
+        },
+        mouseout: e => {
+          const id = e.target.feature.properties.id;
+          if (id !== selectedDistrictId && id !== compareA && id !== compareB)
+            geoLayer.resetStyle(e.target);
+        }
+      });
+      layer.bindTooltip(
+        `<span style="opacity:.5;font-size:9px;letter-spacing:.1em">DISTRICT</span><br><strong>${feature.properties.id}</strong>`,
+        { sticky: true, offset: [10, 0] }
+      );
     }
+  }).addTo(mapInstance);
 
-    updateCompareView(); // you need to implement this to render comparison
-    return;
-  }
+  mapInstance.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
+  renderTimeline(allElections);
 
-  if (!currentRace) return;
-
-  selectedDistrictId = id;
-  showDistrict(id);
-  geoLayer.setStyle(styleFeature);
-
-  if (IS_ADMIN) updateCallBar();
-},
-
-mouseover: e => {
-  const id = e.target.feature.properties.id;
-
-  if (
-    id !== selectedDistrictId &&
-    (!compareA || id !== compareA.id) &&
-    (!compareB || id !== compareB.id)
-  ) {
-    e.target.setStyle({ weight: 2.5, fillOpacity: 0.92 });
-  }
-},
-
-mouseout: e => {
-  const id = e.target.feature.properties.id;
-
-  if (
-    id !== selectedDistrictId &&
-    (!compareA || id !== compareA.id) &&
-    (!compareB || id !== compareB.id)
-  ) {
-    geoLayer.resetStyle(e.target);
-  }
-}
-
-layer.bindTooltip(
-  `<span style="opacity:.5;font-size:9px;letter-spacing:.1em">DISTRICT</span><br><strong>${feature.properties.id}</strong>`,
-  { sticky: true, offset: [10, 0] }
-);
-
-// After GeoJSON layer creation
-mapInstance.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
-renderTimeline(allElections);
-
-// Error handling
 }).catch(err => {
   showFetchError(err.message || 'data files');
 });
