@@ -374,7 +374,7 @@ let selectedDistrictId = null;
 
 // Both fetches run in parallel; rendering waits until both are ready
 Promise.all([
-  fetch('geo.json').then(r => r.json()),
+  fetch('your-geojson.geojson').then(r => r.json()),
   fetch('results.json').then(r => r.json())
 ]).then(([geojson, data]) => {
   resultsData = data;
