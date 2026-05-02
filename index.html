@@ -608,7 +608,7 @@ Promise.all([
         }
       });
       layer.bindTooltip(
-        `<span style="opacity:.5;font-size:9px;letter-spacing:.1em">DISTRICT</span><br><strong>${feature.properties.id}</strong>`,
+        `<span style="opacity:.5;font-size:9px;letter-spacing:.1em">GROUP</span><br><strong>${feature.properties.id}</strong>`,
         { sticky: true, offset: [10,0] }
       );
     }
@@ -759,7 +759,7 @@ function selectRound(idx, roundKey) {
   document.getElementById('turnoutVal').textContent   = turnout   !== '—' ? turnout+'%'   : '—';
   document.getElementById('reportingVal').textContent = reporting !== '—' ? reporting+'%' : '—';
   document.getElementById('reportingBar').style.width = reporting !== '—' ? reporting+'%' : '0%';
-  document.getElementById('reportingSub').textContent = (total && reporting !== '—') ? `${Math.round(reporting/100*total)} of ${total} precincts` : '';
+  document.getElementById('reportingSub').textContent = (total && reporting !== '—') ? `${Math.round(reporting/100*total)}% of expected votes in` : '';
 
   const pw = document.getElementById('partyMetaWrap');
   if (e.party) { pw.style.display='flex'; document.getElementById('partyVal').textContent=e.party; }
@@ -1195,7 +1195,7 @@ function buildShiftMarginChart(groupColor, groupLabel, compTitle) {
   let html = `
     <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
       <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">
-        District Shifts — ${groupLabel}
+        Group Shifts — ${groupLabel}
       </div>
       <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:8px">
         vs. ${compTitle}
@@ -1257,7 +1257,7 @@ function showShiftDistrict(id) {
   const compShare = compDist    ? getGroupShare(compDist,    shiftGroupKey) : null;
 
   let html = `
-    <div class="results-heading">District ${id}</div>
+    <div class="results-heading">Group ${id}</div>
     <div style="text-align:center;padding:14px 0 10px">
       <div style="font-family:var(--font-display);font-size:32px;font-weight:900;color:${gained?groupColor:'#888'}">${sign}${shift.toFixed(1)}<span style="font-size:16px">pp</span></div>
       <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:.1em;text-transform:uppercase">
