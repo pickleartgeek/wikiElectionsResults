@@ -90,7 +90,7 @@
       }
     },
     "runoff_round": {
-      "turnout": 38,
+      "turnout": 72,
       "precincts_reporting": 100,
       "precincts_total": 100,
       "races": {
