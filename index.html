@@ -406,7 +406,7 @@
       <div id="resultsScroll">
         <div class="placeholder">
           <div class="icon">🗳</div>
-          Select a race above, then click a district on the map.
+          Select a race above, then click a group on the map.
         </div>
       </div>
 
@@ -795,7 +795,7 @@ function selectRound(idx, roundKey) {
     legendEl.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${candidateColor(k)}"></div><span>${candidateName(k)}${partyTag}</span></div>`;
   });
 
-  document.getElementById('resultsScroll').innerHTML = `<div class="placeholder"><div class="icon">🗳</div>Select a race above, then click a district on the map.</div>`;
+  document.getElementById('resultsScroll').innerHTML = `<div class="placeholder"><div class="icon">🗳</div>Select a race above, then click a group on the map.</div>`;
   geoLayer.setStyle(styleFeature);
   goPanel('panelResults');
 }
@@ -1177,7 +1177,7 @@ function applyShiftMap() {
   document.getElementById('resultsScroll').innerHTML = `
     <div class="placeholder">
       <div class="icon" style="font-size:20px">📊</div>
-      Shift map active.<br>Click a district to see its shift.
+      Shift map active.<br>Click a group to see its shift.
     </div>`;
 
   // Switch to results panel so map + legend are visible together
@@ -1289,7 +1289,7 @@ function showShiftDistrict(id) {
   }
 
   html += `
-    <div onclick="selectedDistrictId=null;geoLayer.setStyle(styleFeature);document.getElementById('resultsScroll').innerHTML='<div class=\\'placeholder\\'><div class=\\'icon\\'>📊</div>Shift map active.<br>Click a district to see its shift.</div>'"
+    <div onclick="selectedDistrictId=null;geoLayer.setStyle(styleFeature);document.getElementById('resultsScroll').innerHTML='<div class=\\'placeholder\\'><div class=\\'icon\\'>📊</div>Shift map active.<br>Click a group to see its shift.</div>'"
       style="color:var(--muted);font-size:11px;text-align:center;padding:6px 0;cursor:pointer;text-decoration:underline">← Back to overview</div>`;
 
   document.getElementById('resultsScroll').innerHTML = html;
