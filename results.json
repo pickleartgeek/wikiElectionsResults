@@ -123,7 +123,7 @@
     "id": "Class 7 July",
     "title": "Class 7 Election",
     "date": "2025-08-03",
-    "party": "Special",
+    "party": "Regular",
     "turnout": 72,
     "precincts_reporting": 100,
     "precincts_total": 100,
@@ -156,8 +156,8 @@
           "6": { "tmf1": 2, "pag": 6 },
           "7": { "tmf1": 3, "pag": 1 },
           "8": { "tmf1": 3, "pag": 0 },
-          "9": { "tmf1": 2, "pag": 1 },
-        },
+          "9": { "tmf1": 2, "pag": 1 }
+        }
       }
     }
   } 
