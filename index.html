@@ -33,19 +33,10 @@
       display: flex;
     }
 
-    /* ══════════════════════════════════════
-       MAP — always visible behind sidebar
-    ══════════════════════════════════════ */
-    #map {
-      flex: 1;
-      height: 100vh;
-    }
-
+    #map { flex: 1; height: 100vh; }
     .leaflet-container { background: #0d0f14 !important; }
 
-    /* ══════════════════════════════════════
-       SIDEBAR SHELL
-    ══════════════════════════════════════ */
+    /* ══ SIDEBAR ══ */
     #sidebar {
       width: var(--sidebar-w);
       min-width: 300px;
@@ -58,14 +49,12 @@
       position: relative;
     }
 
-    /* Permanent branding header */
     .sb-brand {
       padding: 18px 22px 14px;
       border-bottom: 1px solid var(--border);
       background: var(--bg);
       flex-shrink: 0;
     }
-
     .sb-brand-eyebrow {
       font-family: var(--font-mono);
       font-size: 9px;
@@ -74,7 +63,6 @@
       color: var(--accent2);
       margin-bottom: 3px;
     }
-
     .sb-brand-title {
       font-family: var(--font-display);
       font-size: 22px;
@@ -83,457 +71,143 @@
       line-height: 1.05;
     }
 
-    /* ══════════════════════════════════════
-       PANEL SYSTEM — three panels that
-       slide left/right inside the sidebar
-    ══════════════════════════════════════ */
-    .panel-viewport {
-      flex: 1;
-      overflow: hidden;
-      position: relative;
-    }
+    /* ══ PANEL SYSTEM ══ */
+    .panel-viewport { flex: 1; overflow: hidden; position: relative; }
 
     .panel {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
       transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
       will-change: transform;
     }
+    .panel                { transform: translateX(100%); opacity: 0; pointer-events: none; }
+    .panel.active         { transform: translateX(0);    opacity: 1; pointer-events: all;  }
+    .panel.behind         { transform: translateX(-30px); opacity: 0; pointer-events: none; }
 
-    /* default: hidden to the right */
-    .panel { transform: translateX(100%); opacity: 0; pointer-events: none; }
-    .panel.active { transform: translateX(0); opacity: 1; pointer-events: all; }
-    .panel.behind  { transform: translateX(-30px); opacity: 0; pointer-events: none; }
+    /* ══ PANEL A — TIMELINE ══ */
+    #panelTimeline { overflow: hidden; display: flex; flex-direction: column; }
 
-    /* ══════════════════════════════════════
-       PANEL A — TIMELINE
-    ══════════════════════════════════════ */
-    #panelTimeline {
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .tl-filter-bar {
-      display: flex;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg);
-      flex-shrink: 0;
-    }
-
+    .tl-filter-bar { display: flex; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
     .tl-tab {
-      flex: 1;
-      font-family: var(--font-mono);
-      font-size: 9px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 9px 4px;
-      text-align: center;
-      cursor: pointer;
-      color: var(--muted);
-      border-bottom: 2px solid transparent;
-      transition: all 0.15s;
-      user-select: none;
+      flex: 1; font-family: var(--font-mono); font-size: 9px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 9px 4px; text-align: center; cursor: pointer;
+      color: var(--muted); border-bottom: 2px solid transparent;
+      transition: all 0.15s; user-select: none;
     }
-
     .tl-tab:hover { color: var(--text); }
     .tl-tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
 
     .tl-scroll {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1; overflow-y: auto;
       padding: 18px 16px 24px 28px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--surface2) transparent;
+      scrollbar-width: thin; scrollbar-color: var(--surface2) transparent;
     }
-
     .tl-scroll::-webkit-scrollbar { width: 3px; }
     .tl-scroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
 
     .tl-year-group { margin-bottom: 28px; }
-
     .tl-year {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 500;
-      color: var(--muted);
-      letter-spacing: 0.12em;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      font-family: var(--font-mono); font-size: 10px; font-weight: 500;
+      color: var(--muted); letter-spacing: 0.12em; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
     }
+    .tl-year::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-    .tl-year::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .tl-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding-left: 18px;
-      border-left: 2px solid var(--border);
-    }
+    .tl-cards { display: flex; flex-direction: column; gap: 8px; padding-left: 18px; border-left: 2px solid var(--border); }
 
     .tl-card {
-      position: relative;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      padding: 11px 14px;
-      cursor: pointer;
-      transition: all 0.16s ease;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      position: relative; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 7px;
+      padding: 11px 14px; cursor: pointer;
+      transition: all 0.16s ease; display: flex; align-items: center; gap: 12px;
     }
-
     .tl-card::before {
-      content: '';
-      position: absolute;
-      left: -23px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--surface2);
-      border: 2px solid var(--border);
-      transition: all 0.16s;
+      content: ''; position: absolute; left: -23px; top: 50%;
+      transform: translateY(-50%); width: 8px; height: 8px;
+      border-radius: 50%; background: var(--surface2);
+      border: 2px solid var(--border); transition: all 0.16s;
     }
-
-    .tl-card:hover,
-    .tl-card.selected { border-color: rgba(255,255,255,0.14); background: #1f2330; }
-    .tl-card:hover::before,
-    .tl-card.selected::before { background: var(--accent2); border-color: var(--accent2); }
-
-    .tl-card.most-recent { border-color: rgba(201,168,76,0.25); }
+    .tl-card:hover, .tl-card.selected { border-color: rgba(255,255,255,0.14); background: #1f2330; }
+    .tl-card:hover::before, .tl-card.selected::before { background: var(--accent2); border-color: var(--accent2); }
+    .tl-card.most-recent  { border-color: rgba(201,168,76,0.25); }
     .tl-card.most-recent::before { background: var(--accent2); border-color: var(--accent2); }
-    .tl-card.selected { border-color: rgba(201,168,76,0.4) !important; }
+    .tl-card.selected     { border-color: rgba(201,168,76,0.4) !important; }
 
-    .tl-date-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-width: 30px;
-      flex-shrink: 0;
-    }
-
-    .tl-day {
-      font-family: var(--font-display);
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--text);
-      line-height: 1;
-    }
-
-    .tl-month {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-top: 1px;
-    }
-
-    .tl-vline { width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
-
+    .tl-date-col { display: flex; flex-direction: column; align-items: center; min-width: 30px; flex-shrink: 0; }
+    .tl-day  { font-family: var(--font-display); font-size: 18px; font-weight: 900; color: var(--text); line-height: 1; }
+    .tl-month{ font-family: var(--font-mono); font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-top: 1px; }
+    .tl-vline{ width: 1px; height: 28px; background: var(--border); flex-shrink: 0; }
     .tl-body { flex: 1; min-width: 0; }
-
-    .tl-title {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      margin-bottom: 4px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
+    .tl-title{ font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .tl-tags { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
-
-    .tl-tag {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 1px 5px;
-      border-radius: 2px;
-      background: var(--surface);
-      color: var(--muted);
-      border: 1px solid var(--border);
-    }
-
+    .tl-tag  { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 5px; border-radius: 2px; background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
     .tl-tag.tag-recent { background: rgba(201,168,76,0.08); color: var(--accent2); border-color: rgba(201,168,76,0.2); }
     .tl-tag.tag-runoff { background: rgba(255,159,0,0.08); color: #ff9f00; border-color: rgba(255,159,0,0.2); }
+    .tl-arrow{ color: var(--muted); font-size: 14px; flex-shrink: 0; }
 
-    .tl-arrow { color: var(--muted); font-size: 14px; flex-shrink: 0; }
-
-    /* ══════════════════════════════════════
-       PANEL B — ROUND PICKER
-    ══════════════════════════════════════ */
-    #panelRound {
-      overflow: hidden;
-    }
+    /* ══ PANEL B — ROUND PICKER ══ */
+    #panelRound { overflow: hidden; }
 
     .panel-nav {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg);
-      flex-shrink: 0;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      background: var(--bg); flex-shrink: 0;
     }
-
-    .panel-back {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      cursor: pointer;
-      transition: color 0.15s;
-      user-select: none;
-    }
-
+    .panel-back { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--muted); cursor: pointer; transition: color 0.15s; user-select: none; }
     .panel-back:hover { color: var(--text); }
+    .panel-nav-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--muted); flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .panel-nav-title {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      color: var(--muted);
-      flex: 1;
-      text-align: right;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .round-pick-wrap {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 24px 20px;
-      gap: 10px;
-    }
-
-    .round-pick-label {
-      font-family: var(--font-mono);
-      font-size: 9px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
+    .round-pick-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 20px; gap: 10px; }
+    .round-pick-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 
     .round-opt {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px 18px;
-      cursor: pointer;
-      transition: all 0.16s;
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 16px 18px; cursor: pointer;
+      transition: all 0.16s; display: flex; align-items: center; gap: 14px;
     }
-
     .round-opt:hover { border-color: rgba(255,255,255,0.16); background: #1f2330; }
-
-    .round-opt-icon {
-      font-size: 20px;
-      width: 38px; height: 38px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--surface);
-      border-radius: 7px;
-      flex-shrink: 0;
-    }
-
+    .round-opt-icon { font-size: 20px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; background: var(--surface); border-radius: 7px; flex-shrink: 0; }
     .round-opt-body { flex: 1; }
-
-    .round-opt-title {
-      font-family: var(--font-display);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-
-    .round-opt-sub {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--muted);
-    }
-
+    .round-opt-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .round-opt-sub   { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
     .round-opt-arrow { color: var(--muted); font-size: 16px; }
 
-    /* ══════════════════════════════════════
-       PANEL C — RESULTS
-    ══════════════════════════════════════ */
+    /* ══ PANEL C — RESULTS ══ */
     #panelResults { overflow: hidden; }
 
-    /* Results header — election name + meta */
-    .res-header {
-      padding: 10px 16px 10px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg);
-      flex-shrink: 0;
-    }
-
-    .res-header-top {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .res-election-name {
-      font-family: var(--font-display);
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .res-round-badge {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 3px;
-      background: rgba(255,159,0,0.1);
-      color: #ff9f00;
-      border: 1px solid rgba(255,159,0,0.2);
-      flex-shrink: 0;
-    }
+    .res-header { padding: 10px 16px 10px; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
+    .res-header-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .res-election-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .res-round-badge { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; background: rgba(255,159,0,0.1); color: #ff9f00; border: 1px solid rgba(255,159,0,0.2); flex-shrink: 0; }
 
     .res-meta-row { display: flex; gap: 14px; margin-bottom: 6px; }
     .res-meta-item { display: flex; flex-direction: column; }
+    .res-meta-label { font-family: var(--font-mono); font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 1px; }
+    .res-meta-value { font-family: var(--font-mono); font-size: 13px; font-weight: 500; color: var(--accent); }
 
-    .res-meta-label {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: 1px;
-    }
+    .res-bar-track { width: 100%; height: 2px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+    .res-bar-fill  { height: 100%; background: linear-gradient(90deg, var(--accent2), var(--accent)); border-radius: 2px; }
+    .res-bar-sub   { font-family: var(--font-mono); font-size: 8px; color: var(--muted); margin-top: 3px; letter-spacing: 0.06em; }
 
-    .res-meta-value {
-      font-family: var(--font-mono);
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--accent);
-    }
-
-    .res-bar-track {
-      width: 100%; height: 2px;
-      background: var(--surface2);
-      border-radius: 2px; overflow: hidden;
-    }
-
-    .res-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent2), var(--accent));
-      border-radius: 2px;
-    }
-
-    .res-bar-sub {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      color: var(--muted);
-      margin-top: 3px;
-      letter-spacing: 0.06em;
-    }
-
-    /* Race tabs */
-    .race-tab-bar {
-      padding: 8px 16px 0;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      flex-shrink: 0;
-    }
-
-    .race-tab-label {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-
-    #raceButtons { display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 8px; }
+    .race-tab-bar  { padding: 8px 16px 0; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
+    .race-tab-label{ font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    #raceButtons   { display: flex; flex-wrap: wrap; gap: 5px; padding-bottom: 8px; }
 
     .race-btn {
-      padding: 4px 11px;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.05em;
-      background: var(--surface2);
-      color: var(--muted);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.14s ease;
-      user-select: none;
+      padding: 4px 11px; font-family: var(--font-mono); font-size: 10px;
+      letter-spacing: 0.05em; background: var(--surface2); color: var(--muted);
+      border: 1px solid var(--border); border-radius: 4px; cursor: pointer;
+      transition: all 0.14s ease; user-select: none;
     }
-
     .race-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.16); }
+    .race-btn.active { background: var(--accent2); color: #0d0f14; border-color: var(--accent2); font-weight: 500; }
 
-    .race-btn.active {
-      background: var(--accent2);
-      color: #0d0f14;
-      border-color: var(--accent2);
-      font-weight: 500;
-    }
-
-    /* Admin call bar — hidden by default, shown only when IS_ADMIN */
-    .call-bar {
-      padding: 8px 16px;
-      border-bottom: 1px solid rgba(255,230,0,0.1);
-      background: rgba(255,230,0,0.03);
-      flex-shrink: 0;
-      display: none !important;
-    }
-
+    .call-bar { padding: 8px 16px; border-bottom: 1px solid rgba(255,230,0,0.1); background: rgba(255,230,0,0.03); flex-shrink: 0; display: none !important; }
     .call-bar.admin-on { display: block !important; }
-
-    .call-bar-label {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(255,230,0,0.45);
-      margin-bottom: 6px;
-    }
-
+    .call-bar-label { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,230,0,0.45); margin-bottom: 6px; }
     .call-btns { display: flex; gap: 6px; }
-
-    .call-btn {
-      padding: 5px 11px;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      transition: all 0.15s;
-    }
-
+    .call-btn  { padding: 5px 11px; font-family: var(--font-mono); font-size: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; letter-spacing: 0.04em; transition: all 0.15s; }
     .call-btn-winner { background: #ffe600; color: #0d0f14; }
     .call-btn-winner:hover { background: #ffed40; box-shadow: 0 0 14px rgba(255,230,0,0.35); }
     .call-btn-runoff { background: #ff9f00; color: #0d0f14; }
@@ -541,107 +215,46 @@
     .call-btn-uncall { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
     .call-btn-uncall:hover { color: var(--text); }
 
-    /* Results scroll area */
     #resultsScroll {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1; overflow-y: auto;
       padding: 14px 16px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--surface2) transparent;
+      scrollbar-width: thin; scrollbar-color: var(--surface2) transparent;
     }
-
     #resultsScroll::-webkit-scrollbar { width: 3px; }
     #resultsScroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
 
-    /* Legend */
-    #legend {
-      padding: 8px 16px;
-      border-top: 1px solid var(--border);
-      background: var(--bg);
-      flex-shrink: 0;
-    }
-
-    .legend-label {
-      font-family: var(--font-mono);
-      font-size: 8px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 5px;
-    }
-
+    #legend { padding: 8px 16px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
+    .legend-label { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
     .legend-items { display: flex; flex-wrap: wrap; gap: 5px 10px; }
+    .legend-item  { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); }
+    .legend-dot   { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
-    .legend-item {
-      display: flex; align-items: center;
-      gap: 5px; font-size: 10px; color: var(--muted);
-    }
-
-    .legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-
-    /* ══════════════════════════════════════
-       RESULTS CONTENT STYLES
-    ══════════════════════════════════════ */
+    /* ══ RESULTS CONTENT ══ */
     .results-heading {
-      font-family: var(--font-display);
-      font-size: 14px; font-weight: 700;
-      color: var(--text); margin-bottom: 10px;
-      padding-bottom: 8px;
+      font-family: var(--font-display); font-size: 14px; font-weight: 700;
+      color: var(--text); margin-bottom: 10px; padding-bottom: 8px;
       border-bottom: 1px solid var(--border);
       display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
     }
 
-    .call-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-family: var(--font-mono); font-size: 8px;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 2px 6px; border-radius: 3px; font-weight: 700;
-    }
-
-    .call-badge-winner {
-      background: #ffe600; color: #0d0f14;
-      animation: badge-pulse 2s ease-in-out infinite;
-    }
-
+    .call-badge { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+    .call-badge-winner { background: #ffe600; color: #0d0f14; animation: badge-pulse 2s ease-in-out infinite; }
     .call-badge-runoff { background: #ff9f00; color: #0d0f14; }
+    @keyframes badge-pulse { 0%,100% { box-shadow: 0 0 6px rgba(255,230,0,0.3); } 50% { box-shadow: 0 0 16px rgba(255,230,0,0.6); } }
 
-    @keyframes badge-pulse {
-      0%,100% { box-shadow: 0 0 6px rgba(255,230,0,0.3); }
-      50%      { box-shadow: 0 0 16px rgba(255,230,0,0.6); }
-    }
+    .flip-badge { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; font-weight: 700; background: linear-gradient(135deg,#3b5bdb,#7048e8); color: #fff; box-shadow: 0 0 10px rgba(91,74,232,0.35); }
 
-    .flip-badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-family: var(--font-mono); font-size: 8px;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      padding: 2px 6px; border-radius: 3px; font-weight: 700;
-      background: linear-gradient(135deg,#3b5bdb,#7048e8);
-      color: #fff; box-shadow: 0 0 10px rgba(91,74,232,0.35);
-    }
-
-    .candidate-row {
-      display: flex; align-items: center;
-      gap: 8px; margin-bottom: 4px;
-    }
-
+    .candidate-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
     .candidate-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-
-    .candidate-name { font-size: 12px; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .candidate-name  { font-size: 12px; color: var(--text); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .candidate-name.leader { font-weight: 500; color: #fff; }
-
     .candidate-votes { font-family: var(--font-mono); font-size: 10px; color: var(--muted); white-space: nowrap; }
     .candidate-votes.leader { color: var(--accent); }
 
     .vote-bar-track { width: 100%; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
-    .vote-bar-fill { height: 100%; border-radius: 2px; }
+    .vote-bar-fill  { height: 100%; border-radius: 2px; }
 
-    .winner-tag {
-      display: inline-block; font-family: var(--font-mono); font-size: 7px;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      background: var(--accent2); color: #0d0f14;
-      padding: 1px 4px; border-radius: 2px;
-      margin-left: 4px; vertical-align: middle;
-    }
+    .winner-tag { display: inline-block; font-family: var(--font-mono); font-size: 7px; letter-spacing: 0.08em; text-transform: uppercase; background: var(--accent2); color: #0d0f14; padding: 1px 4px; border-radius: 2px; margin-left: 4px; vertical-align: middle; }
 
     .district-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
 
@@ -651,8 +264,57 @@
     .margin-legend { margin-top: 8px; }
     .margin-legend-label { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
     .margin-scale-wrap { display: flex; align-items: center; gap: 7px; }
-    .margin-scale-bar { flex: 1; height: 6px; border-radius: 3px; }
+    .margin-scale-bar  { flex: 1; height: 6px; border-radius: 3px; }
     .margin-scale-text { font-family: var(--font-mono); font-size: 8px; color: var(--muted); white-space: nowrap; }
+
+    /* ══ SHIFT MAP PANEL ══ */
+    #panelShift { overflow: hidden; }
+
+    .shift-scroll {
+      flex: 1; overflow-y: auto;
+      padding: 16px;
+      scrollbar-width: thin; scrollbar-color: var(--surface2) transparent;
+    }
+    .shift-scroll::-webkit-scrollbar { width: 3px; }
+    .shift-scroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+
+    .shift-section-label {
+      font-family: var(--font-mono); font-size: 8px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px; margin-top: 14px;
+    }
+    .shift-section-label:first-child { margin-top: 0; }
+
+    .shift-opt {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 7px; padding: 11px 14px; cursor: pointer;
+      transition: all 0.15s; display: flex; align-items: center; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .shift-opt:hover { border-color: rgba(255,255,255,0.16); background: #1f2330; }
+    .shift-opt.active { border-color: rgba(201,168,76,0.5); background: rgba(201,168,76,0.06); }
+
+    .shift-opt-swatch { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .shift-opt-body  { flex: 1; }
+    .shift-opt-title { font-size: 12px; color: var(--text); font-weight: 500; }
+    .shift-opt-sub   { font-family: var(--font-mono); font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+    .shift-go-btn {
+      width: 100%; margin-top: 14px;
+      padding: 10px; font-family: var(--font-mono);
+      font-size: 11px; letter-spacing: 0.08em;
+      background: var(--accent2); color: #0d0f14;
+      border: none; border-radius: 6px; cursor: pointer;
+      font-weight: 500; transition: all 0.15s;
+    }
+    .shift-go-btn:hover { background: var(--accent); box-shadow: 0 0 16px rgba(201,168,76,0.35); }
+    .shift-go-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Shift active legend bar */
+    .shift-legend-bar {
+      padding: 8px 16px; border-top: 1px solid var(--border);
+      background: var(--bg); flex-shrink: 0;
+    }
 
     /* Leaflet */
     .leaflet-tooltip {
@@ -665,19 +327,14 @@
 </head>
 <body>
 
-<!-- MAP always rendered behind the sidebar -->
 <div id="map"></div>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
-
-  <!-- Permanent brand header -->
   <div class="sb-brand">
     <div class="sb-brand-eyebrow">Live Results</div>
     <div class="sb-brand-title">TSR Elects</div>
   </div>
 
-  <!-- Panel viewport — slides between panels -->
   <div class="panel-viewport">
 
     <!-- ── PANEL A: TIMELINE ── -->
@@ -686,7 +343,7 @@
         <div class="tl-tab active" onclick="filterTimeline('all',this)">All</div>
         <div class="tl-tab" onclick="filterTimeline('Regular',this)">Regular</div>
         <div class="tl-tab" onclick="filterTimeline('Special',this)">Special</div>
-        </div>
+      </div>
       <div class="tl-scroll" id="tlScroll">
         <div class="placeholder"><div class="icon">🗳</div>Loading elections…</div>
       </div>
@@ -706,7 +363,6 @@
 
     <!-- ── PANEL C: RESULTS ── -->
     <div class="panel" id="panelResults">
-      <!-- Election header -->
       <div class="res-header">
         <div class="res-header-top">
           <div class="panel-back" onclick="goBackFromResults()">←</div>
@@ -733,13 +389,11 @@
         <div class="res-bar-sub" id="reportingSub"></div>
       </div>
 
-      <!-- Race tabs -->
       <div class="race-tab-bar">
         <div class="race-tab-label">Race</div>
         <div id="raceButtons"></div>
       </div>
 
-      <!-- Admin call bar — only shows with ?admin=1 in URL -->
       <div class="call-bar" id="callBar">
         <div class="call-bar-label">🔒 Admin · Call <span id="callBarDistrict"></span></div>
         <div class="call-btns">
@@ -749,7 +403,6 @@
         </div>
       </div>
 
-      <!-- Results content -->
       <div id="resultsScroll">
         <div class="placeholder">
           <div class="icon">🗳</div>
@@ -757,10 +410,59 @@
         </div>
       </div>
 
-      <!-- Candidate legend -->
       <div id="legend">
         <div class="legend-label">Candidates</div>
         <div class="legend-items" id="legendItems"></div>
+      </div>
+    </div>
+
+    <!-- ── PANEL D: SHIFT MAP BUILDER ── -->
+    <div class="panel" id="panelShift">
+      <div class="panel-nav">
+        <div class="panel-back" onclick="exitShiftMode()">← Back</div>
+        <div class="panel-nav-title">Shift Map</div>
+      </div>
+
+      <div class="shift-scroll" id="shiftScroll">
+        <!-- Step 1: pick comparison election -->
+        <div id="shiftStep1">
+          <div class="shift-section-label">Compare with election</div>
+          <div id="shiftElectionList"></div>
+        </div>
+
+        <!-- Step 2: pick group (hidden until election chosen) -->
+        <div id="shiftStep2" style="display:none">
+          <div class="shift-section-label" style="margin-top:0">Compare group</div>
+          <div id="shiftGroupList"></div>
+          <button class="shift-go-btn" id="shiftGoBtn" onclick="applyShiftMap()" disabled>
+            Generate Shift Map →
+          </button>
+        </div>
+      </div>
+
+      <!-- Active shift legend — shown only when shift is live -->
+      <div class="shift-legend-bar" id="shiftLegendBar" style="display:none">
+        <div class="legend-label" id="shiftLegendLabel">Shift</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">Lost / no change</span>
+          <div id="shiftGradBar" style="flex:1;height:8px;border-radius:4px"></div>
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">Gained</span>
+        </div>
+        <!-- Tick marks -->
+        <div style="display:flex;justify-content:space-between;padding:0 0 2px">
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)" id="shiftTickMin"></span>
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)" id="shiftTickMid">0%</span>
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)" id="shiftTickMax"></span>
+        </div>
+        <!-- District count summary -->
+        <div id="shiftSummary" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:4px;padding-top:4px;border-top:1px solid var(--border)"></div>
+
+        <!-- Margin chart -->
+        <div id="shiftMarginChart" style="margin-top:8px"></div>
+
+        <button onclick="exitShiftMode()" style="margin-top:8px;width:100%;padding:6px;font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:4px;cursor:pointer">
+          ✕ Exit shift map
+        </button>
       </div>
     </div>
 
@@ -776,56 +478,45 @@ const IS_ADMIN = new URLSearchParams(window.location.search).get('admin') === '1
 if (IS_ADMIN) document.getElementById('callBar').classList.add('admin-on');
 
 // ══════════════════════════════════════════════════════════════
-//  CANDIDATE REGISTRY
-//  These are the fallback built-ins. The JSON can extend/override
-//  via a top-level "candidates" object (see schema).
-//  Each entry: { name, color, party }
-//  party links to a partyRegistry entry key (e.g. 'tsp', 'udc').
+//  REGISTRIES
 // ══════════════════════════════════════════════════════════════
 let candidateRegistry = {
-  // General
-  wi: { name: 'Write-ins', color: '#bcc0c2', party: 'ua'   },
-  wc:   { name: 'Worth-Cupcake', color: '#4a9edd', party: 'udc'  },
-  qtw:  { name: 'TyroniusTheIII',      color: '#e05555', party: 'tsp'  },
-  rf:   { name: 'Representative-Fee65',color: '#d42f0b', party: 'tsp'   },
-  hkf:   { name: 'HighKingFloof',color: '#e62080', party: 'tsp'   },
-  gsx:  { name: 'gunsmokexeon',        color: '#9b6fd4', party: 'ua'   },
-  dvwb: { name: 'Disguised_VW_Beetle', color: '#e8c44a', party: 'ua'   },
-  prac: { name: 'practicalpurpose', color: '#f2eb11', party: 'udc'   },
-  pc: { name: 'ProCookies128', color: '#10cc26', party: 'ua'   },
-  oc: { name: 'One-Community', color: '#1b235e', party: 'ua'   },
-  wip: { name: 'wiptes167', color: '#f2a38f', party: 'udc'   },  
-  pag: { name: 'PickleArtGeek', color: '#269982', party: 'tsp'   },
-  fmr: { name: 'Boot', color: '#8c0b12', party: 'tsp'   },
-  bberry: { name: 'BlackberryActual', color: '#73797a', party: 'tsp'   },
-  // Historical party affiliations + names
-  pag1: { name: 'PickleArtGeek', color: '#269982', party: 'ua'   },
-  oc1: { name: 'One-Community', color: '#1b235e', party: 'cfsb'   },
-  tmf1: { name: 'teammomofan', color: '#7d1e4f', party: 'ua'   },
-  wip1: { name: 'wiptes167', color: '#f2a38f', party: 'fumo'   },
-  qtw1:  { name: 'QuantaviousTheWise', color: '#e05555', party: 'tsp'  },
-  prac1: { name: 'practicalpurpose', color: '#f2eb11', party: 'ua'   },
-};
-// ══════════════════════════════════════════════════════════════
-//  PARTY REGISTRY
-//  Each entry: { name, color, shortName }
-//  Can also be extended/overridden via JSON top-level "parties".
-// ══════════════════════════════════════════════════════════════
-let partyRegistry = {
-  tsp: { name: 'The Spinner Party',  shortName: 'TSP', color: '#b71212' },
-  udc: { name: 'Union of the Democratic Center', shortName: 'UDC', color: '#32a852' },
-  ua: { name: 'Unaffiliated', shortName: 'Ua.', color: '#bcc0c2' },
-  fumo: { name: 'FUMO Union of the Democratic Center', shortName: 'FUMO-UDC', color: '#f2a38f' },
-  cfs: { name: 'Coalition for Freedom in the Subreddit', shortName: 'FUMO-UDC', color: '#91a195' },
-  cfsb: { name: 'baacked by the Coalition for Freedom in the Subreddit', shortName: 'CFS', color: '#91a195' },
-  spa: { name: 'Spinroom Progressive Alliance', shortName: 'SPA', color: '#1023cc' },
-  spab: { name: 'backed by the Spinroom Progressive Alliance', shortName: 'SPA', color: '#1023cc' }, 
+  wi:    { name: 'Write-ins',            color: '#bcc0c2', party: 'ua'   },
+  wc:    { name: 'Worth-Cupcake',        color: '#4a9edd', party: 'udc'  },
+  qtw:   { name: 'TyroniusTheIII',       color: '#e05555', party: 'tsp'  },
+  rf:    { name: 'Representative-Fee65', color: '#d42f0b', party: 'tsp'  },
+  hkf:   { name: 'HighKingFloof',        color: '#e62080', party: 'tsp'  },
+  gsx:   { name: 'gunsmokexeon',         color: '#9b6fd4', party: 'ua'   },
+  dvwb:  { name: 'Disguised_VW_Beetle',  color: '#e8c44a', party: 'ua'   },
+  prac:  { name: 'practicalpurpose',     color: '#f2eb11', party: 'udc'  },
+  pc:    { name: 'ProCookies128',        color: '#10cc26', party: 'ua'   },
+  oc:    { name: 'One-Community',        color: '#1b235e', party: 'ua'   },
+  wip:   { name: 'wiptes167',            color: '#f2a38f', party: 'udc'  },
+  pag:   { name: 'PickleArtGeek',        color: '#269982', party: 'tsp'  },
+  fmr:   { name: 'Boot',                 color: '#8c0b12', party: 'tsp'  },
+  bberry:{ name: 'BlackberryActual',     color: '#73797a', party: 'tsp'  },
+  pag1:  { name: 'PickleArtGeek',        color: '#269982', party: 'ua'   },
+  oc1:   { name: 'One-Community',        color: '#1b235e', party: 'cfsb' },
+  tmf1:  { name: 'teammomofan',          color: '#7d1e4f', party: 'ua'   },
+  wip1:  { name: 'wiptes167',            color: '#f2a38f', party: 'fumo' },
+  qtw1:  { name: 'QuantaviousTheWise',   color: '#e05555', party: 'tsp'  },
+  prac1: { name: 'practicalpurpose',     color: '#f2eb11', party: 'ua'   },
 };
 
-// Convenience accessors (used throughout render code)
-function candidateColor(key) { return candidateRegistry[key]?.color || '#888888'; }
-function candidateName(key)  { return candidateRegistry[key]?.name  || key; }
-function candidateParty(key) { return candidateRegistry[key]?.party || null; }
+let partyRegistry = {
+  tsp:  { name: 'The Spinner Party',                         shortName: 'TSP',      color: '#b71212' },
+  udc:  { name: 'Union of the Democratic Center',            shortName: 'UDC',      color: '#32a852' },
+  ua:   { name: 'Unaffiliated',                              shortName: 'Ua.',      color: '#bcc0c2' },
+  fumo: { name: 'FUMO Union of the Democratic Center',       shortName: 'FUMO-UDC', color: '#f2a38f' },
+  cfs:  { name: 'Coalition for Freedom in the Subreddit',    shortName: 'CFS',      color: '#91a195' },
+  cfsb: { name: 'backed by the CFS',                         shortName: 'CFS',      color: '#91a195' },
+  spa:  { name: 'Spinroom Progressive Alliance',             shortName: 'SPA',      color: '#1023cc' },
+  spab: { name: 'backed by the SPA',                         shortName: 'SPA',      color: '#1023cc' },
+};
+
+function candidateColor(k) { return candidateRegistry[k]?.color || '#888888'; }
+function candidateName(k)  { return candidateRegistry[k]?.name  || k; }
+function candidateParty(k) { return candidateRegistry[k]?.party || null; }
 
 // ══════════════════════════════════════════════════════════════
 //  STATE
@@ -841,12 +532,15 @@ let geoLayer            = null;
 let mapInstance         = null;
 let activeFilter        = 'all';
 let selectedElectionIdx = null;
-let compareMode         = false;   // compare tool active
-let compareA            = null;    // first selected district
-let compareB            = null;    // second selected district
+
+// Shift map state
+let shiftMode           = false;
+let shiftElectionIdx    = null;   // comparison election index
+let shiftGroupKey       = null;   // candidate key OR 'party:tsp' etc.
+let shiftData           = {};     // { districtId: shiftValue (%) }
 
 // ══════════════════════════════════════════════════════════════
-//  MAP INIT (once, permanent)
+//  MAP INIT
 // ══════════════════════════════════════════════════════════════
 mapInstance = L.map('map', { zoomControl: false }).setView([40, -95], 4);
 L.control.zoom({ position: 'bottomright' }).addTo(mapInstance);
@@ -855,7 +549,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
 }).addTo(mapInstance);
 
 // ══════════════════════════════════════════════════════════════
-//  BOOT — fetch both files, show error state if either fails
+//  BOOT
 // ══════════════════════════════════════════════════════════════
 function showFetchError(which) {
   document.getElementById('tlScroll').innerHTML = `
@@ -864,8 +558,7 @@ function showFetchError(which) {
       <strong style="color:#e05555">Could not load ${which}</strong><br>
       Make sure <code style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">${which}</code>
       is in the same folder as this HTML file and your server is running.<br><br>
-      <span style="font-size:10px;color:var(--muted)">Opening via <code>file://</code> will always fail — use a local server
-      (e.g. <code>npx serve .</code> or VS Code Live Server).</span>
+      <span style="font-size:10px;color:var(--muted)">Opening via <code>file://</code> will always fail — use a local server.</span>
     </div>`;
 }
 
@@ -875,103 +568,74 @@ Promise.all([
 ]).then(([data, geo]) => {
   geojsonCache = geo;
 
-  // Unwrap: support multiple JSON shapes
   let elections;
   if (Array.isArray(data)) {
-    // Plain array of election objects
     elections = data;
   } else if (data && Array.isArray(data.elections)) {
-    // { elections: [...], candidates: {...}, parties: {...} }
     elections = data.elections;
-    // Merge optional top-level registries
-    if (data.candidates && typeof data.candidates === 'object')
-      Object.assign(candidateRegistry, data.candidates);
-    if (data.parties && typeof data.parties === 'object')
-      Object.assign(partyRegistry, data.parties);
+    if (data.candidates && typeof data.candidates === 'object') Object.assign(candidateRegistry, data.candidates);
+    if (data.parties   && typeof data.parties   === 'object') Object.assign(partyRegistry,   data.parties);
   } else if (data && typeof data === 'object') {
-    // Legacy: top-level keys are race names → wrap as single election
-    elections = [{
-      id: 'election_1', title: 'Election', date: null,
-      turnout: null, precincts_reporting: null, precincts_total: null, party: null,
-      first_round: { races: data }, runoff_round: null
-    }];
-  } else {
-    showFetchError('results.json (unrecognised format)');
-    return;
-  }
+    elections = [{ id:'election_1', title:'Election', date:null, turnout:null, precincts_reporting:null, precincts_total:null, party:null, first_round:{ races:data }, runoff_round:null }];
+  } else { showFetchError('results.json (unrecognised format)'); return; }
 
   allElections = elections;
-  allElections.sort((a, b) => {
-    const da = a.date ? new Date(a.date) : 0;
-    const db = b.date ? new Date(b.date) : 0;
-    return db - da;
-  });
+  allElections.sort((a,b) => { const da=a.date?new Date(a.date):0; const db=b.date?new Date(b.date):0; return db-da; });
 
-  // Draw the geo layer once
   geoLayer = L.geoJSON(geojsonCache, {
     style: styleFeature,
     onEachFeature: (feature, layer) => {
       layer.on({
         click: () => {
           const id = feature.properties.id;
-          if (compareMode) {
-            handleCompareClick(id);
-            return;
-          }
-          if (!currentRace) return;
+          if (!currentRace && !shiftMode) return;
           selectedDistrictId = id;
-          showDistrict(id);
+          if (shiftMode) {
+            showShiftDistrict(id);
+          } else {
+            showDistrict(id);
+          }
           geoLayer.setStyle(styleFeature);
-          if (IS_ADMIN) updateCallBar();
+          if (IS_ADMIN && !shiftMode) updateCallBar();
         },
         mouseover: e => {
-          const id = e.target.feature.properties.id;
-          if (id !== selectedDistrictId && id !== compareA && id !== compareB)
+          if (e.target.feature.properties.id !== selectedDistrictId)
             e.target.setStyle({ weight: 2.5, fillOpacity: 0.92 });
         },
         mouseout: e => {
-          const id = e.target.feature.properties.id;
-          if (id !== selectedDistrictId && id !== compareA && id !== compareB)
+          if (e.target.feature.properties.id !== selectedDistrictId)
             geoLayer.resetStyle(e.target);
         }
       });
       layer.bindTooltip(
         `<span style="opacity:.5;font-size:9px;letter-spacing:.1em">DISTRICT</span><br><strong>${feature.properties.id}</strong>`,
-        { sticky: true, offset: [10, 0] }
+        { sticky: true, offset: [10,0] }
       );
     }
   }).addTo(mapInstance);
 
-  mapInstance.fitBounds(geoLayer.getBounds(), { padding: [30, 30] });
+  mapInstance.fitBounds(geoLayer.getBounds(), { padding:[30,30] });
   renderTimeline(allElections);
 
-}).catch(err => {
-  showFetchError(err.message || 'data files');
-});
+}).catch(err => { showFetchError(err.message || 'data files'); });
 
 // ══════════════════════════════════════════════════════════════
 //  PANEL NAVIGATION
 // ══════════════════════════════════════════════════════════════
 function goPanel(targetId) {
-  const panels = ['panelTimeline', 'panelRound', 'panelResults'];
-  const currentIdx = panels.findIndex(p => document.getElementById(p).classList.contains('active'));
-  const targetIdx  = panels.indexOf(targetId);
-
-  panels.forEach((id, i) => {
+  const panels = ['panelTimeline','panelRound','panelResults','panelShift'];
+  const targetIdx = panels.indexOf(targetId);
+  panels.forEach((id,i) => {
     const el = document.getElementById(id);
-    el.classList.remove('active', 'behind');
+    el.classList.remove('active','behind');
     if (i === targetIdx) el.classList.add('active');
     else if (i < targetIdx) el.classList.add('behind');
-    // else: stays at translateX(100%) = default off-right
   });
 }
 
 function goBackFromResults() {
-  if (currentElection?.runoff_round) {
-    goPanel('panelRound');
-  } else {
-    goPanel('panelTimeline');
-  }
+  if (currentElection?.runoff_round) goPanel('panelRound');
+  else goPanel('panelTimeline');
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -981,63 +645,49 @@ function filterTimeline(type, tab) {
   activeFilter = type;
   document.querySelectorAll('.tl-tab').forEach(t => t.classList.remove('active'));
   tab.classList.add('active');
-  const filtered = type === 'all'
-    ? allElections
-    : allElections.filter(e => e.title && e.title.includes(type));
+  const filtered = type === 'all' ? allElections : allElections.filter(e => e.title && e.title.includes(type));
   renderTimeline(filtered);
 }
 
 function renderTimeline(elections) {
   const wrap = document.getElementById('tlScroll');
-  if (!elections.length) {
-    wrap.innerHTML = '<div class="placeholder"><div class="icon">📭</div>No elections found.</div>';
-    return;
-  }
+  if (!elections.length) { wrap.innerHTML = '<div class="placeholder"><div class="icon">📭</div>No elections found.</div>'; return; }
 
   const byYear = {};
-  elections.forEach((e, i) => {
+  elections.forEach((e,i) => {
     const yr = e.date ? new Date(e.date).getFullYear() : 'Unknown';
     if (!byYear[yr]) byYear[yr] = [];
     byYear[yr].push({ ...e, _origIdx: allElections.indexOf(e), _listIdx: i });
   });
 
-  const years = Object.keys(byYear).sort((a, b) => b - a);
+  const years = Object.keys(byYear).sort((a,b) => b-a);
   let html = '';
-
   years.forEach(yr => {
     html += `<div class="tl-year-group"><div class="tl-year">${yr}</div><div class="tl-cards">`;
-
     byYear[yr].forEach(e => {
-      const d      = e.date ? new Date(e.date) : null;
-      const day    = d ? d.getDate() : '?';
-      const month  = d ? d.toLocaleString('en', { month: 'short' }).toUpperCase() : '';
+      const d = e.date ? new Date(e.date) : null;
+      const day = d ? d.getDate() : '?';
+      const month = d ? d.toLocaleString('en',{month:'short'}).toUpperCase() : '';
       const isFirst = e._listIdx === 0;
       const hasRunoff = !!e.runoff_round;
       const isSelected = e._origIdx === selectedElectionIdx;
-
-      html += `<div class="tl-card ${isFirst ? 'most-recent' : ''} ${isSelected ? 'selected' : ''}"
-        onclick="openElection(${e._origIdx})">
-        <div class="tl-date-col">
-          <div class="tl-day">${day}</div>
-          <div class="tl-month">${month}</div>
-        </div>
+      html += `<div class="tl-card ${isFirst?'most-recent':''} ${isSelected?'selected':''}" onclick="openElection(${e._origIdx})">
+        <div class="tl-date-col"><div class="tl-day">${day}</div><div class="tl-month">${month}</div></div>
         <div class="tl-vline"></div>
         <div class="tl-body">
-          <div class="tl-title">${e.title || 'Untitled'}</div>
+          <div class="tl-title">${e.title||'Untitled'}</div>
           <div class="tl-tags">
-            ${isFirst ? '<span class="tl-tag tag-recent">Latest</span>' : ''}
-            ${hasRunoff ? '<span class="tl-tag tag-runoff">⚡ Runoff</span>' : ''}
-            ${e.party ? `<span class="tl-tag">${e.party}</span>` : ''}
-            ${e.turnout != null ? `<span class="tl-tag">${e.turnout}% turnout</span>` : ''}
+            ${isFirst?'<span class="tl-tag tag-recent">Latest</span>':''}
+            ${hasRunoff?'<span class="tl-tag tag-runoff">⚡ Runoff</span>':''}
+            ${e.party?`<span class="tl-tag">${e.party}</span>`:''}
+            ${e.turnout!=null?`<span class="tl-tag">${e.turnout}% turnout</span>`:''}
           </div>
         </div>
         <div class="tl-arrow">›</div>
       </div>`;
     });
-
     html += `</div></div>`;
   });
-
   wrap.innerHTML = html;
 }
 
@@ -1047,42 +697,26 @@ function renderTimeline(elections) {
 function openElection(idx) {
   const e = allElections[idx];
   if (!e) return;
-
   selectedElectionIdx = idx;
   currentElection = e;
-
-  // Re-render timeline to show selected state
-  const filtered = activeFilter === 'all'
-    ? allElections
-    : allElections.filter(el => el.title && el.title.includes(activeFilter));
+  const filtered = activeFilter==='all' ? allElections : allElections.filter(el=>el.title&&el.title.includes(activeFilter));
   renderTimeline(filtered);
 
   if (!e.runoff_round) {
-    // Single round — go straight to map
-    selectRound(idx, 'first_round');
+    selectRound(idx,'first_round');
   } else {
-    // Show round picker
-    document.getElementById('roundNavTitle').textContent = e.title || 'Election';
-
-    const opts = document.getElementById('roundOptions');
-    opts.innerHTML = `
+    document.getElementById('roundNavTitle').textContent = e.title||'Election';
+    document.getElementById('roundOptions').innerHTML = `
       <div class="round-opt" onclick="selectRound(${idx},'first_round')">
         <div class="round-opt-icon">🗳</div>
-        <div class="round-opt-body">
-          <div class="round-opt-title">First Round</div>
-          <div class="round-opt-sub">All candidates · initial vote</div>
-        </div>
+        <div class="round-opt-body"><div class="round-opt-title">First Round</div><div class="round-opt-sub">All candidates · initial vote</div></div>
         <div class="round-opt-arrow">›</div>
       </div>
       <div class="round-opt" onclick="selectRound(${idx},'runoff_round')">
         <div class="round-opt-icon">⚡</div>
-        <div class="round-opt-body">
-          <div class="round-opt-title">Runoff Round</div>
-          <div class="round-opt-sub">Top-two · final results</div>
-        </div>
+        <div class="round-opt-body"><div class="round-opt-title">Runoff Round</div><div class="round-opt-sub">Top-two · final results</div></div>
         <div class="round-opt-arrow">›</div>
       </div>`;
-
     goPanel('panelRound');
   }
 }
@@ -1093,17 +727,16 @@ function openElection(idx) {
 function selectRound(idx, roundKey) {
   const e = allElections[idx];
   if (!e) return;
-
   currentElection    = e;
   currentRoundKey    = roundKey;
   currentRace        = null;
   selectedDistrictId = null;
+  shiftMode          = false;
 
   const isRunoff  = roundKey === 'runoff_round';
   const roundData = isRunoff ? e.runoff_round : (e.first_round || e);
   const races     = roundData.races || roundData;
 
-  // Seed call state — only when races[race] is a district map (object of objects)
   districtCalls = {};
   const savedCalls = roundData.calls || {};
   Object.keys(races).forEach(race => {
@@ -1112,32 +745,26 @@ function selectRound(idx, roundKey) {
     districtCalls[race] = {};
     Object.keys(raceData).forEach(id => {
       if (typeof raceData[id] !== 'object') return;
-      districtCalls[race][id] = savedCalls[race]?.[id] || { status: null, winner: null, prevWinner: null };
+      districtCalls[race][id] = savedCalls[race]?.[id] || { status:null, winner:null, prevWinner:null };
     });
   });
 
-  // Populate results header
-  document.getElementById('resElectionName').textContent = e.title || 'Election';
+  document.getElementById('resElectionName').textContent = e.title||'Election';
   const rb = document.getElementById('resRoundBadge');
-  if (isRunoff) { rb.style.display = ''; rb.textContent = 'Runoff'; }
-  else rb.style.display = 'none';
+  if (isRunoff) { rb.style.display=''; rb.textContent='Runoff'; } else rb.style.display='none';
 
   const turnout   = roundData.turnout   ?? e.turnout   ?? '—';
   const reporting = roundData.precincts_reporting ?? e.precincts_reporting ?? '—';
   const total     = roundData.precincts_total     ?? e.precincts_total     ?? null;
-
-  document.getElementById('turnoutVal').textContent   = turnout   !== '—' ? turnout   + '%' : '—';
-  document.getElementById('reportingVal').textContent = reporting !== '—' ? reporting + '%' : '—';
-  document.getElementById('reportingBar').style.width = reporting !== '—' ? reporting + '%' : '0%';
-  document.getElementById('reportingSub').textContent = (total && reporting !== '—')
-    ? `${Math.round(reporting / 100 * total)} of ${total} precincts`
-    : '';
+  document.getElementById('turnoutVal').textContent   = turnout   !== '—' ? turnout+'%'   : '—';
+  document.getElementById('reportingVal').textContent = reporting !== '—' ? reporting+'%' : '—';
+  document.getElementById('reportingBar').style.width = reporting !== '—' ? reporting+'%' : '0%';
+  document.getElementById('reportingSub').textContent = (total && reporting !== '—') ? `${Math.round(reporting/100*total)} of ${total} precincts` : '';
 
   const pw = document.getElementById('partyMetaWrap');
-  if (e.party) { pw.style.display = 'flex'; document.getElementById('partyVal').textContent = e.party; }
-  else pw.style.display = 'none';
+  if (e.party) { pw.style.display='flex'; document.getElementById('partyVal').textContent=e.party; }
+  else pw.style.display='none';
 
-  // Race buttons
   const raceContainer = document.getElementById('raceButtons');
   raceContainer.innerHTML = '';
   Object.keys(races).forEach(race => {
@@ -1154,7 +781,8 @@ function selectRound(idx, roundKey) {
       showRaceOverview();
     };
     raceContainer.appendChild(btn);
-  });  // Legend — grouped by party where possible
+  });
+
   const allKeys = new Set();
   Object.values(races).forEach(r => Object.values(r).forEach(d => Object.keys(d).forEach(k => allKeys.add(k))));
   const legendEl = document.getElementById('legendItems');
@@ -1163,127 +791,66 @@ function selectRound(idx, roundKey) {
     const party = candidateParty(k);
     const partyInfo = party ? partyRegistry[party] : null;
     const partyTag = partyInfo
-      ? `<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>`
-      : '';
+      ? `<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>` : '';
     legendEl.innerHTML += `<div class="legend-item"><div class="legend-dot" style="background:${candidateColor(k)}"></div><span>${candidateName(k)}${partyTag}</span></div>`;
   });
 
-  document.getElementById('resultsScroll').innerHTML =
-    `<div class="placeholder"><div class="icon">🗳</div>Select a race above, then click a district on the map.</div>`;
-
-  // Restyle map
+  document.getElementById('resultsScroll').innerHTML = `<div class="placeholder"><div class="icon">🗳</div>Select a race above, then click a district on the map.</div>`;
   geoLayer.setStyle(styleFeature);
-
   goPanel('panelResults');
 }
 
 // ══════════════════════════════════════════════════════════════
 //  COLOUR HELPERS
 // ══════════════════════════════════════════════════════════════
-function darkenHex(hex, t) {
-  let r = parseInt(hex.slice(1,3),16);
-  let g = parseInt(hex.slice(3,5),16);
-  let b = parseInt(hex.slice(5,7),16);
-  r = Math.round(r * (1 - t));
-  g = Math.round(g * (1 - t));
-  b = Math.round(b * (1 - t));
-  return `rgb(${r},${g},${b})`;
+function darkenHex(hex,t) {
+  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r*(1-t))},${Math.round(g*(1-t))},${Math.round(b*(1-t))})`;
 }
-
-/**
- * Blend a hex colour toward white by `t` (0 = original, 1 = white).
- */
-function lightenHex(hex, t) {
-  let r = parseInt(hex.slice(1,3),16);
-  let g = parseInt(hex.slice(3,5),16);
-  let b = parseInt(hex.slice(5,7),16);
-  r = Math.round(r + (255 - r) * t);
-  g = Math.round(g + (255 - g) * t);
-  b = Math.round(b + (255 - b) * t);
-  return `rgb(${r},${g},${b})`;
-}
-
-function blendColors(hex1, hex2, t = 0.5) {
-  if (!hex1 || !hex2) return '#888888';
-  const r1 = parseInt(hex1.slice(1,3),16);
-  const g1 = parseInt(hex1.slice(3,5),16);
-  const b1 = parseInt(hex1.slice(5,7),16);
-  const r2 = parseInt(hex2.slice(1,3),16);
-  const g2 = parseInt(hex2.slice(3,5),16);
-  const b2 = parseInt(hex2.slice(5,7),16);
-  if ([r1,g1,b1,r2,g2,b2].some(v => isNaN(v))) return '#888888';
-  const r = Math.round(r1*(1-t) + r2*t);
-  const g = Math.round(g1*(1-t) + g2*t);
-  const b = Math.round(b1*(1-t) + b2*t);
-  return `rgb(${r},${g},${b})`;
+function lightenHex(hex,t) {
+  let r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `rgb(${Math.round(r+(255-r)*t)},${Math.round(g+(255-g)*t)},${Math.round(b+(255-b)*t)})`;
 }
 
 function marginColor(data) {
   if (!data) return '#111111';
-
-  const total = Object.values(data).reduce((a, b) => a + b, 0);
-  if (total === 0) return '#1a1e28';
-
-  const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
-  const [firstKey, firstVal] = sorted[0];
-  const secondVal = sorted[1] ? sorted[1][1] : 0;
-
-  const margin = (firstVal - secondVal) / total; // 0..1
-
-  // Tie
-  // Blend multiple hex colors by averaging RGB
-function blendColors(keys) {
-  const colors = keys.map(k => candidateColor(k));
-
-  let r = 0, g = 0, b = 0;
-
-  colors.forEach(hex => {
-    const num = parseInt(hex.slice(1), 16);
-    r += (num >> 16) & 255;
-    g += (num >> 8) & 255;
-    b += num & 255;
-  });
-
-  const n = colors.length;
-  r = Math.round(r / n);
-  g = Math.round(g / n);
-  b = Math.round(b / n);
-
-  return `rgb(${r}, ${g}, ${b})`;
-}
-
-// Main color picker
-function getRaceColor(results) {
-  const entries = Object.entries(results);
-
-  // Sort descending by votes
-  entries.sort((a, b) => b[1] - a[1]);
-
-  const max = entries[0][1];
-
-  // Get all candidates tied for first
-  const leaders = entries
-    .filter(([_, v]) => v === max)
-    .map(([k]) => k);
-
-  // Tie case → blend colors
-  if (leaders.length > 1) {
-    return blendColors(leaders);
-  }
-
-  // Normal winner
-  return candidateColor(leaders[0]);
-}
-
+  const total = Object.values(data).reduce((a,b)=>a+b,0);
+  if (total===0) return '#1a1e28';
+  const sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]);
+  const [firstKey,firstVal] = sorted[0];
+  const secondVal = sorted[1]?.[1]||0;
+  const margin = (firstVal-secondVal)/total;
   const base = candidateColor(firstKey);
   const MID = 0.35;
-  if (margin < MID) {
-    const t = (1 - margin / MID) * 0.35;
-    return lightenHex(base, t);
-  } else {
-    const t = ((margin - MID) / (1 - MID)) * 0.30;
-    return darkenHex(base, t);
-  }
+  if (margin < MID) return lightenHex(base, (1-margin/MID)*0.35);
+  else return darkenHex(base, ((margin-MID)/(1-MID))*0.30);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SHIFT MAP — colour from white (no gain/loss) → full color (big gain)
+//  shift is a signed percentage-point change.
+//  Positive = gained → strong candidate/party color
+//  Zero or negative = white (fading out)
+// ══════════════════════════════════════════════════════════════
+function shiftColor(shift, hexColor) {
+  // Clamp to [0, maxGain] then map to [white → color]
+  // We use the max absolute gain across all districts to normalise
+  if (!hexColor) hexColor = '#888888';
+  if (shift <= 0) return '#e8e8e8'; // white-ish for no gain / loss
+
+  // t = 0 → white, t = 1 → full color
+  // We normalise by a soft max (capped at 25pp shift = full saturation)
+  const SOFT_MAX = 25;
+  const t = Math.min(shift / SOFT_MAX, 1);
+
+  let r = parseInt(hexColor.slice(1,3),16);
+  let g = parseInt(hexColor.slice(3,5),16);
+  let b = parseInt(hexColor.slice(5,7),16);
+  // Blend from white (255,255,255) → color
+  r = Math.round(255 + (r-255)*t);
+  g = Math.round(255 + (g-255)*t);
+  b = Math.round(255 + (b-255)*t);
+  return `rgb(${r},${g},${b})`;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1291,32 +858,38 @@ function getRaceColor(results) {
 // ══════════════════════════════════════════════════════════════
 function getCurrentRaces() {
   if (!currentElection) return null;
-  const rd = currentRoundKey === 'runoff_round'
-    ? currentElection.runoff_round
-    : (currentElection.first_round || currentElection);
+  const rd = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
   return rd?.races || rd;
 }
 
 function styleFeature(feature) {
-  const isSelected = feature.properties.id === selectedDistrictId;
+  const id = feature.properties.id;
+  const isSelected = id === selectedDistrictId;
+
+  if (shiftMode) {
+    const shift = shiftData[id];
+    if (shift === undefined) return { color:'#3a3f4d', weight:1, fillColor:'#1a1e28', fillOpacity:0.5 };
+    const groupColor = getShiftGroupColor();
+    return {
+      fillColor:   shiftColor(shift, groupColor),
+      fillOpacity: isSelected ? 0.97 : 0.82,
+      color:       isSelected ? '#ffffff' : 'rgba(0,0,0,0.3)',
+      weight:      isSelected ? 2.5 : 1
+    };
+  }
+
   const races = getCurrentRaces();
+  if (!currentRace || !races)
+    return { color: isSelected?'#fff':'#3a3f4d', weight:isSelected?2.5:1, fillColor:'#1a1e28', fillOpacity:0.7 };
 
-  if (!currentRace || !races) {
-    return { color: isSelected ? '#fff' : '#3a3f4d', weight: isSelected ? 2.5 : 1, fillColor: '#1a1e28', fillOpacity: 0.7 };
-  }
-
-  const id   = feature.properties.id;
   const data = races[currentRace]?.[id];
-
-  if (!data) {
-    return { color: '#3a3f4d', weight: 1, fillColor: '#1a1e28', fillOpacity: 0.5 };
-  }
+  if (!data) return { color:'#3a3f4d', weight:1, fillColor:'#1a1e28', fillOpacity:0.5 };
 
   return {
     fillColor:   marginColor(data),
-    fillOpacity: isSelected ? 0.95 : compareMode && (id === compareA || id === compareB) ? 0.95 : 0.72,
-    color:       isSelected ? '#ffffff' : (compareMode && (id === compareA || id === compareB)) ? '#ffffff' : 'rgba(0,0,0,0.4)',
-    weight:      isSelected ? 2.5 : (compareMode && (id === compareA || id === compareB)) ? 2.5 : 1
+    fillOpacity: isSelected ? 0.95 : 0.72,
+    color:       isSelected ? '#ffffff' : 'rgba(0,0,0,0.4)',
+    weight:      isSelected ? 2.5 : 1
   };
 }
 
@@ -1325,178 +898,401 @@ function styleFeature(feature) {
 // ══════════════════════════════════════════════════════════════
 function updateCallBar() {
   if (!IS_ADMIN) return;
-  document.getElementById('callBarDistrict').textContent =
-    (currentRace && selectedDistrictId) ? `— ${selectedDistrictId}` : '';
+  document.getElementById('callBarDistrict').textContent = (currentRace&&selectedDistrictId) ? `— ${selectedDistrictId}` : '';
 }
-
 function callDistrict(status) {
-  if (!IS_ADMIN || !currentRace || !selectedDistrictId) return;
+  if (!IS_ADMIN||!currentRace||!selectedDistrictId) return;
   const rec = districtCalls[currentRace]?.[selectedDistrictId];
   if (!rec) return;
-
   const races = getCurrentRaces();
   const data = races?.[currentRace]?.[selectedDistrictId];
   const sorted = data ? Object.entries(data).sort((a,b)=>b[1]-a[1]) : [];
   const leader = sorted.length ? sorted[0][0] : null;
-
-  if (status) {
-    const prev = rec.winner;
-    rec.prevWinner = (prev && prev !== leader) ? prev : rec.prevWinner;
-    rec.winner = leader;
-    rec.status = status;
-  } else {
-    rec.status = null;
-    rec.winner = null;
-  }
-
-  updateCallBar();
-  showDistrict(selectedDistrictId);
-  // To persist: fetch('/api/calls', { method:'POST', body: JSON.stringify({...}) });
+  if (status) { const prev=rec.winner; rec.prevWinner=(prev&&prev!==leader)?prev:rec.prevWinner; rec.winner=leader; rec.status=status; }
+  else { rec.status=null; rec.winner=null; }
+  updateCallBar(); showDistrict(selectedDistrictId);
 }
 
 // ══════════════════════════════════════════════════════════════
-//  COMPARE TOOL
+//  SHIFT MAP — BUILD UI
 // ══════════════════════════════════════════════════════════════
-function toggleCompare() {
-  compareMode = !compareMode;
-  compareA = null;
-  compareB = null;
+function openShiftPanel() {
+  if (!currentElection || !currentRace) return;
+  shiftElectionIdx = null;
+  shiftGroupKey    = null;
+
+  // Reset step 2
+  document.getElementById('shiftStep2').style.display = 'none';
+  document.getElementById('shiftGoBtn').disabled = true;
+
+  // Populate election list (all except current)
+  const list = document.getElementById('shiftElectionList');
+  list.innerHTML = '';
+
+  const otherElections = allElections.map((e,i)=>({e,i})).filter(({i}) => i !== selectedElectionIdx);
+
+  if (!otherElections.length) {
+    list.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:8px 0">No other elections to compare with.</div>`;
+  } else {
+    otherElections.forEach(({e,i}) => {
+      const d = e.date ? new Date(e.date) : null;
+      const dateStr = d ? d.toLocaleDateString('en',{month:'short',day:'numeric',year:'numeric'}) : 'Unknown date';
+      const div = document.createElement('div');
+      div.className = 'shift-opt';
+      div.innerHTML = `
+        <div class="shift-opt-swatch" style="background:var(--accent2)"></div>
+        <div class="shift-opt-body">
+          <div class="shift-opt-title">${e.title||'Untitled'}</div>
+          <div class="shift-opt-sub">${dateStr}</div>
+        </div>`;
+      div.onclick = () => {
+        document.querySelectorAll('#shiftElectionList .shift-opt').forEach(o=>o.classList.remove('active'));
+        div.classList.add('active');
+        shiftElectionIdx = i;
+        buildShiftGroupList(i);
+      };
+      list.appendChild(div);
+    });
+  }
+
+  goPanel('panelShift');
+}
+
+function buildShiftGroupList(compIdx) {
+  const compElection = allElections[compIdx];
+  if (!compElection) return;
+
+  // Get races from current election
+  const currentRoundData = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
+  const currentRaces = currentRoundData?.races || currentRoundData;
+  const currentRaceData = currentRaces?.[currentRace];
+  if (!currentRaceData) return;
+
+  // Find a matching race in the comparison election
+  // Try first_round, then runoff_round
+  const compRoundData = compElection.first_round || compElection;
+  const compRaces = compRoundData?.races || compRoundData;
+  const compRaceData = compRaces?.[currentRace];
+
+  // Collect all candidate keys from both elections for this race
+  const currentKeys  = new Set(Object.values(currentRaceData).flatMap(d=>Object.keys(d)));
+  const compKeys     = compRaceData ? new Set(Object.values(compRaceData).flatMap(d=>Object.keys(d))) : new Set();
+
+  // Shared candidate keys
+  const sharedCandidates = [...currentKeys].filter(k => compKeys.has(k));
+
+  // Shared parties
+  const currentParties = new Set([...currentKeys].map(k=>candidateParty(k)).filter(Boolean));
+  const compParties    = new Set([...compKeys].map(k=>candidateParty(k)).filter(Boolean));
+  const sharedParties  = [...currentParties].filter(p => compParties.has(p));
+
+  const step2 = document.getElementById('shiftStep2');
+  const groupList = document.getElementById('shiftGroupList');
+  groupList.innerHTML = '';
+  shiftGroupKey = null;
+  document.getElementById('shiftGoBtn').disabled = true;
+
+  if (!sharedParties.length && !sharedCandidates.length) {
+    groupList.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:8px 0">No shared parties or candidates between these two elections.</div>`;
+    step2.style.display = 'block';
+    return;
+  }
+
+  function makeOpt(key, label, sub, color) {
+    const div = document.createElement('div');
+    div.className = 'shift-opt';
+    div.innerHTML = `
+      <div class="shift-opt-swatch" style="background:${color}"></div>
+      <div class="shift-opt-body">
+        <div class="shift-opt-title">${label}</div>
+        <div class="shift-opt-sub">${sub}</div>
+      </div>`;
+    div.onclick = () => {
+      document.querySelectorAll('#shiftGroupList .shift-opt').forEach(o=>o.classList.remove('active'));
+      div.classList.add('active');
+      shiftGroupKey = key;
+      document.getElementById('shiftGoBtn').disabled = false;
+    };
+    groupList.appendChild(div);
+  }
+
+  if (sharedParties.length) {
+    const lbl = document.createElement('div');
+    lbl.className = 'shift-section-label';
+    lbl.textContent = 'By Party';
+    groupList.appendChild(lbl);
+    sharedParties.forEach(p => {
+      const pi = partyRegistry[p];
+      makeOpt('party:'+p, pi?.name||p, pi?.shortName||p, pi?.color||'#888');
+    });
+  }
+
+  if (sharedCandidates.length) {
+    const lbl = document.createElement('div');
+    lbl.className = 'shift-section-label';
+    lbl.textContent = 'By Candidate';
+    groupList.appendChild(lbl);
+    sharedCandidates.forEach(k => {
+      const party = candidateParty(k);
+      const pi = party ? partyRegistry[party] : null;
+      makeOpt('candidate:'+k, candidateName(k), pi?.shortName||'Unaffiliated', candidateColor(k));
+    });
+  }
+
+  step2.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SHIFT MAP — COMPUTE & APPLY
+// ══════════════════════════════════════════════════════════════
+function getShiftGroupColor() {
+  if (!shiftGroupKey) return '#888888';
+  if (shiftGroupKey.startsWith('party:')) {
+    const p = shiftGroupKey.slice(6);
+    return partyRegistry[p]?.color || '#888888';
+  } else {
+    const k = shiftGroupKey.slice(10);
+    return candidateColor(k);
+  }
+}
+
+function getGroupShare(raceDistrictData, groupKey) {
+  // raceDistrictData = { candidateKey: votes, ... }
+  const total = Object.values(raceDistrictData).reduce((a,b)=>a+b,0);
+  if (!total) return null;
+
+  let groupVotes = 0;
+  if (groupKey.startsWith('party:')) {
+    const p = groupKey.slice(6);
+    Object.entries(raceDistrictData).forEach(([k,v]) => {
+      if (candidateParty(k) === p) groupVotes += v;
+    });
+  } else {
+    const k = groupKey.slice(10);
+    groupVotes = raceDistrictData[k] || 0;
+  }
+  return (groupVotes / total) * 100; // percentage
+}
+
+function applyShiftMap() {
+  if (shiftElectionIdx === null || !shiftGroupKey) return;
+
+  const compElection = allElections[shiftElectionIdx];
+  const currentRoundData = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
+  const currentRaces = currentRoundData?.races || currentRoundData;
+  const currentRaceData = currentRaces?.[currentRace];
+
+  const compRoundData = compElection.first_round || compElection;
+  const compRaces = compRoundData?.races || compRoundData;
+  const compRaceData = compRaces?.[currentRace];
+
+  if (!currentRaceData) return;
+
+  shiftData = {};
+  let minShift = Infinity, maxShift = -Infinity;
+  let gainCount = 0, lossCount = 0, noDataCount = 0;
+
+  Object.keys(currentRaceData).forEach(distId => {
+    const curDist  = currentRaceData[distId];
+    const compDist = compRaceData?.[distId];
+
+    const curShare  = getGroupShare(curDist, shiftGroupKey);
+    const compShare = compDist ? getGroupShare(compDist, shiftGroupKey) : null;
+
+    if (curShare === null) { noDataCount++; return; }
+    if (compShare === null) {
+      // No comparison data — treat as 0 baseline
+      shiftData[distId] = curShare;
+      if (curShare > maxShift) maxShift = curShare;
+      if (curShare < minShift) minShift = curShare;
+      gainCount++;
+      return;
+    }
+
+    const shift = curShare - compShare;
+    shiftData[distId] = shift;
+    if (shift > maxShift) maxShift = shift;
+    if (shift < minShift) minShift = shift;
+    if (shift > 0) gainCount++;
+    else lossCount++;
+  });
+
+  shiftMode = true;
   selectedDistrictId = null;
   geoLayer.setStyle(styleFeature);
 
-  const btn = document.getElementById('compareToggleBtn');
-  if (compareMode) {
-    btn.style.background = 'linear-gradient(135deg,#3b5bdb,#7048e8)';
-    btn.style.color = '#fff';
-    btn.textContent = '⚖ Comparing — pick 2 districts';
-    document.getElementById('resultsScroll').innerHTML = `
-      <div class="placeholder">
-        <div class="icon">⚖</div>
-        Click two districts on the map to compare them side by side.
-      </div>`;
+  // Build legend
+  const groupColor = getShiftGroupColor();
+  let groupLabel = '';
+  if (shiftGroupKey.startsWith('party:')) {
+    const p = shiftGroupKey.slice(6);
+    groupLabel = partyRegistry[p]?.name || p;
   } else {
-    btn.style.background = '';
-    btn.style.color = '';
-    btn.textContent = '⚖ Compare Districts';
-    showRaceOverview();
-  }
-}
-
-function handleCompareClick(id) {
-  if (!compareA) {
-    compareA = id;
-  } else if (!compareB && id !== compareA) {
-    compareB = id;
-    showComparison();
-  } else {
-    // Reset and start again
-    compareA = id;
-    compareB = null;
-    document.getElementById('resultsScroll').innerHTML = `
-      <div class="placeholder">
-        <div class="icon">⚖</div>
-        Now pick a second district to compare.
-      </div>`;
-  }
-  geoLayer.setStyle(styleFeature);
-}
-
-function showComparison() {
-  const races = getCurrentRaces();
-  if (!races || !currentRace || !compareA || !compareB) return;
-
-  const dA = races[currentRace]?.[compareA];
-  const dB = races[currentRace]?.[compareB];
-
-  function districtBlock(id, data) {
-    if (!data) return `<div style="color:var(--muted);font-size:11px">No data for ${id}</div>`;
-    const sorted = Object.entries(data).sort((a,b)=>b[1]-a[1]);
-    const total = sorted.reduce((a,[,v])=>a+v,0);
-    const isTie = total > 0 && sorted[0]?.[1] === sorted[1]?.[1];
-    const noVotes = total === 0;
-
-    let html = `<div style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)">`;
-    if (!noVotes && !isTie) {
-      const wKey = sorted[0][0];
-      html += `<span style="color:${candidateColor(wKey)};margin-right:6px">●</span>`;
-    }
-    html += `${id}</div>`;
-
-    if (noVotes) { html += `<div style="color:var(--muted);font-size:11px">No votes</div>`; return html; }
-    if (isTie)   { html += `<div style="color:#aaa;font-size:10px;margin-bottom:6px">⚖ Tie</div>`; }
-
-    sorted.forEach(([k,v],i) => {
-      const pct = total ? ((v/total)*100).toFixed(1) : 0;
-      const leader = !isTie && i===0;
-      html += `
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-          <div style="width:7px;height:7px;border-radius:50%;background:${candidateColor(k)};flex-shrink:0"></div>
-          <span style="font-size:11px;color:${leader?'#fff':'var(--text)'};flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${candidateName(k)}</span>
-          <span style="font-family:var(--font-mono);font-size:10px;color:${leader?'var(--accent)':'var(--muted)'}">${pct}%</span>
-        </div>
-        <div style="width:100%;height:2px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-bottom:5px">
-          <div style="width:${pct}%;height:100%;background:${candidateColor(k)};border-radius:2px"></div>
-        </div>`;
-    });
-
-    const firstVal  = sorted[0]?.[1] || 0;
-    const secondVal = sorted[1]?.[1] || 0;
-    const margin = total ? ((firstVal-secondVal)/total*100).toFixed(1) : null;
-
-    if (!isTie && margin !== null) {
-      html += `<div style="margin-top:6px;font-family:var(--font-mono);font-size:9px;color:var(--muted)">
-        Margin <span style="color:${candidateColor(sorted[0][0])};font-weight:500">+${margin}%</span>
-        &nbsp;·&nbsp; ${total.toLocaleString()} votes
-      </div>`;
-    }
-
-    // Party breakdown
-    const partyTotals = {};
-    sorted.forEach(([k,v]) => {
-      const p = candidateParty(k);
-      if (p) partyTotals[p] = (partyTotals[p]||0)+v;
-    });
-    const partyEntries = Object.entries(partyTotals).sort((a,b)=>b[1]-a[1]);
-    if (partyEntries.length) {
-      html += `<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border)">`;
-      partyEntries.forEach(([p,v]) => {
-        const pInfo = partyRegistry[p];
-        const pct = total ? ((v/total)*100).toFixed(1) : 0;
-        html += `<div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
-          <span style="font-family:var(--font-mono);font-size:8px;text-transform:uppercase;letter-spacing:.08em;background:${pInfo?.color||'#888'}22;color:${pInfo?.color||'#888'};border:1px solid ${pInfo?.color||'#888'}44;padding:1px 4px;border-radius:2px">${pInfo?.shortName||p}</span>
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${pct}%</span>
-        </div>`;
-      });
-      html += `</div>`;
-    }
-
-    return html;
+    const k = shiftGroupKey.slice(10);
+    groupLabel = candidateName(k);
   }
 
-  const html = `
-    <div style="margin-bottom:10px;font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text)">
-      District Comparison
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px">
-        ${districtBlock(compareA, dA)}
-      </div>
-      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px">
-        ${districtBlock(compareB, dB)}
-      </div>
-    </div>
-    <div onclick="compareA=null;compareB=null;document.getElementById('resultsScroll').innerHTML='<div class=\\'placeholder\\'><div class=\\'icon\\'>⚖</div>Click two districts to compare.</div>';geoLayer.setStyle(styleFeature);"
-      style="color:var(--muted);font-size:11px;text-align:center;cursor:pointer;text-decoration:underline;padding:4px 0">
-      ↺ Pick new districts
+  document.getElementById('shiftLegendLabel').textContent = `Shift · ${groupLabel}`;
+  document.getElementById('shiftGradBar').style.background =
+    `linear-gradient(90deg, #e8e8e8, ${groupColor})`;
+  document.getElementById('shiftTickMin').textContent = minShift !== Infinity ? (minShift>=0?'+':'')+minShift.toFixed(1)+'pp' : '';
+  document.getElementById('shiftTickMid').textContent = '0pp';
+  document.getElementById('shiftTickMax').textContent = maxShift !== -Infinity ? '+'+maxShift.toFixed(1)+'pp' : '';
+
+  document.getElementById('shiftSummary').innerHTML =
+    `<span style="color:${groupColor}">▲ ${gainCount} gained</span>&nbsp;&nbsp;`+
+    `<span style="color:#aaa">▼ ${lossCount} lost</span>`+
+    (noDataCount ? `&nbsp;&nbsp;<span style="color:var(--muted)">${noDataCount} no data</span>` : '');
+
+  // Margin chart — district shifts sorted
+  buildShiftMarginChart(groupColor, groupLabel, compElection.title||'Comparison');
+
+  document.getElementById('shiftLegendBar').style.display = 'block';
+
+  // Show the legend panel but keep panelShift visible with legend at bottom
+  // Update results scroll to instruct
+  document.getElementById('resultsScroll').innerHTML = `
+    <div class="placeholder">
+      <div class="icon" style="font-size:20px">📊</div>
+      Shift map active.<br>Click a district to see its shift.
     </div>`;
 
+  // Switch to results panel so map + legend are visible together
+  goPanel('panelResults');
+}
+
+function buildShiftMarginChart(groupColor, groupLabel, compTitle) {
+  // Sorted bar chart of shifts
+  const entries = Object.entries(shiftData).sort((a,b)=>b[1]-a[1]);
+  if (!entries.length) return;
+
+  const maxAbs = Math.max(...entries.map(([,v])=>Math.abs(v)), 1);
+  const SOFT_MAX = 25;
+
+  let html = `
+    <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
+      <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px">
+        District Shifts — ${groupLabel}
+      </div>
+      <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:8px">
+        vs. ${compTitle}
+      </div>`;
+
+  entries.forEach(([id, shift]) => {
+    const gained = shift > 0;
+    const barW   = Math.min(Math.abs(shift)/maxAbs*100, 100);
+    const color  = gained ? groupColor : '#444';
+    const sign   = shift > 0 ? '+' : '';
+    html += `
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+        <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);width:60px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${id}</span>
+        <div style="flex:1;height:5px;background:var(--surface2);border-radius:3px;overflow:hidden">
+          <div style="width:${barW}%;height:100%;background:${color};border-radius:3px"></div>
+        </div>
+        <span style="font-family:var(--font-mono);font-size:9px;color:${gained?groupColor:'#888'};width:42px;text-align:right;flex-shrink:0">${sign}${shift.toFixed(1)}pp</span>
+      </div>`;
+  });
+
+  html += `</div>`;
+  document.getElementById('shiftMarginChart').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SHIFT MAP — DISTRICT CLICK
+// ══════════════════════════════════════════════════════════════
+function showShiftDistrict(id) {
+  const shift = shiftData[id];
+  if (shift === undefined) {
+    document.getElementById('resultsScroll').innerHTML = `<div class="placeholder"><div class="icon">—</div>No shift data for district ${id}.</div>`;
+    return;
+  }
+
+  const groupColor = getShiftGroupColor();
+  let groupLabel = '';
+  if (shiftGroupKey.startsWith('party:')) {
+    const p = shiftGroupKey.slice(6);
+    groupLabel = partyRegistry[p]?.name || p;
+  } else {
+    const k = shiftGroupKey.slice(10);
+    groupLabel = candidateName(k);
+  }
+
+  const sign = shift > 0 ? '+' : '';
+  const gained = shift > 0;
+
+  // Get current and comparison vote shares
+  const currentRoundData = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
+  const currentRaces = currentRoundData?.races || currentRoundData;
+  const currentDist = currentRaces?.[currentRace]?.[id];
+
+  const compElection = allElections[shiftElectionIdx];
+  const compRoundData = compElection?.first_round || compElection;
+  const compRaces = compRoundData?.races || compRoundData;
+  const compDist = compRaces?.[currentRace]?.[id];
+
+  const curShare  = currentDist ? getGroupShare(currentDist, shiftGroupKey) : null;
+  const compShare = compDist    ? getGroupShare(compDist,    shiftGroupKey) : null;
+
+  let html = `
+    <div class="results-heading">District ${id}</div>
+    <div style="text-align:center;padding:14px 0 10px">
+      <div style="font-family:var(--font-display);font-size:32px;font-weight:900;color:${gained?groupColor:'#888'}">${sign}${shift.toFixed(1)}<span style="font-size:16px">pp</span></div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:4px;letter-spacing:.1em;text-transform:uppercase">
+        ${gained ? '▲ Gained' : '▼ Lost'} · ${groupLabel}
+      </div>
+    </div>`;
+
+  if (curShare !== null || compShare !== null) {
+    html += `
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;margin-bottom:10px">
+        <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Vote Share</div>
+        ${compShare !== null ? `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <span style="font-size:11px;color:var(--muted)">${compElection?.title||'Previous'}</span>
+            <span style="font-family:var(--font-mono);font-size:12px;color:var(--text)">${compShare.toFixed(1)}%</span>
+          </div>
+          <div style="width:100%;height:4px;background:var(--surface);border-radius:2px;overflow:hidden;margin-bottom:8px">
+            <div style="width:${Math.min(compShare,100)}%;height:100%;background:#555;border-radius:2px"></div>
+          </div>` : ''}
+        ${curShare !== null ? `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+            <span style="font-size:11px;color:var(--text)">${currentElection?.title||'Current'}</span>
+            <span style="font-family:var(--font-mono);font-size:12px;color:${groupColor}">${curShare.toFixed(1)}%</span>
+          </div>
+          <div style="width:100%;height:4px;background:var(--surface);border-radius:2px;overflow:hidden">
+            <div style="width:${Math.min(curShare,100)}%;height:100%;background:${groupColor};border-radius:2px"></div>
+          </div>` : ''}
+      </div>`;
+  }
+
+  html += `
+    <div onclick="selectedDistrictId=null;geoLayer.setStyle(styleFeature);document.getElementById('resultsScroll').innerHTML='<div class=\\'placeholder\\'><div class=\\'icon\\'>📊</div>Shift map active.<br>Click a district to see its shift.</div>'"
+      style="color:var(--muted);font-size:11px;text-align:center;padding:6px 0;cursor:pointer;text-decoration:underline">← Back to overview</div>`;
+
   document.getElementById('resultsScroll').innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  EXIT SHIFT MODE
+// ══════════════════════════════════════════════════════════════
+function exitShiftMode() {
+  shiftMode = false;
+  shiftData = {};
+  shiftElectionIdx = null;
+  shiftGroupKey = null;
+  selectedDistrictId = null;
+  document.getElementById('shiftLegendBar').style.display = 'none';
+  document.getElementById('shiftMarginChart').innerHTML = '';
+  geoLayer.setStyle(styleFeature);
+  showRaceOverview();
+  goPanel('panelResults');
 }
 
 // ══════════════════════════════════════════════════════════════
 //  RESULTS PANELS
 // ══════════════════════════════════════════════════════════════
 function showRaceOverview() {
+  if (shiftMode) { exitShiftMode(); return; }
   const races = getCurrentRaces();
   if (!races || !currentRace) return;
 
@@ -1507,40 +1303,35 @@ function showRaceOverview() {
   const sorted = Object.entries(totals).sort((a,b)=>b[1]-a[1]);
   const total  = sorted.reduce((a,[,v])=>a+v,0);
 
-  const calls  = districtCalls[currentRace] || {};
+  const calls = districtCalls[currentRace]||{};
   const cW = Object.values(calls).filter(c=>c.status==='winner').length;
   const cR = Object.values(calls).filter(c=>c.status==='runoff').length;
 
-  // Party totals
   const partyTotals = {};
-  sorted.forEach(([k,v]) => {
-    const p = candidateParty(k);
-    if (p) partyTotals[p] = (partyTotals[p]||0)+v;
-  });
+  sorted.forEach(([k,v]) => { const p=candidateParty(k); if(p) partyTotals[p]=(partyTotals[p]||0)+v; });
 
   let html = `<div class="results-heading">${currentRace} — Overview</div>`;
 
-  // Party summary bar
   const partyEntries = Object.entries(partyTotals).sort((a,b)=>b[1]-a[1]);
-  if (partyEntries.length && total > 0) {
+  if (partyEntries.length && total>0) {
     html += `<div style="margin-bottom:10px">
       <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">By Party</div>
       <div style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:4px">`;
     partyEntries.forEach(([p,v]) => {
-      const pct = ((v/total)*100).toFixed(1);
-      const col = partyRegistry[p]?.color || '#888';
+      const pct=((v/total)*100).toFixed(1);
+      const col=partyRegistry[p]?.color||'#888';
       html += `<div style="width:${pct}%;background:${col}" title="${partyRegistry[p]?.name||p}: ${pct}%"></div>`;
     });
     html += `</div><div style="display:flex;gap:10px;flex-wrap:wrap">`;
     partyEntries.forEach(([p,v]) => {
-      const pct = ((v/total)*100).toFixed(1);
-      const pInfo = partyRegistry[p];
+      const pct=((v/total)*100).toFixed(1);
+      const pInfo=partyRegistry[p];
       html += `<span style="font-family:var(--font-mono);font-size:9px;color:${pInfo?.color||'#888'}">${pInfo?.shortName||p} ${pct}%</span>`;
     });
     html += `</div></div>`;
   }
 
-  if (cW || cR) {
+  if (cW||cR) {
     html += `<div style="margin-bottom:8px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">`;
     if (cW) html += `<span style="color:#ffe600;margin-right:10px">✔ ${cW} called</span>`;
     if (cR) html += `<span style="color:#ff9f00">⚡ ${cR} runoff</span>`;
@@ -1548,13 +1339,11 @@ function showRaceOverview() {
   }
 
   sorted.forEach(([k,v],i) => {
-    const pct = total ? ((v/total)*100).toFixed(1) : 0;
-    const leader = i===0;
-    const party = candidateParty(k);
-    const partyInfo = party ? partyRegistry[party] : null;
-    const partyTag = partyInfo
-      ? `<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>`
-      : '';
+    const pct=total?((v/total)*100).toFixed(1):0;
+    const leader=i===0;
+    const party=candidateParty(k);
+    const partyInfo=party?partyRegistry[party]:null;
+    const partyTag=partyInfo?`<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>`:'';
     html += `
       <div class="candidate-row">
         <div class="candidate-swatch" style="background:${candidateColor(k)}"></div>
@@ -1576,9 +1365,9 @@ function showRaceOverview() {
       <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:4px">Tie = grey · No votes = #1a1e28</div>
     </div>
     <hr class="district-divider">
-    <button id="compareToggleBtn" onclick="toggleCompare()"
-      style="width:100%;padding:7px;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:5px;cursor:pointer;transition:all .2s;margin-bottom:4px">
-      ⚖ Compare Districts
+    <button onclick="openShiftPanel()"
+      style="width:100%;padding:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:5px;cursor:pointer;transition:all .2s;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:6px">
+      <span>📊</span> Shift Map
     </button>
     <div style="color:var(--muted);font-size:11px;text-align:center;padding:4px 0">Click a district on the map for local results</div>`;
 
@@ -1587,19 +1376,19 @@ function showRaceOverview() {
 
 function showDistrict(id) {
   const races = getCurrentRaces();
-  if (!currentRace || !races) return;
+  if (!currentRace||!races) return;
   const data = races[currentRace]?.[id];
   if (!data) return;
 
   const sorted    = Object.entries(data).sort((a,b)=>b[1]-a[1]);
   const total     = sorted.reduce((a,[,v])=>a+v,0);
-  const rec       = districtCalls[currentRace]?.[id] || {};
-  const firstVal  = sorted[0]?.[1] || 0;
-  const secondVal = sorted[1]?.[1] || 0;
-  const margin    = total ? ((firstVal-secondVal)/total*100).toFixed(1) : null;
-  const isTie     = total > 0 && firstVal === secondVal;
-  const noVotes   = total === 0;
-  const isFlip    = rec.status && rec.prevWinner && rec.prevWinner !== rec.winner;
+  const rec       = districtCalls[currentRace]?.[id]||{};
+  const firstVal  = sorted[0]?.[1]||0;
+  const secondVal = sorted[1]?.[1]||0;
+  const margin    = total?((firstVal-secondVal)/total*100).toFixed(1):null;
+  const isTie     = total>0 && firstVal===secondVal;
+  const noVotes   = total===0;
+  const isFlip    = rec.status && rec.prevWinner && rec.prevWinner!==rec.winner;
 
   let badges = '';
   if (rec.status==='winner') badges += `<span class="call-badge call-badge-winner">✔ Called</span>`;
@@ -1608,31 +1397,19 @@ function showDistrict(id) {
 
   let html = `<div class="results-heading">District ${id} ${badges}</div>`;
 
-  if (noVotes) {
-    html += `<div style="color:var(--muted);font-size:12px;padding:8px 0">No votes reported yet.</div>`;
-  } else if (isTie) {
-    html += `<div style="background:#2a2a2a;border-radius:5px;padding:8px 10px;margin-bottom:10px;font-family:var(--font-mono);font-size:10px;color:#aaa">⚖ Tie — no candidate leads</div>`;
-  }
+  if (noVotes) html += `<div style="color:var(--muted);font-size:12px;padding:8px 0">No votes reported yet.</div>`;
+  else if (isTie) html += `<div style="background:#2a2a2a;border-radius:5px;padding:8px 10px;margin-bottom:10px;font-family:var(--font-mono);font-size:10px;color:#aaa">⚖ Tie — no candidate leads</div>`;
 
-  // Party totals for this district
   const partyTotals = {};
-  sorted.forEach(([k,v]) => {
-    const p = candidateParty(k);
-    if (p) partyTotals[p] = (partyTotals[p]||0)+v;
-  });
+  sorted.forEach(([k,v]) => { const p=candidateParty(k); if(p) partyTotals[p]=(partyTotals[p]||0)+v; });
 
   sorted.forEach(([k,v],i) => {
-    const pct = total ? ((v/total)*100).toFixed(1) : 0;
-    const leader = !isTie && i===0;
-    const party = candidateParty(k);
-    const partyInfo = party ? partyRegistry[party] : null;
-    const partyTag = partyInfo
-      ? `<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>`
-      : '';
-    const tag = leader
-      ? (rec.status==='winner' ? '<span class="winner-tag">✔ Winner</span>'
-        : rec.status==='runoff' ? '<span class="winner-tag">⚡ Runoff</span>'
-        : '<span class="winner-tag">Leading</span>') : '';
+    const pct=total?((v/total)*100).toFixed(1):0;
+    const leader=!isTie&&i===0;
+    const party=candidateParty(k);
+    const partyInfo=party?partyRegistry[party]:null;
+    const partyTag=partyInfo?`<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${partyInfo.color}22;color:${partyInfo.color};border:1px solid ${partyInfo.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${partyInfo.shortName}</span>`:'';
+    const tag=leader?(rec.status==='winner'?'<span class="winner-tag">✔ Winner</span>':rec.status==='runoff'?'<span class="winner-tag">⚡ Runoff</span>':'<span class="winner-tag">Leading</span>'):'';
     html += `
       <div class="candidate-row">
         <div class="candidate-swatch" style="background:${candidateColor(k)}"></div>
@@ -1642,28 +1419,27 @@ function showDistrict(id) {
       <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${candidateColor(k)}"></div></div>`;
   });
 
-  // Party summary for district
   const partyEntries = Object.entries(partyTotals).sort((a,b)=>b[1]-a[1]);
-  if (partyEntries.length && total > 0) {
+  if (partyEntries.length && total>0) {
     html += `<div style="margin:6px 0 10px;padding:8px 10px;background:var(--surface2);border-radius:5px;border:1px solid var(--border)">
       <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">Party Vote</div>
       <div style="display:flex;height:5px;border-radius:3px;overflow:hidden;margin-bottom:5px">`;
     partyEntries.forEach(([p,v]) => {
-      const pct = ((v/total)*100).toFixed(1);
-      const col = partyRegistry[p]?.color || '#888';
+      const pct=((v/total)*100).toFixed(1);
+      const col=partyRegistry[p]?.color||'#888';
       html += `<div style="width:${pct}%;background:${col}"></div>`;
     });
     html += `</div><div style="display:flex;gap:10px;flex-wrap:wrap">`;
     partyEntries.forEach(([p,v]) => {
-      const pct = ((v/total)*100).toFixed(1);
-      const pInfo = partyRegistry[p];
+      const pct=((v/total)*100).toFixed(1);
+      const pInfo=partyRegistry[p];
       html += `<span style="font-family:var(--font-mono);font-size:9px;color:${pInfo?.color||'#888'}">${pInfo?.shortName||p} ${pct}%</span>`;
     });
     html += `</div></div>`;
   }
 
-  if (!noVotes && !isTie && margin !== null) {
-    const wc = candidateColor(sorted[0][0]);
+  if (!noVotes&&!isTie&&margin!==null) {
+    const wc=candidateColor(sorted[0][0]);
     html += `<hr class="district-divider">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
         <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Margin</span>
