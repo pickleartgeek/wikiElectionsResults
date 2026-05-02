@@ -129,7 +129,7 @@
     "precincts_total": 100,
     "first_round": {
       "races": {
-        "Class 7": {
+        "Class 7 July First Round": {
           "1": { "tmf1": 2, "pag": 1,  "qtw": 0, "wi": 1 },
           "2": { "tmf1": 0, "pag": 1,  "qtw": 0, "wi": 1 },
           "3": { "tmf1": 4, "pag": 0,  "qtw": 2, "wi": 0 },
@@ -147,7 +147,7 @@
       "precincts_reporting": 100,
       "precincts_total": 100,
       "races": {
-        "First Round Class 2 July": {
+        "Class 7 July Runoff": {
           "1": { "tmf1": 2, "pag": 2 },
           "2": { "tmf1": 0, "pag": 2 },
           "3": { "tmf1": 3, "pag": 2 },
