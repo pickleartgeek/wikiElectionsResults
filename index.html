@@ -1418,7 +1418,7 @@ function showDistrict(id) {
   else if (rec.status==='runoff') badges += `<span class="call-badge call-badge-runoff">⚡ Runoff</span>`;
   if (isFlip) badges += `<span class="flip-badge">🔄 Flip</span>`;
 
-  let html = `<div class="results-heading">District ${id} ${badges}</div>`;
+  let html = `<div class="results-heading">Group ${id} ${badges}</div>`;
 
   if (noVotes) html += `<div style="color:var(--muted);font-size:12px;padding:8px 0">No votes reported yet.</div>`;
   else if (isTie) html += `<div style="background:#2a2a2a;border-radius:5px;padding:8px 10px;margin-bottom:10px;font-family:var(--font-mono);font-size:10px;color:#aaa">⚖ Tie — no candidate leads</div>`;
