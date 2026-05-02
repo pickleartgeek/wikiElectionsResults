@@ -949,6 +949,9 @@ function openShiftPanel() {
         document.querySelectorAll('#shiftElectionList .shift-opt').forEach(o=>o.classList.remove('active'));
         div.classList.add('active');
         shiftElectionIdx = i;
+        function normalizeKey(k) {
+          return k.toLowerCase().replace(/\d+$/, '');
+        }
         buildShiftGroupList(i);
       };
       list.appendChild(div);
@@ -979,7 +982,7 @@ function buildShiftGroupList(compIdx) {
   const compKeys     = compRaceData ? new Set(Object.values(compRaceData).flatMap(d=>Object.keys(d))) : new Set();
 
   // Shared candidate keys
-  const sharedCandidates = [...currentKeys].filter(k => compKeys.has(k));
+  const sharedCandidates = [...currentKeys].filter(k1 =>   [...compKeys].some(k2 =>     normalizeKey(k1) === normalizeKey(k2)   ) );
 
   // Shared parties
   const currentParties = new Set([...currentKeys].map(k=>candidateParty(k)).filter(Boolean));
