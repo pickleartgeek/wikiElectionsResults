@@ -480,6 +480,11 @@ if (IS_ADMIN) document.getElementById('callBar').classList.add('admin-on');
 // ══════════════════════════════════════════════════════════════
 //  REGISTRIES
 // ══════════════════════════════════════════════════════════════
+  function normalizeKey(k) {
+  return k
+    .toLowerCase()
+    .replace(/\d+$/, ''); // pag1 → pag, qtw1 → qtw
+  }
 let candidateRegistry = {
   wi:    { name: 'Write-ins',            color: '#bcc0c2', party: 'ua'   },
   wc:    { name: 'Worth-Cupcake',        color: '#4a9edd', party: 'udc'  },
@@ -495,6 +500,7 @@ let candidateRegistry = {
   pag:   { name: 'PickleArtGeek',        color: '#269982', party: 'tsp'  },
   fmr:   { name: 'Boot',                 color: '#8c0b12', party: 'tsp'  },
   bberry:{ name: 'BlackberryActual',     color: '#73797a', party: 'tsp'  },
+  //Historical
   pag1:  { name: 'PickleArtGeek',        color: '#269982', party: 'ua'   },
   oc1:   { name: 'One-Community',        color: '#1b235e', party: 'cfsb' },
   tmf1:  { name: 'teammomofan',          color: '#7d1e4f', party: 'ua'   },
@@ -509,7 +515,7 @@ let partyRegistry = {
   ua:   { name: 'Unaffiliated',                              shortName: 'Ua.',      color: '#bcc0c2' },
   fumo: { name: 'FUMO Union of the Democratic Center',       shortName: 'FUMO-UDC', color: '#f2a38f' },
   cfs:  { name: 'Coalition for Freedom in the Subreddit',    shortName: 'CFS',      color: '#91a195' },
-  cfsb: { name: 'backed by the CFS',                         shortName: 'CFS',      color: '#91a195' },
+  cfsb: { name: 'backed by the CFS',                         shor tName: 'CFS',      color: '#91a195' },
   spa:  { name: 'Spinroom Progressive Alliance',             shortName: 'SPA',      color: '#1023cc' },
   spab: { name: 'backed by the SPA',                         shortName: 'SPA',      color: '#1023cc' },
 };
@@ -975,11 +981,11 @@ function buildShiftGroupList(compIdx) {
   const compRaceData = compRaces?.[currentRace];
 
   // Collect all candidate keys from both elections for this race
-  const currentKeys  = new Set(Object.values(currentRaceData).flatMap(d=>Object.keys(d)));
+  const currentKeys = new Set(   Object.values(currentRaceData).flatMap(d =>     Object.keys(d).map(normalizeKey)   ) );
   const compKeys     = compRaceData ? new Set(Object.values(compRaceData).flatMap(d=>Object.keys(d))) : new Set();
 
   // Shared candidate keys
-  const sharedCandidates = [...currentKeys].filter(k => compKeys.has(k));
+  const sharedCandidates = [...currentKeys].filter(k =>   compKeys.has(k) );
 
   // Shared parties
   const currentParties = new Set([...currentKeys].map(k=>candidateParty(k)).filter(Boolean));
