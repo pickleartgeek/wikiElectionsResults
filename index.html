@@ -1231,7 +1231,49 @@ function marginColor(data) {
   const margin = (firstVal - secondVal) / total; // 0..1
 
   // Tie
-  if (margin === 0) return '#888888';
+  // Blend multiple hex colors by averaging RGB
+function blendColors(keys) {
+  const colors = keys.map(k => candidateColor(k));
+
+  let r = 0, g = 0, b = 0;
+
+  colors.forEach(hex => {
+    const num = parseInt(hex.slice(1), 16);
+    r += (num >> 16) & 255;
+    g += (num >> 8) & 255;
+    b += num & 255;
+  });
+
+  const n = colors.length;
+  r = Math.round(r / n);
+  g = Math.round(g / n);
+  b = Math.round(b / n);
+
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+// Main color picker
+function getRaceColor(results) {
+  const entries = Object.entries(results);
+
+  // Sort descending by votes
+  entries.sort((a, b) => b[1] - a[1]);
+
+  const max = entries[0][1];
+
+  // Get all candidates tied for first
+  const leaders = entries
+    .filter(([_, v]) => v === max)
+    .map(([k]) => k);
+
+  // Tie case → blend colors
+  if (leaders.length > 1) {
+    return blendColors(leaders);
+  }
+
+  // Normal winner
+  return candidateColor(leaders[0]);
+}
 
   const base = candidateColor(firstKey);
   const MID = 0.35;
