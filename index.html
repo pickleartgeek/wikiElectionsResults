@@ -961,6 +961,12 @@ function openShiftPanel() {
   goPanel('panelShift');
 }
 
+function getParty(k) {
+  return candidateRegistry[k]?.party
+      || candidateRegistry[normalizeKey(k)]?.party
+      || null;
+  }
+
 function buildShiftGroupList(compIdx) {
   const compElection = allElections[compIdx];
   if (!compElection) return;
