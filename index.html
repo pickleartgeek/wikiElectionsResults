@@ -967,6 +967,20 @@ function getParty(k) {
       || null;
   }
 
+function normalizeKey(k) {
+  return k.toLowerCase().replace(/\d+$/, '');
+}
+
+function findMatchingRace(races, targetRace) {
+  if (!races) return null;
+
+  const normTarget = normalizeKey(targetRace);
+
+  return Object.entries(races).find(([key]) =>
+    normalizeKey(key).includes(normTarget)
+  )?.[1] || null;
+}
+
 function buildShiftGroupList(compIdx) {
   const compElection = allElections[compIdx];
   if (!compElection) return;
@@ -974,14 +988,14 @@ function buildShiftGroupList(compIdx) {
   // Get races from current election
   const currentRoundData = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
   const currentRaces = currentRoundData?.races || currentRoundData;
-  const currentRaceData = currentRaces?.[currentRace];
+  const currentRaceData = findMatchingRace(currentRaces, currentRace);
   if (!currentRaceData) return;
 
   // Find a matching race in the comparison election
   // Try first_round, then runoff_round
   const compRoundData = compElection.first_round || compElection;
   const compRaces = compRoundData?.races || compRoundData;
-  const compRaceData = compRaces?.[currentRace];
+  const compRaceData = findMatchingRace(compRaces, currentRace);
 
   // Collect all candidate keys from both elections for this race
   const currentKeys  = new Set(Object.values(currentRaceData).flatMap(d=>Object.keys(d)));
@@ -1089,11 +1103,11 @@ function applyShiftMap() {
   const compElection = allElections[shiftElectionIdx];
   const currentRoundData = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
   const currentRaces = currentRoundData?.races || currentRoundData;
-  const currentRaceData = currentRaces?.[currentRace];
+  const currentRaceData = findMatchingRace(currentRaces, currentRace);
 
   const compRoundData = compElection.first_round || compElection;
   const compRaces = compRoundData?.races || compRoundData;
-  const compRaceData = compRaces?.[currentRace];
+  const compRaceData = findMatchingRace(compRaces, currentRace);
 
   if (!currentRaceData) return;
 
