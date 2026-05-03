@@ -158,7 +158,7 @@
     .panel-back:hover { color: var(--text); }
     .panel-nav-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--muted); flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .round-pick-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 20px; gap: 10px; }
+    .round-pick-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 20px; gap: 10px; overflow-y: auto; }
     .round-pick-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
 
     .round-opt {
@@ -198,7 +198,7 @@
       padding: 4px 11px; font-family: var(--font-mono); font-size: 10px;
       letter-spacing: 0.05em; background: var(--surface2); color: var(--muted);
       border: 1px solid var(--border); border-radius: 4px; cursor: pointer;
-      transition: all 0.14s ease; user-select: none;
+      transition: all 0.14px ease; user-select: none;
     }
     .race-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.16); }
     .race-btn.active { background: var(--accent2); color: #0d0f14; border-color: var(--accent2); font-weight: 500; }
@@ -430,9 +430,15 @@
           <div id="shiftElectionList"></div>
         </div>
 
-        <!-- Step 2: pick group (hidden until election chosen) -->
+        <!-- Step 2: pick race within that election (hidden until election chosen) -->
         <div id="shiftStep2" style="display:none">
-          <div class="shift-section-label" style="margin-top:0">Compare group</div>
+          <div class="shift-section-label">Round / Race</div>
+          <div id="shiftRaceList"></div>
+        </div>
+
+        <!-- Step 3: pick candidate/party group (hidden until race chosen) -->
+        <div id="shiftStep3" style="display:none">
+          <div class="shift-section-label">Compare group</div>
           <div id="shiftGroupList"></div>
           <button class="shift-go-btn" id="shiftGoBtn" onclick="applyShiftMap()" disabled>
             Generate Shift Map →
@@ -448,18 +454,13 @@
           <div id="shiftGradBar" style="flex:1;height:8px;border-radius:4px"></div>
           <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">Gained</span>
         </div>
-        <!-- Tick marks -->
         <div style="display:flex;justify-content:space-between;padding:0 0 2px">
           <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)" id="shiftTickMin"></span>
           <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)" id="shiftTickMid">0%</span>
           <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)" id="shiftTickMax"></span>
         </div>
-        <!-- District count summary -->
         <div id="shiftSummary" style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:4px;padding-top:4px;border-top:1px solid var(--border)"></div>
-
-        <!-- Margin chart -->
         <div id="shiftMarginChart" style="margin-top:8px"></div>
-
         <button onclick="exitShiftMode()" style="margin-top:8px;width:100%;padding:6px;font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:4px;cursor:pointer">
           ✕ Exit shift map
         </button>
@@ -511,7 +512,7 @@ let candidateRegistry = {
 let partyRegistry = {
   tsp:  { name: 'The Spinner Party',                         shortName: 'TSP',      color: '#b71212' },
   udc:  { name: 'Union of the Democratic Center',            shortName: 'UDC',      color: '#32a852' },
-  iltsr:{ name: 'Iron League of TheSpinRoom',              shortName: 'ILTSR',      color: '#edce2f' },
+  iltsr:{ name: 'Iron League of TheSpinRoom',                shortName: 'ILTSR',    color: '#edce2f' },
   ua:   { name: 'Unaffiliated',                              shortName: 'Ua.',      color: '#bcc0c2' },
   fumo: { name: 'FUMO Union of the Democratic Center',       shortName: 'FUMO-UDC', color: '#f2a38f' },
 };
@@ -519,6 +520,59 @@ let partyRegistry = {
 function candidateColor(k) { return candidateRegistry[k]?.color || '#888888'; }
 function candidateName(k)  { return candidateRegistry[k]?.name  || k; }
 function candidateParty(k) { return candidateRegistry[k]?.party || null; }
+
+// ══════════════════════════════════════════════════════════════
+//  HELPERS — key normalisation for fuzzy race matching
+// ══════════════════════════════════════════════════════════════
+
+/**
+ * Strip trailing digits from a candidate key so that "qtw1" matches "qtw".
+ */
+function normalizeCandidateKey(k) {
+  return k.toLowerCase().replace(/\d+$/, '');
+}
+
+/**
+ * Return ALL races from an election object across every round,
+ * each tagged with metadata so the shift picker can show them.
+ *
+ * Returns an array of:
+ *   { label, roundKey, raceName, raceData }
+ *
+ * label     – human-readable string shown in the picker
+ * roundKey  – 'first_round' | 'runoff_round'
+ * raceName  – the key inside races{}
+ * raceData  – the district→votes map
+ */
+function getAllRacesFromElection(election) {
+  const out = [];
+  if (!election) return out;
+
+  function extractRound(roundObj, roundKey, roundLabel) {
+    if (!roundObj) return;
+    const races = roundObj.races || roundObj;
+    if (typeof races !== 'object') return;
+    Object.entries(races).forEach(([raceName, raceData]) => {
+      if (typeof raceData !== 'object') return;
+      out.push({ label: `${roundLabel} · ${raceName}`, roundKey, raceName, raceData });
+    });
+  }
+
+  extractRound(election.first_round || election, 'first_round', 'First Round');
+  if (election.runoff_round) extractRound(election.runoff_round, 'runoff_round', 'Runoff');
+
+  return out;
+}
+
+/**
+ * Get the race data object for the currently-viewed race.
+ * Returns { [districtId]: { [candidateKey]: votes } }
+ */
+function getCurrentRaceData() {
+  const races = getCurrentRaces();
+  if (!races || !currentRace) return null;
+  return races[currentRace] || null;
+}
 
 // ══════════════════════════════════════════════════════════════
 //  STATE
@@ -538,8 +592,9 @@ let selectedElectionIdx = null;
 // Shift map state
 let shiftMode           = false;
 let shiftElectionIdx    = null;   // comparison election index
-let shiftGroupKey       = null;   // candidate key OR 'party:tsp' etc.
-let shiftData           = {};     // { districtId: shiftValue (%) }
+let shiftRaceEntry      = null;   // { label, roundKey, raceName, raceData } from comparison election
+let shiftGroupKey       = null;   // 'party:tsp' | 'candidate:dvwb'
+let shiftData           = {};     // { districtId: shiftValue (pp) }
 
 // ══════════════════════════════════════════════════════════════
 //  MAP INIT
@@ -828,27 +883,14 @@ function marginColor(data) {
   else return darkenHex(base, ((margin-MID)/(1-MID))*0.30);
 }
 
-// ══════════════════════════════════════════════════════════════
-//  SHIFT MAP — colour from white (no gain/loss) → full color (big gain)
-//  shift is a signed percentage-point change.
-//  Positive = gained → strong candidate/party color
-//  Zero or negative = white (fading out)
-// ══════════════════════════════════════════════════════════════
 function shiftColor(shift, hexColor) {
-  // Clamp to [0, maxGain] then map to [white → color]
-  // We use the max absolute gain across all districts to normalise
   if (!hexColor) hexColor = '#888888';
-  if (shift <= -45) return '#e8e8e8'; // white-ish for no gain / loss
-
-  // t = 0 → white, t = 1 → full color
-  // We normalise by a soft max (capped at 45pp shift = full saturation)
+  if (shift <= -45) return '#e8e8e8';
   const SOFT_MAX = 45;
   const t = Math.min(shift / SOFT_MAX, 1);
-
   let r = parseInt(hexColor.slice(1,3),16);
   let g = parseInt(hexColor.slice(3,5),16);
   let b = parseInt(hexColor.slice(5,7),16);
-  // Blend from white (255,255,255) → color
   r = Math.round(255 + (r-255)*t);
   g = Math.round(255 + (g-255)*t);
   b = Math.round(255 + (b-255)*t);
@@ -916,22 +958,27 @@ function callDistrict(status) {
 }
 
 // ══════════════════════════════════════════════════════════════
-//  SHIFT MAP — BUILD UI
+//  SHIFT MAP — STEP 1: open panel, pick comparison election
 // ══════════════════════════════════════════════════════════════
 function openShiftPanel() {
   if (!currentElection || !currentRace) return;
+
+  // Reset all steps
   shiftElectionIdx = null;
+  shiftRaceEntry   = null;
   shiftGroupKey    = null;
 
-  // Reset step 2
   document.getElementById('shiftStep2').style.display = 'none';
+  document.getElementById('shiftStep3').style.display = 'none';
   document.getElementById('shiftGoBtn').disabled = true;
 
   // Populate election list (all except current)
   const list = document.getElementById('shiftElectionList');
   list.innerHTML = '';
 
-  const otherElections = allElections.map((e,i)=>({e,i})).filter(({i}) => i !== selectedElectionIdx);
+  const otherElections = allElections
+    .map((e,i) => ({e,i}))
+    .filter(({i}) => i !== selectedElectionIdx);
 
   if (!otherElections.length) {
     list.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:8px 0">No other elections to compare with.</div>`;
@@ -951,10 +998,11 @@ function openShiftPanel() {
         document.querySelectorAll('#shiftElectionList .shift-opt').forEach(o=>o.classList.remove('active'));
         div.classList.add('active');
         shiftElectionIdx = i;
-        function normalizeKey(k) {
-          return k.toLowerCase().replace(/\d+$/, '');
-        }
-        buildShiftGroupList(i);
+        shiftRaceEntry   = null;
+        shiftGroupKey    = null;
+        document.getElementById('shiftStep3').style.display = 'none';
+        document.getElementById('shiftGoBtn').disabled = true;
+        buildShiftRaceList(i);
       };
       list.appendChild(div);
     });
@@ -963,63 +1011,85 @@ function openShiftPanel() {
   goPanel('panelShift');
 }
 
-function getParty(k) {
-  return candidateRegistry[k]?.party
-      || candidateRegistry[normalizeKey(k)]?.party
-      || null;
-  }
-
-function normalizeKey(k) {
-  return k.toLowerCase().replace(/\d+$/, '');
-}
-
-function findMatchingRace(races, targetRace) {
-  if (!races) return null;
-
-  const normTarget = normalizeKey(targetRace);
-
-  return Object.entries(races).find(([key]) =>
-    normalizeKey(key).includes(normTarget)
-  )?.[1] || null;
-}
-
-function buildShiftGroupList(compIdx) {
+// ══════════════════════════════════════════════════════════════
+//  SHIFT MAP — STEP 2: pick race from comparison election
+// ══════════════════════════════════════════════════════════════
+function buildShiftRaceList(compIdx) {
   const compElection = allElections[compIdx];
   if (!compElection) return;
 
-  // Get races from current election
-  const currentRoundData = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
-  const currentRaces = currentRoundData?.races || currentRoundData;
-  const currentRaceData = findMatchingRace(currentRaces, currentRace);
-  if (!currentRaceData) return;
+  const allRaces = getAllRacesFromElection(compElection);
 
-  // Find a matching race in the comparison election
-  // Try first_round, then runoff_round
-  const compRoundData = compElection.first_round || compElection;
-  const compRaces = compRoundData?.races || compRoundData;
-  const compRaceData = findMatchingRace(compRaces, currentRace);
+  const raceList = document.getElementById('shiftRaceList');
+  raceList.innerHTML = '';
 
-  // Collect all candidate keys from both elections for this race
-  const currentKeys  = new Set(Object.values(currentRaceData).flatMap(d=>Object.keys(d)));
-  const compKeys     = compRaceData ? new Set(Object.values(compRaceData).flatMap(d=>Object.keys(d))) : new Set();
+  if (!allRaces.length) {
+    raceList.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:8px 0">No races found in this election.</div>`;
+    document.getElementById('shiftStep2').style.display = 'block';
+    return;
+  }
 
-  // Shared candidate keys
-  const sharedCandidates = [...currentKeys].filter(k1 =>   [...compKeys].some(k2 =>     normalizeKey(k1) === normalizeKey(k2)   ) );
+  allRaces.forEach(entry => {
+    const div = document.createElement('div');
+    div.className = 'shift-opt';
+
+    const icon = entry.roundKey === 'runoff_round' ? '⚡' : '🗳';
+    div.innerHTML = `
+      <div class="shift-opt-swatch" style="background:${entry.roundKey==='runoff_round'?'#ff9f00':'var(--accent2)'}"></div>
+      <div class="shift-opt-body">
+        <div class="shift-opt-title">${icon} ${entry.raceName}</div>
+        <div class="shift-opt-sub">${entry.roundKey === 'runoff_round' ? 'Runoff round' : 'First round'}</div>
+      </div>`;
+
+    div.onclick = () => {
+      document.querySelectorAll('#shiftRaceList .shift-opt').forEach(o=>o.classList.remove('active'));
+      div.classList.add('active');
+      shiftRaceEntry = entry;
+      shiftGroupKey  = null;
+      document.getElementById('shiftGoBtn').disabled = true;
+      buildShiftGroupList();
+    };
+    raceList.appendChild(div);
+  });
+
+  document.getElementById('shiftStep2').style.display = 'block';
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SHIFT MAP — STEP 3: pick candidate/party group
+// ══════════════════════════════════════════════════════════════
+function buildShiftGroupList() {
+  const currentRaceData = getCurrentRaceData();
+  if (!currentRaceData || !shiftRaceEntry) return;
+
+  const compRaceData = shiftRaceEntry.raceData;
+
+  // Collect candidate keys from each race (normalised for matching)
+  const currentKeys = new Set(
+    Object.values(currentRaceData).flatMap(d => Object.keys(d))
+  );
+  const compKeys = new Set(
+    Object.values(compRaceData).flatMap(d => Object.keys(d))
+  );
+
+  // Two keys "match" if their normalised forms are equal
+  const sharedCandidates = [...currentKeys].filter(k1 =>
+    [...compKeys].some(k2 => normalizeCandidateKey(k1) === normalizeCandidateKey(k2))
+  );
 
   // Shared parties
   const currentParties = new Set([...currentKeys].map(k=>candidateParty(k)).filter(Boolean));
   const compParties    = new Set([...compKeys].map(k=>candidateParty(k)).filter(Boolean));
   const sharedParties  = [...currentParties].filter(p => compParties.has(p));
 
-  const step2 = document.getElementById('shiftStep2');
   const groupList = document.getElementById('shiftGroupList');
   groupList.innerHTML = '';
   shiftGroupKey = null;
   document.getElementById('shiftGoBtn').disabled = true;
 
   if (!sharedParties.length && !sharedCandidates.length) {
-    groupList.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:8px 0">No shared parties or candidates between these two elections.</div>`;
-    step2.style.display = 'block';
+    groupList.innerHTML = `<div style="color:var(--muted);font-size:12px;padding:8px 0">No shared parties or candidates between these two races.</div>`;
+    document.getElementById('shiftStep3').style.display = 'block';
     return;
   }
 
@@ -1044,6 +1114,7 @@ function buildShiftGroupList(compIdx) {
   if (sharedParties.length) {
     const lbl = document.createElement('div');
     lbl.className = 'shift-section-label';
+    lbl.style.marginTop = '0';
     lbl.textContent = 'By Party';
     groupList.appendChild(lbl);
     sharedParties.forEach(p => {
@@ -1064,7 +1135,7 @@ function buildShiftGroupList(compIdx) {
     });
   }
 
-  step2.style.display = 'block';
+  document.getElementById('shiftStep3').style.display = 'block';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1081,8 +1152,12 @@ function getShiftGroupColor() {
   }
 }
 
+/**
+ * Get the vote share of a group in one district's data.
+ * groupKey can be 'party:tsp' or 'candidate:dvwb'.
+ * Candidate matching uses normalizeCandidateKey so "dvwb" matches "dvwb" in either race.
+ */
 function getGroupShare(raceDistrictData, groupKey) {
-  // raceDistrictData = { candidateKey: votes, ... }
   const total = Object.values(raceDistrictData).reduce((a,b)=>a+b,0);
   if (!total) return null;
 
@@ -1093,24 +1168,20 @@ function getGroupShare(raceDistrictData, groupKey) {
       if (candidateParty(k) === p) groupVotes += v;
     });
   } else {
-    const k = groupKey.slice(10);
-    groupVotes = raceDistrictData[k] || 0;
+    // candidate — match by normalised key
+    const normTarget = normalizeCandidateKey(groupKey.slice(10));
+    Object.entries(raceDistrictData).forEach(([k,v]) => {
+      if (normalizeCandidateKey(k) === normTarget) groupVotes += v;
+    });
   }
-  return (groupVotes / total) * 100; // percentage
+  return (groupVotes / total) * 100;
 }
 
 function applyShiftMap() {
-  if (shiftElectionIdx === null || !shiftGroupKey) return;
+  if (shiftElectionIdx === null || !shiftRaceEntry || !shiftGroupKey) return;
 
-  const compElection = allElections[shiftElectionIdx];
-  const currentRoundData = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
-  const currentRaces = currentRoundData?.races || currentRoundData;
-  const currentRaceData = findMatchingRace(currentRaces, currentRace);
-
-  const compRoundData = compElection.first_round || compElection;
-  const compRaces = compRoundData?.races || compRoundData;
-  const compRaceData = findMatchingRace(compRaces, currentRace);
-
+  const currentRaceData = getCurrentRaceData();
+  const compRaceData    = shiftRaceEntry.raceData;
   if (!currentRaceData) return;
 
   shiftData = {};
@@ -1125,8 +1196,8 @@ function applyShiftMap() {
     const compShare = compDist ? getGroupShare(compDist, shiftGroupKey) : null;
 
     if (curShare === null) { noDataCount++; return; }
+
     if (compShare === null) {
-      // No comparison data — treat as 0 baseline
       shiftData[distId] = curShare;
       if (curShare > maxShift) maxShift = curShare;
       if (curShare < minShift) minShift = curShare;
@@ -1138,15 +1209,14 @@ function applyShiftMap() {
     shiftData[distId] = shift;
     if (shift > maxShift) maxShift = shift;
     if (shift < minShift) minShift = shift;
-    if (shift > 0) gainCount++;
-    else lossCount++;
+    if (shift > 0) gainCount++; else lossCount++;
   });
 
   shiftMode = true;
   selectedDistrictId = null;
   geoLayer.setStyle(styleFeature);
 
-  // Build legend
+  // Legend
   const groupColor = getShiftGroupColor();
   let groupLabel = '';
   if (shiftGroupKey.startsWith('party:')) {
@@ -1156,6 +1226,8 @@ function applyShiftMap() {
     const k = shiftGroupKey.slice(10);
     groupLabel = candidateName(k);
   }
+
+  const compElection = allElections[shiftElectionIdx];
 
   document.getElementById('shiftLegendLabel').textContent = `Shift · ${groupLabel}`;
   document.getElementById('shiftGradBar').style.background =
@@ -1169,30 +1241,24 @@ function applyShiftMap() {
     `<span style="color:#aaa">▼ ${lossCount} lost</span>`+
     (noDataCount ? `&nbsp;&nbsp;<span style="color:var(--muted)">${noDataCount} no data</span>` : '');
 
-  // Margin chart — district shifts sorted
-  buildShiftMarginChart(groupColor, groupLabel, compElection.title||'Comparison');
+  buildShiftMarginChart(groupColor, groupLabel, `${compElection.title||'Comparison'} · ${shiftRaceEntry.raceName}`);
 
   document.getElementById('shiftLegendBar').style.display = 'block';
 
-  // Show the legend panel but keep panelShift visible with legend at bottom
-  // Update results scroll to instruct
   document.getElementById('resultsScroll').innerHTML = `
     <div class="placeholder">
       <div class="icon" style="font-size:20px">📊</div>
       Shift map active.<br>Click a group to see its shift.
     </div>`;
 
-  // Switch to results panel so map + legend are visible together
   goPanel('panelResults');
 }
 
 function buildShiftMarginChart(groupColor, groupLabel, compTitle) {
-  // Sorted bar chart of shifts
   const entries = Object.entries(shiftData).sort((a,b)=>b[1]-a[1]);
   if (!entries.length) return;
 
   const maxAbs = Math.max(...entries.map(([,v])=>Math.abs(v)), 1);
-  const SOFT_MAX = 25;
 
   let html = `
     <div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)">
@@ -1245,18 +1311,14 @@ function showShiftDistrict(id) {
   const sign = shift > 0 ? '+' : '';
   const gained = shift > 0;
 
-  // Get current and comparison vote shares
-  const currentRoundData = currentRoundKey==='runoff_round' ? currentElection.runoff_round : (currentElection.first_round||currentElection);
-  const currentRaces = currentRoundData?.races || currentRoundData;
-  const currentDist = currentRaces?.[currentRace]?.[id];
-
-  const compElection = allElections[shiftElectionIdx];
-  const compRoundData = compElection?.first_round || compElection;
-  const compRaces = compRoundData?.races || compRoundData;
-  const compDist = compRaces?.[currentRace]?.[id];
+  const currentRaceData = getCurrentRaceData();
+  const currentDist = currentRaceData?.[id];
+  const compDist    = shiftRaceEntry?.raceData?.[id];
 
   const curShare  = currentDist ? getGroupShare(currentDist, shiftGroupKey) : null;
   const compShare = compDist    ? getGroupShare(compDist,    shiftGroupKey) : null;
+
+  const compElection = allElections[shiftElectionIdx];
 
   let html = `
     <div class="results-heading">Group ${id}</div>
@@ -1273,7 +1335,7 @@ function showShiftDistrict(id) {
         <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Vote Share</div>
         ${compShare !== null ? `
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-            <span style="font-size:11px;color:var(--muted)">${compElection?.title||'Previous'}</span>
+            <span style="font-size:11px;color:var(--muted)">${compElection?.title||'Previous'} · ${shiftRaceEntry?.raceName||''}</span>
             <span style="font-family:var(--font-mono);font-size:12px;color:var(--text)">${compShare.toFixed(1)}%</span>
           </div>
           <div style="width:100%;height:4px;background:var(--surface);border-radius:2px;overflow:hidden;margin-bottom:8px">
@@ -1281,7 +1343,7 @@ function showShiftDistrict(id) {
           </div>` : ''}
         ${curShare !== null ? `
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-            <span style="font-size:11px;color:var(--text)">${currentElection?.title||'Current'}</span>
+            <span style="font-size:11px;color:var(--text)">${currentElection?.title||'Current'} · ${currentRace||''}</span>
             <span style="font-family:var(--font-mono);font-size:12px;color:${groupColor}">${curShare.toFixed(1)}%</span>
           </div>
           <div style="width:100%;height:4px;background:var(--surface);border-radius:2px;overflow:hidden">
@@ -1304,7 +1366,8 @@ function exitShiftMode() {
   shiftMode = false;
   shiftData = {};
   shiftElectionIdx = null;
-  shiftGroupKey = null;
+  shiftRaceEntry   = null;
+  shiftGroupKey    = null;
   selectedDistrictId = null;
   document.getElementById('shiftLegendBar').style.display = 'none';
   document.getElementById('shiftMarginChart').innerHTML = '';
