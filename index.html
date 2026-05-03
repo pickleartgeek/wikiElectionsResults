@@ -493,14 +493,17 @@ let candidateRegistry = {
   pc:    { name: 'ProCookies128',        color: '#10cc26', party: 'ua'   },
   oc:    { name: 'One-Community',        color: '#1b235e', party: 'ua'   },
   wip:   { name: 'wiptes167',            color: '#f2a38f', party: 'udc'  },
+  halo:  { name: 'Halogram',             color: '#0966bd', party: 'ua'   },
+  md:    { name: 'Mani_disciple',        color: '#fcf003', party: 'ua'   },
+  pm:    { name: 'Paleolithic-Money',    color: '#b8a12e', party: 'ua'   },
   pag:   { name: 'PickleArtGeek',        color: '#269982', party: 'tsp'  },
   fmr:   { name: 'Boot',                 color: '#8c0b12', party: 'tsp'  },
   bberry:{ name: 'BlackberryActual',     color: '#73797a', party: 'tsp'  },
   pag1:  { name: 'PickleArtGeek',        color: '#269982', party: 'ua'   },
-  oc1:   { name: 'One-Community',        color: '#1b235e', party: 'cfsb' },
   tmf1:  { name: 'teammomofan',          color: '#7d1e4f', party: 'ua'   },
   wip1:  { name: 'wiptes167',            color: '#f2a38f', party: 'fumo' },
   qtw1:  { name: 'QuantaviousTheWise',   color: '#e05555', party: 'tsp'  },
+  qtw2:  { name: 'QuantaviousTheWise',   color: '#e05555', party: 'ua'   },
   prac1: { name: 'practicalpurpose',     color: '#f2eb11', party: 'ua'   },
   ip1:   { name: 'Impressive_Plant',     color: '#03003b', party: 'ua'   },
 };
@@ -508,13 +511,9 @@ let candidateRegistry = {
 let partyRegistry = {
   tsp:  { name: 'The Spinner Party',                         shortName: 'TSP',      color: '#b71212' },
   udc:  { name: 'Union of the Democratic Center',            shortName: 'UDC',      color: '#32a852' },
-  iltsr:{ name: 'Iron League of TheSpinRoom',              shortName: 'ILTSR',    color: '#edce2f' },
+  iltsr:{ name: 'Iron League of TheSpinRoom',              shortName: 'ILTSR',      color: '#edce2f' },
   ua:   { name: 'Unaffiliated',                              shortName: 'Ua.',      color: '#bcc0c2' },
   fumo: { name: 'FUMO Union of the Democratic Center',       shortName: 'FUMO-UDC', color: '#f2a38f' },
-  cfs:  { name: 'Coalition for Freedom in the Subreddit',    shortName: 'CFS',      color: '#91a195' },
-  cfsb: { name: 'backed by the CFS',                         shortName: 'CFS',      color: '#91a195' },
-  spa:  { name: 'Spinroom Progressive Alliance',             shortName: 'SPA',      color: '#1023cc' },
-  spab: { name: 'backed by the SPA',                         shortName: 'SPA',      color: '#1023cc' },
 };
 
 function candidateColor(k) { return candidateRegistry[k]?.color || '#888888'; }
