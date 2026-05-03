@@ -202,5 +202,47 @@
         }
       }
     }
-  } 
+  },
+  {
+  "id": "Class 6 June",
+  "title": "Class 6 Election",
+  "date": "2025-06-26",
+  "party": "Special",
+  "turnout": 55,
+  "precincts_reporting": 100,
+  "precincts_total": 100,
+  "first_round": {
+    "races": {
+      "Class 6 June First Round": {
+        "1": { "wip1": 2, "md": 0, "qtw2": 2, "pm": 0, "dvwb": 0, "bberry": 0 },
+        "2": { "wip1": 2, "md": 0, "qtw2": 0, "pm": 0, "dvwb": 0, "bberry": 0 },
+        "3": { "wip1": 2, "md": 1, "qtw2": 0, "pm": 0, "dvwb": 1, "bberry": 0 },
+        "4": { "wip1": 0, "md": 1, "qtw2": 0, "pm": 0, "dvwb": 0, "bberry": 0 },
+        "5": { "wip1": 2, "md": 1, "qtw2": 1, "pm": 0, "dvwb": 1, "bberry": 0 },
+        "6": { "wip1": 2, "md": 0, "qtw2": 1, "pm": 1, "dvwb": 0, "bberry": 0 },
+        "7": { "wip1": 1, "md": 0, "qtw2": 1, "pm": 0, "dvwb": 0, "bberry": 0 },
+        "8": { "wip1": 0, "md": 0, "qtw2": 0, "pm": 0, "dvwb": 0, "bberry": 0 },
+        "9": { "wip1": 0, "md": 0, "qtw2": 1, "pm": 1, "dvwb": 0, "bberry": 0 }
+      }
+    }
+  },
+  "runoff_round": {
+    "turnout": 60,
+    "precincts_reporting": 100,
+    "precincts_total": 100,
+    "races": {
+      "Class 6 June Runoff": {
+        "1": { "wip1": 3, "md": 0 },
+        "2": { "wip1": 1, "md": 0 },
+        "3": { "wip1": 2, "md": 2 },
+        "4": { "wip1": 1, "md": 1 },
+        "5": { "wip1": 3, "md": 1 },
+        "6": { "wip1": 3, "md": 3 },
+        "7": { "wip1": 2, "md": 0 },
+        "8": { "wip1": 0, "md": 1 },
+        "9": { "wip1": 3, "md": 1 }
+      }
+    }
+  }
+}
 ]
