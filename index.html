@@ -1137,7 +1137,7 @@ function simGetDistricts(){
 function openSimPanel(){
   const cands=simCollectAllCandidates();
   const dists=simGetDistricts();
-  document.getElementById('simDistrictCount').textContent=`${dists.length} district${dists.length!==1?'s':''} will participate in this simulation`;
+  document.getElementById('simDistrictCount').textContent=`${dists.length} group${dists.length!==1?'s':''} will participate in this simulation`;
 
   // Group by party
   const byParty={};
