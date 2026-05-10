@@ -22,12 +22,13 @@
       --sidebar-w: 360px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: var(--font-body); height: 100vh; overflow: hidden; display: flex; }
-    #map { flex: 1; height: 100vh; }
+    html { height: 100%; height: -webkit-fill-available; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); height: 100vh; height: 100dvh; overflow: hidden; display: flex; }
+    #map { flex: 1; height: 100%; }
     .leaflet-container { background: #0d0f14 !important; }
 
     /* ══ SIDEBAR ══ */
-    #sidebar { width: var(--sidebar-w); min-width: 300px; height: 100vh; display: flex; flex-direction: column; background: var(--surface); border-left: 1px solid var(--border); overflow: hidden; }
+    #sidebar { width: var(--sidebar-w); min-width: 300px; height: 100%; display: flex; flex-direction: column; background: var(--surface); border-left: 1px solid var(--border); overflow: hidden; }
     .sb-brand { padding: 18px 22px 14px; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
     .sb-brand-eyebrow { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent2); margin-bottom: 3px; }
     .sb-brand-title { font-family: var(--font-display); font-size: 22px; font-weight: 900; color: var(--text); line-height: 1.05; }
@@ -48,7 +49,7 @@
     .tl-tab { flex: 1; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 9px 4px; text-align: center; cursor: pointer; color: var(--muted); border-bottom: 2px solid transparent; transition: all 0.15s; user-select: none; }
     .tl-tab:hover { color: var(--text); }
     .tl-tab.active { color: var(--accent2); border-bottom-color: var(--accent2); }
-    .tl-scroll { flex: 1; overflow-y: auto; padding: 18px 16px 24px 28px; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; min-height: 0; }
+    .tl-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px 16px 24px 28px; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; min-height: 0; }
     .tl-scroll::-webkit-scrollbar { width: 3px; }
     .tl-scroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
     .tl-year-group { margin-bottom: 28px; }
@@ -81,7 +82,7 @@
     .panel-nav-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--muted); flex: 1; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* ══ PANEL B — ROUND PICKER ══ */
-    .round-pick-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 20px; gap: 10px; overflow-y: auto; min-height: 0; }
+    .round-pick-wrap { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 24px 20px; gap: 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; }
     .round-pick-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
     .round-opt { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; cursor: pointer; transition: all 0.16s; display: flex; align-items: center; gap: 14px; }
     .round-opt:hover { border-color: rgba(255,255,255,0.16); background: #1f2330; }
@@ -109,18 +110,14 @@
     .race-btn { padding: 4px 11px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; background: var(--surface2); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; transition: all 0.14s; user-select: none; }
     .race-btn:hover { color: var(--text); border-color: rgba(255,255,255,0.16); }
     .race-btn.active { background: var(--accent2); color: #0d0f14; border-color: var(--accent2); font-weight: 500; }
-    .call-bar { padding: 8px 16px; border-bottom: 1px solid rgba(255,230,0,0.1); background: rgba(255,230,0,0.03); flex-shrink: 0; display: none !important; }
-    .call-bar.admin-on { display: block !important; }
-    .call-bar-label { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,230,0,0.45); margin-bottom: 6px; }
-    .call-btns { display: flex; gap: 6px; }
-    .call-btn { padding: 5px 11px; font-family: var(--font-mono); font-size: 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; letter-spacing: 0.04em; transition: all 0.15s; }
-    .call-btn-winner { background: #ffe600; color: #0d0f14; }
-    .call-btn-winner:hover { background: #ffed40; box-shadow: 0 0 14px rgba(255,230,0,0.35); }
-    .call-btn-runoff { background: #ff9f00; color: #0d0f14; }
-    .call-btn-runoff:hover { background: #ffb733; }
-    .call-btn-uncall { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-    .call-btn-uncall:hover { color: var(--text); }
-    #resultsScroll { flex: 1; overflow-y: auto; padding: 14px 16px; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; min-height: 0; }
+    /* race-level call banner shown in the results header */
+    .race-call-banner { padding: 7px 16px; border-bottom: 1px solid rgba(255,230,0,0.15); background: rgba(255,230,0,0.04); flex-shrink: 0; display: none; align-items: center; gap: 10px; }
+    .race-call-banner.show { display: flex; }
+    .race-call-banner.runoff-banner { border-color: rgba(255,159,0,0.2); background: rgba(255,159,0,0.05); }
+    .rcb-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; animation: badge-pulse 2s ease-in-out infinite; }
+    .rcb-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+    .rcb-name { font-family: var(--font-mono); font-size: 10px; font-weight: 600; flex: 1; }
+    #resultsScroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; min-height: 0; }
     #resultsScroll::-webkit-scrollbar { width: 3px; }
     #resultsScroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
     #legend { padding: 8px 16px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
@@ -156,11 +153,11 @@
 
     /* ══ SHIFT PANEL — scroll fix ══ */
     #panelShift { overflow: hidden; }
-    .shift-scroll { flex: 1; overflow-y: auto; padding: 16px; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; min-height: 0; }
+    .shift-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; min-height: 0; }
     .shift-scroll::-webkit-scrollbar { width: 3px; }
     .shift-scroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
     /* legend bar is capped so it never crowds the scroll area */
-    .shift-legend-bar { padding: 8px 16px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; overflow-y: auto; max-height: 52vh; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; }
+    .shift-legend-bar { padding: 8px 16px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; max-height: 52vh; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; }
     .shift-legend-bar::-webkit-scrollbar { width: 3px; }
     .shift-section-label { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; margin-top: 14px; }
     .shift-section-label:first-child { margin-top: 0; }
@@ -176,8 +173,13 @@
     .shift-go-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
     /* ══ SIMULATOR PANEL ══ */
-    #panelSim { overflow: hidden; }
-    .sim-scroll { flex: 1; overflow-y: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; }
+    #panelSim { overflow: hidden; display: flex; flex-direction: column; }
+    /* simSetupView is the scrollable setup container */
+    #simSetupView { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; }
+    #simSetupView::-webkit-scrollbar { width: 3px; }
+    #simSetupView::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
+    /* sim-scroll kept for any other uses */
+    .sim-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; }
     .sim-scroll::-webkit-scrollbar { width: 3px; }
     .sim-scroll::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
     .sim-setup { padding: 16px; }
@@ -221,7 +223,7 @@
     .sim-sb-bar-wrap { width: 72px; flex-shrink: 0; }
     .sim-sb-bar-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
     .sim-sb-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
-    .sim-districts-area { flex: 1; overflow-y: auto; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; }
+    .sim-districts-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; min-height: 0; scrollbar-width: thin; scrollbar-color: var(--surface2) transparent; }
     .sim-districts-area::-webkit-scrollbar { width: 3px; }
     .sim-districts-area::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 2px; }
     .sim-districts-pad { padding: 12px 14px; }
@@ -325,13 +327,12 @@
         <div class="race-tab-label">Race</div>
         <div id="raceButtons"></div>
       </div>
-      <div class="call-bar" id="callBar">
-        <div class="call-bar-label">🔒 Admin · Call <span id="callBarDistrict"></span></div>
-        <div class="call-btns">
-          <button class="call-btn call-btn-winner" onclick="callDistrict('winner')">✔ Winner</button>
-          <button class="call-btn call-btn-runoff" onclick="callDistrict('runoff')">⚡ Runoff</button>
-          <button class="call-btn call-btn-uncall" onclick="callDistrict(null)">✕ Uncall</button>
-        </div>
+      <!-- Race-level call banner (read from JSON, no admin interaction) -->
+      <div class="race-call-banner" id="raceCallBanner">
+        <div class="rcb-dot" id="rcbDot"></div>
+        <div class="rcb-label" id="rcbLabel"></div>
+        <div class="rcb-name" id="rcbName"></div>
+        <span class="call-badge" id="rcbBadge"></span>
       </div>
       <div id="resultsScroll"><div class="placeholder"><div class="icon">🗳</div>Select a race above, then click a group on the map.</div></div>
       <div id="legend"><div class="legend-label">Candidates</div><div class="legend-items" id="legendItems"></div></div>
@@ -384,7 +385,7 @@
       </div>
 
       <!-- Setup view -->
-      <div id="simSetupView" class="sim-scroll">
+      <div id="simSetupView">
         <div class="sim-setup">
           <div class="sim-section-hd">Candidates</div>
           <div id="simCandList"></div>
@@ -446,10 +447,56 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
 // ══════════════════════════════════════════════════════════════
-//  ADMIN
+//  RACE-LEVEL CALLS (read from JSON, displayed automatically)
 // ══════════════════════════════════════════════════════════════
-const IS_ADMIN = new URLSearchParams(window.location.search).get('admin') === '1';
-if (IS_ADMIN) document.getElementById('callBar').classList.add('admin-on');
+// JSON format expected inside a round object:
+//   "race_calls": {
+//     "Class 4": { "status": "winner", "winner": "wc" },
+//     "Class 5": { "status": "runoff", "winner": "gsx" }
+//   }
+// `winner` is the candidate key that was called.
+
+function getRaceCall(raceName) {
+  if (!currentElection || !currentRoundKey) return null;
+  const rd = currentRoundKey === 'runoff_round'
+    ? currentElection.runoff_round
+    : (currentElection.first_round || currentElection);
+  const calls = rd?.race_calls || rd?.calls || null;
+  if (!calls) return null;
+  return calls[raceName] || null;
+}
+
+function updateRaceCallBanner(raceName) {
+  const banner = document.getElementById('raceCallBanner');
+  const call = raceName ? getRaceCall(raceName) : null;
+
+  if (!call || !call.status) {
+    banner.classList.remove('show', 'runoff-banner');
+    return;
+  }
+
+  const isWinner = call.status === 'winner';
+  const winnerKey = call.winner || null;
+  const color = winnerKey ? candidateColor(winnerKey) : (isWinner ? '#ffe600' : '#ff9f00');
+  const name = winnerKey ? candidateName(winnerKey) : '—';
+
+  document.getElementById('rcbDot').style.background = color;
+  document.getElementById('rcbLabel').textContent = isWinner ? 'Race called —' : 'Goes to runoff —';
+  document.getElementById('rcbName').textContent = name;
+  document.getElementById('rcbName').style.color = color;
+
+  const badge = document.getElementById('rcbBadge');
+  if (isWinner) {
+    badge.textContent = '✔ Winner';
+    badge.className = 'call-badge call-badge-winner';
+  } else {
+    badge.textContent = '⚡ Runoff';
+    badge.className = 'call-badge call-badge-runoff';
+  }
+
+  banner.classList.toggle('runoff-banner', !isWinner);
+  banner.classList.add('show');
+}
 
 // ══════════════════════════════════════════════════════════════
 //  REGISTRIES
@@ -516,7 +563,7 @@ function getCurrentRaceData(){
 //  STATE
 // ══════════════════════════════════════════════════════════════
 let allElections=[], geojsonCache=null, currentElection=null, currentRoundKey=null,
-    currentRace=null, selectedDistrictId=null, districtCalls={},
+    currentRace=null, selectedDistrictId=null,
     geoLayer=null, mapInstance=null, activeFilter='all', selectedElectionIdx=null;
 let shiftMode=false, shiftElectionIdx=null, shiftRaceEntry=null, shiftGroupKey=null, shiftData={};
 
@@ -684,13 +731,6 @@ function selectRound(idx,roundKey){
   const isRunoff=roundKey==='runoff_round';
   const roundData=isRunoff?e.runoff_round:(e.first_round||e);
   const races=roundData.races||roundData;
-  districtCalls={};
-  const savedCalls=roundData.calls||{};
-  Object.keys(races).forEach(race=>{
-    const rd=races[race];if(!rd||typeof rd!=='object') return;
-    districtCalls[race]={};
-    Object.keys(rd).forEach(id=>{ if(typeof rd[id]==='object') districtCalls[race][id]=savedCalls[race]?.[id]||{status:null,winner:null,prevWinner:null}; });
-  });
   document.getElementById('resElectionName').textContent=e.title||'Election';
   const rb=document.getElementById('resRoundBadge');
   if(isRunoff){rb.style.display='';rb.textContent='Runoff';}else rb.style.display='none';
@@ -703,13 +743,16 @@ function selectRound(idx,roundKey){
   document.getElementById('reportingSub').textContent=(total&&reporting!=='—')?`${Math.round(reporting/100*total)}% of expected votes in`:'';
   const pw=document.getElementById('partyMetaWrap');
   if(e.party){pw.style.display='flex';document.getElementById('partyVal').textContent=e.party;}else pw.style.display='none';
+  // Clear banner until a race is picked
+  updateRaceCallBanner(null);
   const rc=document.getElementById('raceButtons');rc.innerHTML='';
   Object.keys(races).forEach(race=>{
     const btn=document.createElement('div');btn.className='race-btn';btn.textContent=race;
     btn.onclick=()=>{
       document.querySelectorAll('.race-btn').forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');currentRace=race;selectedDistrictId=null;
-      if(IS_ADMIN) updateCallBar();geoLayer.setStyle(styleFeature);showRaceOverview();
+      updateRaceCallBanner(race);
+      geoLayer.setStyle(styleFeature);showRaceOverview();
     };
     rc.appendChild(btn);
   });
@@ -769,21 +812,6 @@ function styleFeature(feature){
   const data=races[currentRace]?.[id];
   if(!data)return{color:'#3a3f4d',weight:1,fillColor:'#1a1e28',fillOpacity:0.5};
   return{fillColor:marginColor(data),fillOpacity:isSel?0.95:0.72,color:isSel?'#fff':'rgba(0,0,0,0.4)',weight:isSel?2.5:1};
-}
-
-// ══════════════════════════════════════════════════════════════
-//  ADMIN CALLS
-// ══════════════════════════════════════════════════════════════
-function updateCallBar(){if(!IS_ADMIN)return;document.getElementById('callBarDistrict').textContent=(currentRace&&selectedDistrictId)?`— ${selectedDistrictId}`:'';}
-function callDistrict(status){
-  if(!IS_ADMIN||!currentRace||!selectedDistrictId)return;
-  const rec=districtCalls[currentRace]?.[selectedDistrictId];if(!rec)return;
-  const data=getCurrentRaces()?.[currentRace]?.[selectedDistrictId];
-  const sorted=data?Object.entries(data).sort((a,b)=>b[1]-a[1]):[];
-  const leader=sorted[0]?.[0]||null;
-  if(status){const prev=rec.winner;rec.prevWinner=(prev&&prev!==leader)?prev:rec.prevWinner;rec.winner=leader;rec.status=status;}
-  else{rec.status=null;rec.winner=null;}
-  updateCallBar();showDistrict(selectedDistrictId);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -942,9 +970,31 @@ function showRaceOverview(){
   const rd=races[currentRace];let tots={};
   Object.values(rd).forEach(d=>Object.entries(d).forEach(([k,v])=>{tots[k]=(tots[k]||0)+v;}));
   const sorted=Object.entries(tots).sort((a,b)=>b[1]-a[1]),total=sorted.reduce((a,[,v])=>a+v,0);
-  const calls=districtCalls[currentRace]||{},cW=Object.values(calls).filter(c=>c.status==='winner').length,cR=Object.values(calls).filter(c=>c.status==='runoff').length;
+  const raceCall=getRaceCall(currentRace);
   const pt={};sorted.forEach(([k,v])=>{const p=candidateParty(k);if(p)pt[p]=(pt[p]||0)+v;});
-  let h=`<div class="results-heading">${currentRace} — Overview</div>`;
+
+  // Race-call hero block
+  let h='';
+  if(raceCall?.status){
+    const isWin=raceCall.status==='winner';
+    const wk=raceCall.winner||null;
+    const wcolor=wk?candidateColor(wk):(isWin?'#ffe600':'#ff9f00');
+    const wname=wk?candidateName(wk):'—';
+    const wparty=wk?candidateParty(wk):null;
+    const wpi=wparty?partyRegistry[wparty]:null;
+    const badge=isWin?`<span class="call-badge call-badge-winner">✔ Winner</span>`:`<span class="call-badge call-badge-runoff">⚡ Runoff</span>`;
+    h+=`<div style="background:${isWin?'rgba(255,230,0,0.05)':'rgba(255,159,0,0.05)'};border:1px solid ${isWin?'rgba(255,230,0,0.25)':'rgba(255,159,0,0.25)'};border-radius:8px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px">
+      <div style="width:10px;height:10px;border-radius:50%;background:${wcolor};flex-shrink:0;animation:badge-pulse 2s ease-in-out infinite"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px">${isWin?'Race Called':'Goes to Runoff'}</div>
+        <div style="font-size:13px;font-weight:600;color:${wcolor};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${wname}${wpi?`<span style="font-family:var(--font-mono);font-size:7px;background:${wpi.color}22;color:${wpi.color};border:1px solid ${wpi.color}44;padding:1px 4px;border-radius:2px;margin-left:6px;vertical-align:middle">${wpi.shortName}</span>`:''}
+        </div>
+      </div>
+      ${badge}
+    </div>`;
+  }
+
+  h+=`<div class="results-heading">${currentRace} — Overview</div>`;
   const pe=Object.entries(pt).sort((a,b)=>b[1]-a[1]);
   if(pe.length&&total>0){
     h+=`<div style="margin-bottom:10px"><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px">By Party</div><div style="display:flex;height:6px;border-radius:3px;overflow:hidden;margin-bottom:4px">`;
@@ -953,11 +1003,15 @@ function showRaceOverview(){
     pe.forEach(([p,v])=>{const pi=partyRegistry[p];h+=`<span style="font-family:var(--font-mono);font-size:9px;color:${pi?.color||'#888'}">${pi?.shortName||p} ${((v/total)*100).toFixed(1)}%</span>`;});
     h+=`</div></div>`;
   }
-  if(cW||cR){h+=`<div style="margin-bottom:8px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">`;if(cW)h+=`<span style="color:#ffe600;margin-right:10px">✔ ${cW} called</span>`;if(cR)h+=`<span style="color:#ff9f00">⚡ ${cR} runoff</span>`;h+=`</div>`;}
   sorted.forEach(([k,v],i)=>{
     const pct=total?((v/total)*100).toFixed(1):0,leader=i===0,p=candidateParty(k),pi=p?partyRegistry[p]:null;
     const pt2=pi?`<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${pi.color}22;color:${pi.color};border:1px solid ${pi.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${pi.shortName}</span>`:'';
-    h+=`<div class="candidate-row"><div class="candidate-swatch" style="background:${candidateColor(k)}"></div><span class="candidate-name ${leader?'leader':''}">${candidateName(k)}${pt2}${leader?'<span class="winner-tag">Leading</span>':''}</span><span class="candidate-votes ${leader?'leader':''}">${v.toLocaleString()} · ${pct}%</span></div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${candidateColor(k)}"></div></div>`;
+    // Highlight called winner in the candidate list too
+    const isCalledWinner = raceCall?.status==='winner' && raceCall?.winner && normalizeCandidateKey(raceCall.winner)===normalizeCandidateKey(k);
+    const leaderTag = isCalledWinner
+      ? '<span class="winner-tag">✔ Winner</span>'
+      : (leader ? '<span class="winner-tag">Leading</span>' : '');
+    h+=`<div class="candidate-row"><div class="candidate-swatch" style="background:${candidateColor(k)}"></div><span class="candidate-name ${leader||isCalledWinner?'leader':''}">${candidateName(k)}${pt2}${leaderTag}</span><span class="candidate-votes ${leader?'leader':''}">${v.toLocaleString()} · ${pct}%</span></div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${candidateColor(k)}"></div></div>`;
   });
   const bc=candidateColor(sorted[0]?.[0]);
   h+=`<hr class="district-divider"><div class="margin-legend"><div class="margin-legend-label">Map shading — margin of victory</div><div class="margin-scale-wrap"><span class="margin-scale-text">Closer</span><div class="margin-scale-bar" style="background:linear-gradient(90deg,${lightenHex(bc,0.35)},${bc},${darkenHex(bc,0.30)})"></div><span class="margin-scale-text">Larger</span></div><div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:4px">Tie = grey · No votes = dark</div></div><hr class="district-divider"><button onclick="openShiftPanel()" style="width:100%;padding:8px;font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:5px;cursor:pointer;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:6px"><span>📊</span> Shift Map</button><div style="color:var(--muted);font-size:11px;text-align:center;padding:4px 0">Click a district on the map for local results</div>`;
@@ -968,22 +1022,25 @@ function showDistrict(id){
   const races=getCurrentRaces();if(!currentRace||!races)return;
   const data=races[currentRace]?.[id];if(!data)return;
   const sorted=Object.entries(data).sort((a,b)=>b[1]-a[1]),total=sorted.reduce((a,[,v])=>a+v,0);
-  const rec=districtCalls[currentRace]?.[id]||{};
   const fv=sorted[0]?.[1]||0,sv=sorted[1]?.[1]||0;
-  const margin=total?((fv-sv)/total*100).toFixed(1):null,isTie=total>0&&fv===sv,noVotes=!total,isFlip=rec.status&&rec.prevWinner&&rec.prevWinner!==rec.winner;
-  let b='';
-  if(rec.status==='winner')b+=`<span class="call-badge call-badge-winner">✔ Called</span>`;
-  else if(rec.status==='runoff')b+=`<span class="call-badge call-badge-runoff">⚡ Runoff</span>`;
-  if(isFlip)b+=`<span class="flip-badge">🔄 Flip</span>`;
-  let h=`<div class="results-heading">Group ${id} ${b}</div>`;
+  const margin=total?((fv-sv)/total*100).toFixed(1):null,isTie=total>0&&fv===sv,noVotes=!total;
+  // Race-level call — does the overall race have a called winner matching this district's leader?
+  const raceCall=getRaceCall(currentRace);
+  const calledWinnerKey=raceCall?.status==='winner'?raceCall.winner:null;
+  const calledRunoff=raceCall?.status==='runoff';
+  let h=`<div class="results-heading">Group ${id}</div>`;
   if(noVotes)h+=`<div style="color:var(--muted);font-size:12px;padding:8px 0">No votes reported yet.</div>`;
   else if(isTie)h+=`<div style="background:#2a2a2a;border-radius:5px;padding:8px 10px;margin-bottom:10px;font-family:var(--font-mono);font-size:10px;color:#aaa">⚖ Tie — no candidate leads</div>`;
   const pt={};sorted.forEach(([k,v])=>{const p=candidateParty(k);if(p)pt[p]=(pt[p]||0)+v;});
   sorted.forEach(([k,v],i)=>{
     const pct=total?((v/total)*100).toFixed(1):0,leader=!isTie&&i===0,p=candidateParty(k),pi=p?partyRegistry[p]:null;
     const pt2=pi?`<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:${pi.color}22;color:${pi.color};border:1px solid ${pi.color}44;padding:1px 4px;border-radius:2px;margin-left:4px">${pi.shortName}</span>`:'';
-    const tag=leader?(rec.status==='winner'?'<span class="winner-tag">✔ Winner</span>':rec.status==='runoff'?'<span class="winner-tag">⚡ Runoff</span>':'<span class="winner-tag">Leading</span>'):'';
-    h+=`<div class="candidate-row"><div class="candidate-swatch" style="background:${candidateColor(k)}"></div><span class="candidate-name ${leader?'leader':''}">${candidateName(k)}${pt2}${tag}</span><span class="candidate-votes ${leader?'leader':''}">${v.toLocaleString()} · ${pct}%</span></div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${candidateColor(k)}"></div></div>`;
+    // Show winner tag if this candidate is the called winner for the race
+    const isCalled = calledWinnerKey && normalizeCandidateKey(calledWinnerKey)===normalizeCandidateKey(k);
+    const tag = isCalled
+      ? '<span class="winner-tag">✔ Winner</span>'
+      : (calledRunoff && leader ? '<span class="winner-tag">⚡ Runoff</span>' : (leader ? '<span class="winner-tag">Leading</span>' : ''));
+    h+=`<div class="candidate-row"><div class="candidate-swatch" style="background:${candidateColor(k)}"></div><span class="candidate-name ${leader||isCalled?'leader':''}">${candidateName(k)}${pt2}${tag}</span><span class="candidate-votes ${leader?'leader':''}">${v.toLocaleString()} · ${pct}%</span></div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${candidateColor(k)}"></div></div>`;
   });
   const pe=Object.entries(pt).sort((a,b)=>b[1]-a[1]);
   if(pe.length&&total>0){
@@ -995,7 +1052,6 @@ function showDistrict(id){
   }
   if(!noVotes&&!isTie&&margin!==null){const wc=candidateColor(sorted[0][0]);h+=`<hr class="district-divider"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px"><span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Margin</span><span style="font-family:var(--font-mono);font-size:13px;color:${wc};font-weight:500">+${margin}%</span></div><div class="vote-bar-track" style="height:4px"><div class="vote-bar-fill" style="width:${Math.min(parseFloat(margin),100)}%;background:${marginColor(data)}"></div></div>`;}
   h+=`<hr class="district-divider"><div style="color:var(--muted);font-size:11px;margin-bottom:3px">Total votes cast</div><div style="font-family:var(--font-mono);font-size:17px;color:var(--accent);margin-bottom:10px">${total.toLocaleString()}</div>`;
-  if(isFlip){h+=`<div style="background:linear-gradient(135deg,rgba(59,91,219,0.18),rgba(112,72,232,0.18));border:1px solid rgba(112,72,232,0.3);border-radius:6px;padding:9px 12px;margin-bottom:10px"><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9b8fe8;margin-bottom:3px">🔄 District Flip</div><div style="font-size:12px;color:var(--text)"><span style="color:${candidateColor(rec.prevWinner)}">${candidateName(rec.prevWinner)}</span><span style="color:var(--muted);margin:0 6px">→</span><span style="color:${candidateColor(rec.winner)}">${candidateName(rec.winner)}</span></div></div>`;}
   h+=`<div onclick="showRaceOverview();selectedDistrictId=null;if(geoLayer)geoLayer.setStyle(styleFeature);" style="color:var(--muted);font-size:11px;text-align:center;padding:6px 0;cursor:pointer;text-decoration:underline">← Back to overview</div>`;
   document.getElementById('resultsScroll').innerHTML=h;
 }
@@ -1009,9 +1065,11 @@ let simPaused          = false;
 let simActive          = false;
 let simDistricts       = [];
 let simQueue           = [];
-let simDistrictResults = {};  // id → {winner, votes:{k:n}, total}
-let simWinCounts       = {};  // key → seat count
+let simDistrictResults = {};  // id → {winner, votes:{k:n}, total, isUpset}
+let simWinCounts       = {};  // key → districts won
+let simVoteTotals      = {};  // key → total votes accumulated across all districts
 let simActiveCands     = [];
+let simUpsetCount      = 0;
 
 // ── Gather all unique candidate keys from history ──
 function simCollectAllCandidates(){
@@ -1088,40 +1146,206 @@ function setSimSpeed(ms,btn){
   // If sim is running, the next tick will pick up new speed automatically
 }
 
-// ── Simulate votes for one district ──
-function simGenerateVotes(distId, cands){
-  const vol=parseInt(document.getElementById('simVolSlider').value)/100;
+// ══════════════════════════════════════════════════════════════
+//  SIM STATISTICS ENGINE
+//  Proper Dirichlet sampling with historical priors per district
+// ══════════════════════════════════════════════════════════════
 
-  // Base weights seeded from historical data
-  const w={};cands.forEach(k=>w[k]=1.0);
-  allElections.forEach(e=>{
-    function scan(rd){
-      if(!rd)return;const races=rd.races||rd;
-      if(typeof races!=='object')return;
-      Object.values(races).forEach(r=>{
-        if(typeof r!=='object')return;
-        const dd=r[distId]||r[String(distId)];if(!dd)return;
-        Object.entries(dd).forEach(([k,v])=>{
-          const nk=normalizeCandidateKey(k);
-          cands.forEach(ck=>{ if(normalizeCandidateKey(ck)===nk) w[ck]=(w[ck]||1)+v*1.8; });
+// ── Gamma(a,1) sample via Marsaglia-Tsang ──
+function sampleGamma(a) {
+  if (a <= 0) return 0;
+  if (a < 1) return sampleGamma(1 + a) * Math.pow(Math.random(), 1 / a);
+  const d = a - 1/3, c = 1 / Math.sqrt(9 * d);
+  for (;;) {
+    let x, v;
+    do { x = randn(); v = 1 + c * x; } while (v <= 0);
+    v = v * v * v;
+    const u = Math.random();
+    if (u < 1 - 0.0331 * (x*x)*(x*x)) return d * v;
+    if (Math.log(u) < 0.5*x*x + d*(1 - v + Math.log(v))) return d * v;
+  }
+}
+
+// ── Standard normal via Box-Muller ──
+let _rnCache = null;
+function randn() {
+  if (_rnCache !== null) { const v = _rnCache; _rnCache = null; return v; }
+  const u = 1 - Math.random(), v = Math.random();
+  const r = Math.sqrt(-2 * Math.log(u));
+  _rnCache = r * Math.sin(2 * Math.PI * v);
+  return r * Math.cos(2 * Math.PI * v);
+}
+
+// ── Sample from Dirichlet(alpha[]) using Gamma method ──
+// Returns normalised share array in same order as alphas
+function sampleDirichlet(alphas) {
+  const gs = alphas.map(a => sampleGamma(Math.max(a, 1e-6)));
+  const sum = gs.reduce((a, b) => a + b, 0);
+  return sum === 0 ? alphas.map(() => 1/alphas.length) : gs.map(g => g / sum);
+}
+
+// ── Build per-district, per-candidate historical prior ──
+// Returns: { [normKey]: { meanShare, observations }, _distTotal: number }
+// Recency weighting: elections sorted newest→oldest, weight decays by 0.65^i
+function buildDistrictPriors(distId) {
+  const obs = {}; // normKey → [{share, weight}]
+  const distTotalObs = []; // [{total, weight}] — one per race appearance
+
+  allElections.forEach((e, ei) => {
+    const recencyWeight = Math.pow(0.65, ei);
+
+    function scanRound(rd) {
+      if (!rd) return;
+      const races = rd.races || rd;
+      if (typeof races !== 'object') return;
+      Object.values(races).forEach(raceData => {
+        if (typeof raceData !== 'object') return;
+        const dd = raceData[distId] || raceData[String(distId)];
+        if (!dd || typeof dd !== 'object') return;
+        const distTotal = Object.values(dd).reduce((a, b) => a + b, 0);
+        if (!distTotal) return;
+        // Record the district total ONCE per race appearance
+        distTotalObs.push({ total: distTotal, weight: recencyWeight });
+        Object.entries(dd).forEach(([k, v]) => {
+          const nk = normalizeCandidateKey(k);
+          if (!obs[nk]) obs[nk] = [];
+          obs[nk].push({ share: v / distTotal, weight: recencyWeight });
         });
       });
     }
-    scan(e.first_round||e);if(e.runoff_round)scan(e.runoff_round);
+    scanRound(e.first_round || e);
+    if (e.runoff_round) scanRound(e.runoff_round);
   });
 
-  // Apply log-normal noise scaled by volatility
-  const noisy={};
-  cands.forEach(k=>{ noisy[k]=Math.max(0.05,w[k]*Math.exp((Math.random()*2-1)*vol*2.8)); });
-  const wsum=Object.values(noisy).reduce((a,b)=>a+b,0);
-  const base=4+Math.floor(Math.random()*8);
-  const votes={};
-  cands.forEach(k=>{ votes[k]=Math.max(0,Math.round((noisy[k]/wsum)*base)); });
-  // Guarantee at least 1 total vote
-  if(Object.values(votes).reduce((a,b)=>a+b,0)===0) votes[cands[0]]=1;
+  const priors = {};
+  Object.entries(obs).forEach(([nk, arr]) => {
+    const wSum = arr.reduce((a, o) => a + o.weight, 0);
+    priors[nk] = {
+      meanShare: arr.reduce((a, o) => a + o.share * o.weight, 0) / wSum,
+      observations: arr.length
+    };
+  });
 
-  const sorted=Object.entries(votes).sort((a,b)=>b[1]-a[1]);
-  return{winner:sorted[0][0],votes,total:Object.values(votes).reduce((a,b)=>a+b,0)};
+  // Weighted average of the actual district vote total across all race appearances
+  if (distTotalObs.length > 0) {
+    const wSum = distTotalObs.reduce((a, o) => a + o.weight, 0);
+    priors._distTotal = distTotalObs.reduce((a, o) => a + o.total * o.weight, 0) / wSum;
+    priors._distTotalRaw = distTotalObs.map(o => o.total); // all observed totals
+  } else {
+    priors._distTotal = null;
+    priors._distTotalRaw = [];
+  }
+
+  return priors;
+}
+
+// ── Pre-build priors for all districts once per simulation ──
+let simDistrictPriors = {}; // distId → priors map
+let simHistoricalPlurality = {}; // distId → normKey of historical winner per cand set
+
+function simBuildAllPriors(cands) {
+  simDistrictPriors = {};
+  simHistoricalPlurality = {};
+  const normSelected = cands.map(k => normalizeCandidateKey(k));
+
+  simDistricts.forEach(distId => {
+    const priors = buildDistrictPriors(distId);
+    simDistrictPriors[distId] = priors;
+
+    // Historical plurality winner among selected candidates
+    let bestShare = -1, bestNorm = null;
+    normSelected.forEach(nk => {
+      const p = priors[nk];
+      if (p && p.meanShare > bestShare) { bestShare = p.meanShare; bestNorm = nk; }
+    });
+    simHistoricalPlurality[distId] = bestNorm;
+  });
+}
+
+// ── Core vote generator: Dirichlet sampling with historical Bayesian prior ──
+function simGenerateVotes(distId, cands) {
+  const volSlider = parseInt(document.getElementById('simVolSlider').value); // 0–100
+  const volFrac = volSlider / 100;
+
+  // Precision: how tightly the Dirichlet concentrates around the prior.
+  // vol=0  → precision=200 (almost exactly the prior every time)
+  // vol=100 → precision=1.5 (nearly uniform — anyone can win anywhere)
+  const precision = Math.exp((1 - volFrac) * Math.log(200) + volFrac * Math.log(1.5));
+
+  const priors = simDistrictPriors[distId] || {};
+
+  // --- Step 1: prior share for each selected candidate ---
+  const rawPrior = {};
+  let priorSum = 0;
+  cands.forEach(k => {
+    const nk = normalizeCandidateKey(k);
+    const p = priors[nk];
+    // Candidates with no history in this district get a small floor share
+    rawPrior[k] = p ? p.meanShare : 0.02;
+    priorSum += rawPrior[k];
+  });
+
+  // Normalise so selected candidates sum to 1
+  const normPrior = {};
+  cands.forEach(k => {
+    normPrior[k] = priorSum > 0 ? rawPrior[k] / priorSum : 1 / cands.length;
+  });
+
+  // --- Step 2: Dirichlet alphas ---
+  const alphas = cands.map(k => precision * normPrior[k]);
+
+  // --- Step 3: Draw shares ---
+  const shares = sampleDirichlet(alphas);
+
+  // --- Step 4: Vote count ---
+  // Use the district's own historical average total directly.
+  // At vol=0 we return that exact number; at vol=100 we sample widely.
+  const histTotal = priors._distTotal || 6;
+  // Clamp to the observed data range (data has totals roughly 2–15)
+  const clampedBase = Math.max(2, Math.min(Math.round(histTotal), 20));
+
+  let sampledTotal;
+  if (volSlider === 0) {
+    // Deterministic: use the historical average exactly
+    sampledTotal = clampedBase;
+  } else {
+    // Gamma(shape, scale): shape rises as volatility falls so variance shrinks.
+    // vol=0→shape=∞ (handled above), vol=100→shape=2 (high variance)
+    // We map vol to shape in [2, 20]
+    const countShape = 20 - volFrac * 18; // vol=0→20, vol=100→2
+    const countScale = clampedBase / countShape; // mean = shape*scale = clampedBase ✓
+    // Draw and clamp to [1, 3×base] to stop runaway tails
+    sampledTotal = Math.max(1, Math.min(
+      Math.round(sampleGamma(countShape) * countScale),
+      Math.round(clampedBase * 3)
+    ));
+  }
+
+  // --- Step 5: Allocate votes (integer-safe) ---
+  const votes = {};
+  let assigned = 0;
+  cands.forEach((k, i) => {
+    if (i < cands.length - 1) {
+      votes[k] = Math.max(0, Math.round(shares[i] * sampledTotal));
+      assigned += votes[k];
+    } else {
+      // Last candidate gets the remainder to preserve the exact total
+      votes[k] = Math.max(0, sampledTotal - assigned);
+    }
+  });
+
+  const finalTotal = Object.values(votes).reduce((a, b) => a + b, 0);
+  if (finalTotal === 0) votes[cands[0]] = 1;
+
+  const sorted = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+  const winner = sorted[0][0];
+
+  // Upset: winner differs from historical plurality holder
+  const winnerNorm = normalizeCandidateKey(winner);
+  const histPlur = simHistoricalPlurality[distId];
+  const isUpset = !!histPlur && histPlur !== winnerNorm;
+
+  return { winner, votes, total: Object.values(votes).reduce((a, b) => a + b, 0), isUpset };
 }
 
 function simStart(checkedMap){
@@ -1132,9 +1356,12 @@ function simStart(checkedMap){
   if(!simDistricts.length){alert('No districts loaded from GeoJSON.');return;}
 
   simActive=true;simPaused=false;
-  simDistrictResults={};simWinCounts={};
+  simDistrictResults={};simWinCounts={};simVoteTotals={};simUpsetCount=0;
   simQueue=[...simDistricts].sort(()=>Math.random()-0.5);
-  cands.forEach(k=>simWinCounts[k]=0);
+  cands.forEach(k=>{ simWinCounts[k]=0; simVoteTotals[k]=0; });
+
+  // Pre-build Bayesian priors for all districts (do this once, it's O(districts×elections))
+  simBuildAllPriors(cands);
 
   document.getElementById('simSetupView').style.display='none';
   document.getElementById('simLiveView').style.display='flex';
@@ -1163,12 +1390,16 @@ function simTick(cands){
   const res=simGenerateVotes(id,cands);
   simDistrictResults[id]=res;
   simWinCounts[res.winner]=(simWinCounts[res.winner]||0)+1;
+  // Accumulate actual votes per candidate
+  Object.entries(res.votes).forEach(([k,v])=>{ simVoteTotals[k]=(simVoteTotals[k]||0)+v; });
+  if(res.isUpset) simUpsetCount++;
 
   const reported=simDistricts.length-simQueue.length;
   const pct=Math.round((reported/simDistricts.length)*100);
   document.getElementById('simDistHd').textContent=`${reported} / ${simDistricts.length} reporting`;
   document.getElementById('simReportingPct').textContent=pct+'%';
-  document.getElementById('simStatusText').textContent=`Group ${id} reporting…`;
+  const upsetLabel = res.isUpset ? ` 🔀 Upset in Group ${id}!` : `Group ${id} reporting…`;
+  document.getElementById('simStatusText').textContent=upsetLabel;
 
   updateSimCard(id,res,cands);
   updateSimScoreboard(cands);
@@ -1196,19 +1427,28 @@ function simStop(){
 
 function simReset(){
   simStop();
+  simDistrictPriors={};simHistoricalPlurality={};simUpsetCount=0;simVoteTotals={};
   document.getElementById('simLiveView').style.display='none';
   document.getElementById('simSetupView').style.display='block';
   document.getElementById('simNavTitle').textContent='Election Simulator';
   document.getElementById('simPauseBtn').disabled=false;
 }
 
-// ── Scoreboard ──
+// ── Scoreboard — shows actual vote totals and percentage ──
 function updateSimScoreboard(cands){
-  const sorted=[...cands].sort((a,b)=>(simWinCounts[b]||0)-(simWinCounts[a]||0));
-  const maxW=Math.max(1,...sorted.map(k=>simWinCounts[k]||0));
+  const totalVotes = Object.values(simVoteTotals).reduce((a,b)=>a+b,0);
+  const sorted=[...cands].sort((a,b)=>(simVoteTotals[b]||0)-(simVoteTotals[a]||0));
+  const maxV=Math.max(1,...sorted.map(k=>simVoteTotals[k]||0));
   document.getElementById('simScoreboard').innerHTML=sorted.map(k=>{
-    const w=simWinCounts[k]||0;
-    return`<div class="sim-sb-row"><div class="sim-sb-swatch" style="background:${candidateColor(k)}"></div><div class="sim-sb-name">${candidateName(k)}</div><div class="sim-sb-wins">${w}</div><div class="sim-sb-bar-wrap"><div class="sim-sb-bar-track"><div class="sim-sb-bar-fill" style="width:${(w/maxW*100).toFixed(0)}%;background:${candidateColor(k)}"></div></div></div></div>`;
+    const v=simVoteTotals[k]||0;
+    const pct=totalVotes>0?((v/totalVotes)*100).toFixed(1):'0.0';
+    const wc=candidateColor(k);
+    return`<div class="sim-sb-row">
+      <div class="sim-sb-swatch" style="background:${wc}"></div>
+      <div class="sim-sb-name">${candidateName(k)}</div>
+      <div class="sim-sb-wins" style="font-size:11px;width:40px">${pct}%</div>
+      <div class="sim-sb-bar-wrap"><div class="sim-sb-bar-track"><div class="sim-sb-bar-fill" style="width:${(v/maxV*100).toFixed(0)}%;background:${wc}"></div></div></div>
+    </div>`;
   }).join('');
 }
 
@@ -1228,7 +1468,7 @@ function renderSimCards(cands){
 function updateSimCard(id,res,cands){
   const card=document.getElementById('sdc_'+id);if(!card)return;
   card.classList.remove('pending');
-  void card.offsetWidth; // force reflow to retrigger animation
+  void card.offsetWidth;
   card.classList.add('just-called');
   setTimeout(()=>card.classList.remove('just-called'),1500);
 
@@ -1236,10 +1476,11 @@ function updateSimCard(id,res,cands){
   const sorted=Object.entries(res.votes).sort((a,b)=>b[1]-a[1]);
   const margin=sorted.length>1?((sorted[0][1]-sorted[1][1])/tot*100).toFixed(1):'100';
   const wc=candidateColor(res.winner);
+  const upsetTag=res.isUpset?`<span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.08em;text-transform:uppercase;background:linear-gradient(135deg,#3b5bdb,#7048e8);color:#fff;padding:1px 5px;border-radius:2px;margin-left:4px">🔀 Upset</span>`:'';
 
   card.innerHTML=`<div class="sim-dist-top">
     <div class="sim-dist-id">${id}</div>
-    <div class="sim-dist-winner" style="color:${wc};font-weight:500">${candidateName(res.winner)}</div>
+    <div class="sim-dist-winner" style="color:${wc};font-weight:500">${candidateName(res.winner)}${upsetTag}</div>
     <div class="sim-dist-margin" style="color:${wc}">+${margin}%</div>
   </div>
   <div class="sim-dist-bar-track">${cands.map(k=>{
@@ -1254,58 +1495,62 @@ function updateSimCard(id,res,cands){
 function updateTicker(cands){
   const ticker=document.getElementById('simTicker');
   if(!cands.length){ticker.innerHTML='';return;}
+  const totalVotes=Object.values(simVoteTotals).reduce((a,b)=>a+b,0);
   const reported=simDistricts.length-simQueue.length;
-  const items=cands.map(k=>`<span class="sim-ticker-item"><span class="sim-ticker-dot" style="background:${candidateColor(k)}"></span>${candidateName(k)} <strong style="color:${candidateColor(k)}">${simWinCounts[k]||0}</strong></span>`);
+  const items=cands.map(k=>{
+    const v=simVoteTotals[k]||0;
+    const pct=totalVotes>0?((v/totalVotes)*100).toFixed(1):'—';
+    return`<span class="sim-ticker-item"><span class="sim-ticker-dot" style="background:${candidateColor(k)}"></span>${candidateName(k)} <strong style="color:${candidateColor(k)}">${pct}%</strong></span>`;
+  });
   const extra=`&nbsp;&nbsp;&nbsp;<span class="sim-ticker-item" style="color:var(--muted)">${reported}/${simDistricts.length} reporting</span>`;
   ticker.innerHTML=(items.join('')+extra).repeat(3);
 }
 
 // ── Final overlay ──
 function buildFinalOverlay(cands){
-  const sorted=[...cands].sort((a,b)=>(simWinCounts[b]||0)-(simWinCounts[a]||0));
-  const total=simDistricts.length;
-  let h=`<div class="sim-final-title">Election Night Results</div><div class="sim-final-sub">All ${total} districts reported</div><div class="sim-final-results">`;
+  const totalVotes=Object.values(simVoteTotals).reduce((a,b)=>a+b,0);
+  const totalDistricts=simDistricts.length;
+  // Sort by vote total (primary) then districts won (tiebreak)
+  const sorted=[...cands].sort((a,b)=>{
+    const vd=(simVoteTotals[b]||0)-(simVoteTotals[a]||0);
+    return vd!==0?vd:(simWinCounts[b]||0)-(simWinCounts[a]||0);
+  });
+  const coveredDists=simDistricts.filter(id=>simDistrictPriors[id]&&Object.keys(simDistrictPriors[id]).length>0).length;
+  const volVal=document.getElementById('simVolSlider').value;
+
+  let h=`<div class="sim-final-title">Election Night Results</div>
+    <div class="sim-final-sub">All ${totalDistricts} districts · ${totalVotes.toLocaleString()} votes cast</div>
+    <div class="sim-final-results">`;
+
   sorted.forEach((k,i)=>{
-    const w=simWinCounts[k]||0,pct=(w/total*100).toFixed(1);
+    const v=simVoteTotals[k]||0;
+    const pct=totalVotes>0?((v/totalVotes)*100).toFixed(1):'0.0';
+    const won=simWinCounts[k]||0;
+    const wc=candidateColor(k);
     h+=`<div class="sim-final-row ${i===0?'winner-row':''}">
       ${i===0?'<div class="sim-final-icon">👑</div>':'<div class="sim-final-rank">#'+(i+1)+'</div>'}
-      <div class="sim-final-swatch" style="background:${candidateColor(k)}"></div>
+      <div class="sim-final-swatch" style="background:${wc}"></div>
       <div class="sim-final-name">${candidateName(k)}</div>
-      <div class="sim-final-pct">${pct}%</div>
-      <div class="sim-final-wins">${w}</div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0">
+        <div style="font-family:var(--font-display);font-size:20px;font-weight:900;color:${i===0?'var(--accent2)':'var(--text)'};line-height:1">${pct}%</div>
+        <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:1px">${v.toLocaleString()} votes · ${won}W</div>
+      </div>
     </div>`;
   });
-  h+=`</div><div class="sim-final-actions">
-    <div class="sim-final-btn" onclick="document.getElementById('simFinalOverlay').style.display='none'">📍 View Map</div>
-    <div class="sim-final-btn primary" onclick="simReset()">↺ New Simulation</div>
-  </div>`;
-  const ov=document.getElementById('simFinalOverlay');
-  ov.innerHTML=h;ov.style.display='flex';
-}
 
-// ── Click a district during sim to see detail ──
-function showSimDistrictDetail(id){
-  const res=simDistrictResults[id];
-  if(!res){
-    // District hasn't reported yet — show in results panel
-    goPanel('panelResults');
-    document.getElementById('resultsScroll').innerHTML=`<div class="placeholder"><div class="icon">⏳</div>Group ${id}<br>Not yet reported.</div>`;
-    return;
-  }
-  goPanel('panelResults');
-  const sorted=Object.entries(res.votes).sort((a,b)=>b[1]-a[1]);
-  const tot=res.total||1;
-  let h=`<div class="results-heading" style="margin-bottom:8px">Group ${id} <span style="font-family:var(--font-mono);font-size:9px;color:#ff9f00;background:rgba(255,159,0,0.1);border:1px solid rgba(255,159,0,0.2);padding:2px 6px;border-radius:3px">Simulation</span></div>`;
-  sorted.forEach(([k,v],i)=>{
-    const pct=((v/tot)*100).toFixed(1),leader=i===0,wc=candidateColor(k);
-    h+=`<div class="candidate-row"><div class="candidate-swatch" style="background:${wc}"></div><span class="candidate-name ${leader?'leader':''}">${candidateName(k)}${leader?'<span class="winner-tag">✔ Winner</span>':''}</span><span class="candidate-votes ${leader?'leader':''}">${v} · ${pct}%</span></div><div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${wc}"></div></div>`;
+  // Vote share bar
+  h+=`</div><div style="height:8px;border-radius:4px;overflow:hidden;display:flex;margin-bottom:14px">`;
+  sorted.forEach(k=>{
+    const v=simVoteTotals[k]||0;
+    const pct=totalVotes>0?((v/totalVotes)*100).toFixed(2):'0';
+    h+=`<div style="width:${pct}%;background:${candidateColor(k)};transition:width 0.5s ease"></div>`;
   });
-  const margin=sorted.length>1?((sorted[0][1]-sorted[1][1])/tot*100).toFixed(1):null;
-  if(margin)h+=`<hr class="district-divider"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Margin</span><span style="font-family:var(--font-mono);font-size:13px;color:${candidateColor(res.winner)};font-weight:500">+${margin}%</span></div>`;
-  h+=`<hr class="district-divider"><div style="color:var(--muted);font-size:11px;margin-bottom:3px">Total votes cast</div><div style="font-family:var(--font-mono);font-size:17px;color:var(--accent);margin-bottom:12px">${tot}</div>`;
-  h+=`<div onclick="selectedDistrictId=null;geoLayer.setStyle(styleFeature);goPanel('panelSim')" style="color:var(--muted);font-size:11px;text-align:center;padding:6px 0;cursor:pointer;text-decoration:underline">← Back to simulation</div>`;
-  document.getElementById('resultsScroll').innerHTML=h;
-}
-</script>
-</body>
-</html>
+  h+=`</div>`;
+
+  // Stats
+  h+=`<div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    ${simUpsetCount>0?`<div style="flex:1;background:rgba(112,72,232,0.12);border:1px solid rgba(112,72,232,0.3);border-radius:6px;padding:7px 10px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:#9b8fe8">${simUpsetCount}</div><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Upsets</div></div>`:''}
+    <div style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent2)">${totalVotes}</div><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Total votes</div></div>
+    <div style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent2)">${volVal}%</div><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Volatility</div></div>
+  </div>
+  <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:12px;line-height:1.6;padding:5px 8px;background:var(--surface2);border-radiu
