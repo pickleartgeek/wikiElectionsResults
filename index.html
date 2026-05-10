@@ -395,7 +395,7 @@
 
           <div class="sim-section-hd">Volatility</div>
           <div class="sim-config-row">
-            <span class="sim-config-label">District variance</span>
+            <span class="sim-config-label">Group variance</span>
             <input type="range" class="sim-slider" id="simVolSlider" min="0" max="100" value="40"
               oninput="document.getElementById('simVolVal').textContent=this.value+'%'">
             <span class="sim-config-val" id="simVolVal">40%</span>
@@ -422,7 +422,7 @@
       <div id="simLiveView" class="sim-live" style="display:none">
         <div class="sim-ticker"><div class="sim-ticker-inner" id="simTicker"></div></div>
         <div class="sim-scoreboard">
-          <div class="sim-sb-title">Seat Count</div>
+          <div class="sim-sb-title">Popular Vote</div>
           <div id="simScoreboard"></div>
         </div>
         <div class="sim-districts-area">
@@ -1103,7 +1103,7 @@ function showDistrict(id){
 // ══════════════════════════════════════════════════════════════
 //  ████  ELECTION SIMULATOR  ████
 // ══════════════════════════════════════════════════════════════
-let simSpeedMs         = 600;
+let simSpeedMs         = 1000;
 let simTimer           = null;
 let simPaused          = false;
 let simActive          = false;
@@ -1454,7 +1454,7 @@ function simTick(cands){
 }
 
 function simFinish(cands){
-  document.getElementById('simStatusText').textContent='All districts reporting';
+  document.getElementById('simStatusText').textContent='All groups reporting';
   document.getElementById('simPauseBtn').disabled=true;
   buildFinalOverlay(cands);
 }
@@ -1598,7 +1598,7 @@ function buildFinalOverlay(cands){
     <div style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent2)">${volVal}%</div><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Volatility</div></div>
   </div>
   <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:12px;line-height:1.6;padding:5px 8px;background:var(--surface2);border-radius:4px;border-left:2px solid var(--border)">
-    Dirichlet · recency-weighted priors · ${coveredDists}/${totalDistricts} districts with prior data
+    Dirichlet · recency-weighted priors · ${coveredDists}/${totalDistricts} groups with prior data
   </div>`;
 
   h+=`<div class="sim-final-actions">
