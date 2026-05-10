@@ -579,14 +579,59 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png'
 // ══════════════════════════════════════════════════════════════
 //  BOOT
 // ══════════════════════════════════════════════════════════════
-function showFetchError(w){
-  document.getElementById('tlScroll').innerHTML=`<div class="placeholder"><div class="icon">⚠️</div><strong style="color:#e05555">Could not load ${w}</strong><br>Place files in the same folder and use a local server.</div>`;
+function showFetchError(msg){
+  document.getElementById('tlScroll').innerHTML=`<div class="placeholder">
+    <div class="icon">⚠️</div>
+    <strong style="color:#e05555">Failed to load data</strong><br>
+    <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted);word-break:break-all">${msg}</span><br><br>
+    Make sure <code style="font-family:var(--font-mono);font-size:10px;color:var(--accent)">results.json</code> and your GeoJSON file are in the same folder as this HTML file, and open it via a local server (not <code style="font-family:var(--font-mono);font-size:10px">file://</code>).
+  </div>`;
 }
+
+// Catch any uncaught JS errors and surface them in the sidebar
+window.addEventListener('error', e => {
+  const el = document.getElementById('tlScroll');
+  if (el && el.textContent.includes('Loading')) {
+    showFetchError(`JS error: ${e.message} (line ${e.lineno})`);
+  }
+});
+
+// Try a list of common geojson filenames so the user doesn't have to rename their file
+const GEOJSON_CANDIDATES = [
+  'your-geojson.geojson',
+  'map.geojson',
+  'districts.geojson',
+  'groups.geojson',
+  'data.geojson',
+  'tsr.geojson',
+  'spinroom.geojson',
+  'map.json',
+  'districts.json',
+];
+
+async function tryFetchGeoJSON() {
+  for (const name of GEOJSON_CANDIDATES) {
+    try {
+      const r = await fetch(name);
+      if (r.ok) {
+        const data = await r.json();
+        // Validate it looks like GeoJSON
+        if (data && (data.type === 'FeatureCollection' || data.features)) return data;
+      }
+    } catch(e) { /* try next */ }
+  }
+  return null;
+}
+
 Promise.all([
-  fetch('results.json').then(r=>{if(!r.ok)throw new Error('results.json');return r.json();}),
-  fetch('your-geojson.geojson').then(r=>{if(!r.ok)throw new Error('.geojson');return r.json();})
-]).then(([data,geo])=>{
-  geojsonCache=geo;
+  fetch('results.json').then(r => { if (!r.ok) throw new Error('results.json not found (HTTP ' + r.status + ')'); return r.json(); }),
+  tryFetchGeoJSON()
+]).then(([data, geo]) => {
+  if (!geo) {
+    showFetchError(`GeoJSON not found. Tried: ${GEOJSON_CANDIDATES.join(', ')}. Rename your GeoJSON file to one of these names and place it next to index.html.`);
+    return;
+  }
+  geojsonCache = geo;
   let elections;
   if(Array.isArray(data)){ elections=data; }
   else if(data&&Array.isArray(data.elections)){
@@ -612,7 +657,6 @@ Promise.all([
           else if(simActive) showSimDistrictDetail(id);
           else showDistrict(id);
           geoLayer.setStyle(styleFeature);
-          if(IS_ADMIN&&!shiftMode&&!simActive) updateCallBar();
         },
         mouseover:e=>{ if(e.target.feature.properties.id!==selectedDistrictId) e.target.setStyle({weight:2.5,fillOpacity:0.92}); },
         mouseout:e=>{ if(e.target.feature.properties.id!==selectedDistrictId) geoLayer.resetStyle(e.target); }
@@ -1553,4 +1597,85 @@ function buildFinalOverlay(cands){
     <div style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent2)">${totalVotes}</div><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Total votes</div></div>
     <div style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;text-align:center"><div style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent2)">${volVal}%</div><div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Volatility</div></div>
   </div>
-  <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:12px;line-height:1.6;padding:5px 8px;background:var(--surface2);border-radiu
+  <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:12px;line-height:1.6;padding:5px 8px;background:var(--surface2);border-radius:4px;border-left:2px solid var(--border)">
+    Dirichlet · recency-weighted priors · ${coveredDists}/${totalDistricts} districts with prior data
+  </div>`;
+
+  h+=`<div class="sim-final-actions">
+    <div class="sim-final-btn" onclick="document.getElementById('simFinalOverlay').style.display='none'">📍 View Map</div>
+    <div class="sim-final-btn primary" onclick="simReset()">↺ New Simulation</div>
+  </div>`;
+
+  const ov=document.getElementById('simFinalOverlay');
+  ov.innerHTML=h;ov.style.display='flex';
+}
+
+// ── Click a district during sim to see detail ──
+function showSimDistrictDetail(id){
+  const res=simDistrictResults[id];
+  if(!res){
+    goPanel('panelResults');
+    document.getElementById('resultsScroll').innerHTML=`<div class="placeholder"><div class="icon">⏳</div>Group ${id}<br>Not yet reported.</div>`;
+    return;
+  }
+  goPanel('panelResults');
+  const sorted=Object.entries(res.votes).sort((a,b)=>b[1]-a[1]);
+  const tot=res.total||1;
+  const priors=simDistrictPriors[id]||{};
+
+  let h=`<div class="results-heading" style="margin-bottom:8px">Group ${id}
+    <span style="font-family:var(--font-mono);font-size:9px;color:#ff9f00;background:rgba(255,159,0,0.1);border:1px solid rgba(255,159,0,0.2);padding:2px 6px;border-radius:3px">Simulation</span>
+    ${res.isUpset?'<span class="flip-badge">🔀 Upset</span>':''}
+  </div>`;
+
+  sorted.forEach(([k,v],i)=>{
+    const pct=((v/tot)*100).toFixed(1),leader=i===0,wc=candidateColor(k);
+    const nk=normalizeCandidateKey(k);
+    const prior=priors[nk];
+    const priorPct=prior?(prior.meanShare*100).toFixed(1):null;
+    const priorBar=priorPct
+      ?`<div style="margin:-4px 0 7px;display:flex;align-items:center;gap:5px">
+          <div style="flex:1;height:2px;background:var(--surface2);border-radius:1px;overflow:hidden">
+            <div style="width:${priorPct}%;height:100%;background:${wc};opacity:0.4;border-radius:1px"></div>
+          </div>
+          <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted);white-space:nowrap">Prior ${priorPct}%</span>
+        </div>`
+      :'';
+    h+=`<div class="candidate-row">
+      <div class="candidate-swatch" style="background:${wc}"></div>
+      <span class="candidate-name ${leader?'leader':''}">${candidateName(k)}${leader?'<span class="winner-tag">✔ Winner</span>':''}</span>
+      <span class="candidate-votes ${leader?'leader':''}">${v} · ${pct}%</span>
+    </div>
+    <div class="vote-bar-track"><div class="vote-bar-fill" style="width:${pct}%;background:${wc}"></div></div>
+    ${priorBar}`;
+  });
+
+  const margin=sorted.length>1?((sorted[0][1]-sorted[1][1])/tot*100).toFixed(1):null;
+  if(margin) h+=`<hr class="district-divider">
+    <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+      <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase">Margin</span>
+      <span style="font-family:var(--font-mono);font-size:13px;color:${candidateColor(res.winner)};font-weight:500">+${margin}%</span>
+    </div>`;
+
+  h+=`<hr class="district-divider">
+    <div style="color:var(--muted);font-size:11px;margin-bottom:3px">Simulated votes cast</div>
+    <div style="font-family:var(--font-mono);font-size:17px;color:var(--accent);margin-bottom:10px">${tot}</div>`;
+
+  if(res.isUpset){
+    const histPlur=simHistoricalPlurality[id];
+    const histCandKey=simActiveCands.find(k=>normalizeCandidateKey(k)===histPlur);
+    const histName=histCandKey?candidateName(histCandKey):(histPlur||'unknown');
+    h+=`<div style="background:linear-gradient(135deg,rgba(59,91,219,0.18),rgba(112,72,232,0.18));border:1px solid rgba(112,72,232,0.3);border-radius:6px;padding:9px 12px;margin-bottom:10px">
+      <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9b8fe8;margin-bottom:3px">🔀 Upset</div>
+      <div style="font-size:12px;color:var(--text)">Historical favourite: <span style="color:#9b8fe8">${histName}</span></div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px">Dirichlet draw flipped the expected result</div>
+    </div>`;
+  }
+
+  h+=`<div onclick="selectedDistrictId=null;geoLayer.setStyle(styleFeature);goPanel('panelSim')"
+    style="color:var(--muted);font-size:11px;text-align:center;padding:6px 0;cursor:pointer;text-decoration:underline">← Back to simulation</div>`;
+  document.getElementById('resultsScroll').innerHTML=h;
+}
+</script>
+</body>
+</html>
