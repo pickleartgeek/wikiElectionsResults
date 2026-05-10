@@ -67,6 +67,48 @@
     }
   },
   {
+    "id": "Class 5 September",
+    "title": "Class 5 Special Election",
+    "date": "2025-10-02",
+    "party": "Special",
+    "turnout": 62,
+    "precincts_reporting": 100,
+    "precincts_total": 100,
+    "first_round": {
+      "races": {
+        "Class 5 September First Round": {
+          "1": { "fw": 3, "gsx": 2, "rf": 0, "snjj": 0 },
+          "2": { "fw": 1, "gsx": 1, "rf": 0, "snjj": 0 },
+          "3": { "fw": 2, "gsx": 1, "rf": 1, "snjj": 0 },
+          "4": { "fw": 1, "gsx": 2, "rf": 0, "snjj": 0 },
+          "5": { "fw": 0, "gsx": 2, "rf": 1, "snjj": 1 },
+          "6": { "fw": 3, "gsx": 3, "rf": 0, "snjj": 0 },
+          "7": { "fw": 1, "gsx": 2, "rf": 0, "snjj": 0 },
+          "8": { "fw": 3, "gsx": 0, "rf": 0, "snjj": 0 },
+          "9": { "fw": 1, "gsx": 1, "rf": 1, "snjj": 0 }
+        }
+      }
+    },
+    "runoff_round": {
+      "turnout": 62,
+      "precincts_reporting": 100,
+      "precincts_total": 100,
+      "races": {
+        "Class 5 September Runoff": {
+          "1": { "fw": 3, "gsx": 2 },
+          "2": { "fw": 1, "gsx": 1 },
+          "3": { "fw": 2, "gsx": 2 },
+          "4": { "fw": 1, "gsx": 2 },
+          "5": { "fw": 2, "gsx": 2 },
+          "6": { "fw": 3, "gsx": 3 },
+          "7": { "fw": 1, "gsx": 2 },
+          "8": { "fw": 3, "gsx": 0 },
+          "9": { "fw": 1, "gsx": 2 }
+        }
+      }
+    }
+  },
+  {
     "id": "Class 1 September",
     "title": "Class 1 Election",
     "date": "2025-10-02",
