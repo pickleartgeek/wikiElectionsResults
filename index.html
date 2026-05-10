@@ -1397,7 +1397,7 @@ function simStart(checkedMap){
   if(cands.length<2)return;
   simActiveCands=cands;
   simDistricts=simGetDistricts();
-  if(!simDistricts.length){alert('No districts loaded from GeoJSON.');return;}
+  if(!simDistricts.length){alert('No groups loaded from GeoJSON.');return;}
 
   simActive=true;simPaused=false;
   simDistrictResults={};simWinCounts={};simVoteTotals={};simUpsetCount=0;
@@ -1563,7 +1563,7 @@ function buildFinalOverlay(cands){
   const volVal=document.getElementById('simVolSlider').value;
 
   let h=`<div class="sim-final-title">Election Night Results</div>
-    <div class="sim-final-sub">All ${totalDistricts} districts · ${totalVotes.toLocaleString()} votes cast</div>
+    <div class="sim-final-sub">All ${totalDistricts} groups · ${totalVotes.toLocaleString()} votes cast</div>
     <div class="sim-final-results">`;
 
   sorted.forEach((k,i)=>{
