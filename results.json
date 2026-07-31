@@ -1,5 +1,30 @@
 [
   {
+    "id": "Class 6",
+    "title": "Class 6 Election",
+    "date": "2026-07-31",
+    "party": "Regular",
+    "turnout": 15,
+    "precincts_reporting": 53,
+    "precincts_total": 100,
+    "first_round": {
+      "races": {
+        "Class 6": {
+          "1": { "wip":0, "dvwb":0, "jc17":0, "nzb":1, "ictoan": 1, "mf1": 0, "hkf": 0},
+          "2": { "wip":0, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 0},
+          "3": { "wip":1, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 1},
+          "4": { "wip":0, "dvwb":0, "jc17":1, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 0},
+          "5": { "wip":0, "dvwb":0, "jc17":0, "nzb":1, "ictoan": 0, "mf1": 0, "hkf": 0},
+          "6": { "wip":0, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 0},
+          "7": { "wip":1, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 0},
+          "8": { "wip":0, "dvwb":1, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 1, "hkf": 0},
+          "9": { "wip":0, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 0}
+        }
+      }
+    },
+    "runoff_round": null
+  },
+  {
     "id": "Class 4",
     "title": "Class 4 Election",
     "date": "2026-04-11",
