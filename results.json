@@ -1,7 +1,7 @@
 [
   {
-    "id": "Class 6 2026",
-    "title": "Class 6 Election",
+    "id": "Class 6 2026-07",
+    "title": "Class 6 July 2026 Election",
     "date": "2026-07-31",
     "party": "Regular",
     "turnout": 15,
@@ -9,7 +9,7 @@
     "precincts_total": 100,
     "first_round": {
       "races": {
-        "Class 6": {
+        "Class 6 July 2026 First RCV Round": {
           "1": { "wip":0, "dvwb":0, "jc17":0, "nzb":1, "ictoan": 1, "mf1": 0, "hkf": 0},
           "2": { "wip":0, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 0},
           "3": { "wip":1, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 1},
