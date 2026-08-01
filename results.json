@@ -4,9 +4,10 @@
     "title": "Class 6 July 2026 Election",
     "date": "2026-07-31",
     "party": "Regular",
-    "turnout": 33, 
-    "precincts_reporting": 90,
+    "turnout": 35, 
+    "precincts_reporting": 95,
     "precincts_total": 100,
+    "winner": "wip"
     "first_round": {
       "races": {
         "Class 6 July 2026 First Round": {
