@@ -7,7 +7,7 @@
     "turnout": 35, 
     "precincts_reporting": 95,
     "precincts_total": 100,
-    "winner": "wip"
+    "winner": "wip",
     "first_round": {
       "races": {
         "Class 6 July 2026 First Round": {
