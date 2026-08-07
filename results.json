@@ -37,6 +37,8 @@
                 "7": { "wip":1, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 0},
                 "8": { "wip":0, "dvwb":1, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 2, "hkf": 0},
                 "9": { "wip":1, "dvwb":0, "jc17":0, "nzb":0, "ictoan": 0, "mf1": 0, "hkf": 0}
+       }
+     }
     }
   },
   {
@@ -60,7 +62,7 @@
           "8": { "wc": 2, "qtw": 0 },
           "9": { "wc": 1, "qtw": 0 }
         }
-      }
+      }   
     },
     "runoff_round": null
   },
@@ -86,6 +88,7 @@
           "9": { "dvwb": 1, "gsx": 0, "rf": 0 }
         }
       }
+    } 
     },
     "runoff_round": {
       "turnout": 38,
