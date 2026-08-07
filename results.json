@@ -43,7 +43,7 @@
   },
   {
     "id": "Class 4",
-    "title": "Class 4 Election",
+    "title": "Class 4",
     "date": "2026-04-11",
     "party": "Special",
     "turnout": 38,
@@ -68,7 +68,7 @@
   },
   {
     "id": "Class 5",
-    "title": "Class 5 Election",
+    "title": "Class 5",
     "date": "2026-04-11",
     "party": "Special",
     "turnout": 38,
@@ -110,7 +110,7 @@
   },
   {
     "id": "Class 5 September",
-    "title": "Class 5 Special Election",
+    "title": "Class 5",
     "date": "2025-10-02",
     "party": "Special",
     "turnout": 62,
@@ -152,7 +152,7 @@
   },
   {
     "id": "Class 1 September",
-    "title": "Class 1 Election",
+    "title": "Class 1",
     "date": "2025-10-02",
     "party": "Regular",
     "turnout": 62,
@@ -194,7 +194,7 @@
   },
   {
     "id": "Class 2 July",
-    "title": "Class 2 Election",
+    "title": "Class 2",
     "date": "2025-08-03",
     "party": "Special",
     "turnout": 72,
@@ -247,7 +247,7 @@
   },
   {
     "id": "Class 7 July",
-    "title": "Class 7 Election",
+    "title": "Class 7",
     "date": "2025-08-03",
     "party": "Regular",
     "turnout": 72,
@@ -289,7 +289,7 @@
   },
   {
   "id": "Class 6 June",
-  "title": "Class 6 Election",
+  "title": "Class 6",
   "date": "2025-06-26",
   "party": "Regular",
   "turnout": 55,
