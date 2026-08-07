@@ -312,9 +312,4 @@
     }
   }
 },
-"race_calls",: {    
-     "Class 6 July": { "status": "runoff", "winner": "wip" },
-     "Class 4": { "status": "winner", "winner": "wc" },
-     "Class 5": { "status": "runoff", "winner": "dvwb" }
-}
 ]
