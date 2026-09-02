@@ -362,7 +362,7 @@ let reporting = 99.99;
 let map = L.map('map', { zoomControl: false }).setView([40, -95], 4);
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+L.tileLayer('https://basemaps.cartocdn.com/rastertiles/dark_nolabels/%7Bz%7D/%7Bx%7D/%7By%7D.png?key=cb1_2ta3_1_c4fc38dd4c1971e2cf952baf', {
   attribution: '&copy; OpenStreetMap &copy; CARTO',
   maxZoom: 19
 }).addTo(map);
